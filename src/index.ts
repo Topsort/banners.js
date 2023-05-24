@@ -17,19 +17,6 @@ const getDeviceType = (): "mobile" | "desktop" => {
   return "desktop";
 };
 
-const getAspectRatio = (width: number, height: number): string => {
-  // Calculate GCD
-  let x = width;
-  let y = height;
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-
-  return `${width / x}:${height / x}`;
-};
-
 interface Loading {
   status: "loading";
 }
@@ -52,19 +39,30 @@ interface Ready {
 
 type BannerState = Loading | Errored | NoWinners | Ready;
 
+function getLink(banner: any) {
+  if (banner.type === "url") {
+    return banner.id;
+  } else {
+    return `${banner.type}/${banner.id}`;
+  }
+}
+
 @customElement("topsort-banner")
 export class TopsortBanner extends LitElement {
   @property({ attribute: "topsort-api-key", type: String })
-  apiKey: string;
+  readonly apiKey?: string;
 
   @property({ attribute: "topsort-api-url", type: String })
-  apiUrl: string;
+  readonly apiUrl?: string;
 
   @property({ type: Number })
-  width: number;
+  readonly width = 0;
 
   @property({ type: Number })
-  height: number;
+  readonly height = 0;
+
+  @property({ type: String })
+  readonly slotId?: string;
 
   @state()
   private _state: BannerState = {
@@ -80,7 +78,7 @@ export class TopsortBanner extends LitElement {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "User-Agent": "topsort/banners",
+          "User-Agent": "topsort/banners 1.0.0",
         },
         body: JSON.stringify({
           auctions: [
@@ -88,7 +86,7 @@ export class TopsortBanner extends LitElement {
               type: "banners",
               slots: 1,
               device,
-              aspectRatio: getAspectRatio(this.width, this.height),
+              slotId: this.slotId,
             },
           ],
         }),
@@ -106,7 +104,7 @@ export class TopsortBanner extends LitElement {
               status: "ready",
               asset: data.results[0].winners[0].asset,
               resolvedBidId: data.winners[0].resolvedBidId,
-              href: `/products/${data.winners[0].id}`,
+              href: getLink(data.winners[0]),
             };
           }
         } else {
@@ -131,13 +129,6 @@ export class TopsortBanner extends LitElement {
     }
   }
 
-  async handleClick() {
-    // TODO: Handle click events on this banner using a queue in localstorage
-    if (this._state.status === "ready") {
-      // Only handle clicks on a ready banner
-    }
-  }
-
   // Runs when DOM is loaded. Much like React's `getInitialProps`
   connectedCallback() {
     super.connectedCallback();
@@ -146,22 +137,23 @@ export class TopsortBanner extends LitElement {
 
   render() {
     switch (this._state.status) {
-      case "ready":
+      case "ready": {
         //const srcset = this._state.asset.join(", ");
         const src = this._state.asset[0].url;
         const style = css`
           img {
-            max-width: 100%;
-            height: auto;
+            width: ${this.width}px;
+            height: ${this.height}px;
           }
         `;
         return html`
-        <div style="${style}">
+        <div style="${style}" data-ts-resolved-bid-id=${this._state.resolvedBidId}>
           <a href="${this._state.href}">
             <img src="${src}"></img>
           </a>
         </div>
-      `;
+        `;
+      }
       case "loading":
         return html`<marquee>Loading</marquee>`;
       case "errored":
