@@ -1,5 +1,5 @@
 {
-  "name": "banner-web-components",
+  "name": "@Topsort/banners",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -16,7 +16,7 @@
     "dev": "vite",
     "build": "tsc && vite build"
   },
-  "author": "PabloReszczynski",
+  "author": "Pablo Reszczynski <pablo@topsort.com>",
   "devDependencies": {
     "typescript": "^4.8.3",
     "vite": "^3.1.3",
