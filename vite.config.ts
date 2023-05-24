@@ -1,13 +1,13 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
     lib: {
-      entry: 'src/index.ts',
-      format: ['es']
+      entry: "src/index.ts",
+      formats: ["es"],
     },
     rollupOptions: {
-      external: /^lit/
-    }
-  }
-})
+      external: /^lit/,
+    },
+  },
+});
