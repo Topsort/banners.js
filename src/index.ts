@@ -52,9 +52,6 @@ export class TopsortBanner extends LitElement {
   @property({ attribute: "topsort-api-key", type: String })
   readonly apiKey?: string;
 
-  @property({ attribute: "topsort-api-url", type: String })
-  readonly apiUrl?: string;
-
   @property({ type: Number })
   readonly width = 0;
 
@@ -72,7 +69,7 @@ export class TopsortBanner extends LitElement {
   async runAuction() {
     const device = getDeviceType();
     try {
-      const res = await fetch(`${this.apiUrl}/api/v2/auctions`, {
+      const res = await fetch("api.topsort.com/v2/auctions", {
         method: "POST",
         mode: "cors",
         headers: {
