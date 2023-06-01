@@ -8,6 +8,13 @@
   "main": "dist/banners.js",
   "module": "dist/banners.js",
   "license": "MIT",
+  "keywords": [
+    "banners",
+    "web-components",
+    "topsort",
+    "ads"
+  ],
+  "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
     ".": "./dist/banners.js"
   },
