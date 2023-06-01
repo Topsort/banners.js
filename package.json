@@ -4,6 +4,7 @@
   "version": "0.0.1-alpha",
   "description": "",
   "type": "module",
+  "author": "Topsort",
   "main": "dist/banners.js",
   "module": "dist/banners.js",
   "license": "MIT",
@@ -35,6 +36,7 @@
   },
   "prettier": {
     "useTabs": false,
-    "tabWidth": 2
+    "tabWidth": 2,
+    "printWidth": 100
   }
 }
