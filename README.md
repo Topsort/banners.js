@@ -1,4 +1,4 @@
-#[version](https://img.shields.io/npm/v/@topsort/banners)
+![version](https://img.shields.io/npm/v/@topsort/banners)
 ![downloads](https://img.shields.io/npm/dw/@topsort/banners)
 ![license](https://img.shields.io/github/license/Topsort/banners.js)
 ![GitHub Repo stars](https://img.shields.io/github/stars/topsort/banners.js?style=social)
