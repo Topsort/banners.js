@@ -13,6 +13,6 @@ export default defineConfig({
     },
   },
   define: {
-    APP_VERSION: JSON.stringify(process.env.npm_package_version),
+    'import.meta.env.PACKAGE_VERSION': JSON.stringify(process.env.npm_package_version),
   }
 });

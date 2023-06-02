@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, TemplateResult, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
 /* Set up global environment for TS_BANNERS */
@@ -86,7 +86,7 @@ export class TopsortBanner extends LitElement {
     status: "loading",
   };
 
-  private getLink(banner: Banner) {
+  private getLink(banner: Banner): string {
     if (window.TS_BANNERS.getLink) {
       return window.TS_BANNERS.getLink(banner);
     }
@@ -97,16 +97,18 @@ export class TopsortBanner extends LitElement {
     }
   }
 
-  private getLoadingElement() {
+  private getLoadingElement(): TemplateResult {
     if (window.TS_BANNERS.getLoadingElement) {
-      return window.TS_BANNERS.getLoadingElement();
+      const element = window.TS_BANNERS.getLoadingElement();
+      return html`${element}`;
     }
-    return html`<marquee>Loading</marquee>`;
+    return html`<div>Loading</div>`;
   }
 
-  private getErrorElement(error: Error) {
+  private getErrorElement(error: Error): TemplateResult {
     if (window.TS_BANNERS.getErrorElement) {
-      return window.TS_BANNERS.getErrorElement(error);
+      const element = window.TS_BANNERS.getErrorElement(error);
+      return html`${element}`;
     }
     return html`<pre>${error.message}</pre>`;
   }
@@ -120,7 +122,7 @@ export class TopsortBanner extends LitElement {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "User-Agent": "topsort/banners 0.0.1-alpha",
+          "User-Agent": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}}`,
         },
         body: JSON.stringify({
           auctions: [
