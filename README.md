@@ -62,6 +62,7 @@ window.TS_BANNERS = {
 # Banner Interface
 
 | Name            | Type                                        | Description                                                                  |
+|-----------------|---------------------------------------------|------------------------------------------------------------------------------|
 | `type`          | `"product" \| "vendor" \| "brand" \| "url"` | The type of the winning entity, represented by the banner.                   |
 | `id`            | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
