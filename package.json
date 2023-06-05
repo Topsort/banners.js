@@ -24,7 +24,7 @@
     "types"
   ],
   "scripts": {
-    "dev": "vite serve ./example",
+    "dev": "vite serve",
     "build": "tsc && vite build"
   },
   "devDependencies": {

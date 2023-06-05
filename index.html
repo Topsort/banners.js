@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Topsort Banner</title>
+		<script  type="module"  src="https://unpkg.com/skeleton-webcomponent-loader@1.0.5/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"></script>
+    <script
+      type="module"
+      src="src/index.ts"></script>
+  </head>
+	<script>
+		window.TS_BANNERS = {
+			getLoadingElement() {
+				return document.createElement('nb-skeleton');
+			},
+		};
+	</script>
+  <body>
+    <div style="outline 1px solid black">
+      <topsort-banner
+        topsort-api-key="alala"
+        slot-id="alala"
+        width="600"
+        height="400"
+        ></topsort-banner>
+    </div>
+  </body>
+</html>
+
