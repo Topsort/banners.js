@@ -6,9 +6,9 @@ import { customElement, property, state } from "lit/decorators.js";
 declare global {
   interface Window {
     TS_BANNERS: {
-      getLink: (banner: Banner) => string;
-      getLoadingElement: () => HTMLElement;
-      getErrorElement: (error: Error) => HTMLElement;
+      getLink(banner: Banner): string;
+      getLoadingElement(): HTMLElement;
+      getErrorElement(error: Error): HTMLElement;
     }
   }
 }
@@ -77,9 +77,6 @@ export class TopsortBanner extends LitElement {
 
   @property({ type: String })
   readonly slotId?: string;
-
-  @property({ type: String })
-  readonly class?: string;
 
   @state()
   private state: BannerState = {

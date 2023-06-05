@@ -5,16 +5,30 @@
 
 # Topsort Banner Ad Web component
 
-# Installation
-
-```bash
-npm install @topsort/banners.js
-```
-
 # Usage
 
+Directly from unpkg.com
+
 ```html
-<script type="module" src="node_modules/@topsort/banners/banners.js"></script>
+<script type="module" src="unpkg.com/@topsort/banners@0.0.1-alpha/dist/banners.js"></script>
+<script>
+// Custom behavior can be configured for each site.
+window.TS_BANNERS = {
+  getLink(banner) {
+    return "https://example.com/" + banner.id;
+  },
+  getLoadingElement() {
+    const el = document.createElement("div");
+    el.innerText = "Loading...";
+    return el;
+  },
+  getErrorElement() {
+    const el = document.createElement("div");
+    el.innerText = "Error loading banner";
+    return el;
+  },
+}
+</script>
 <body>
   <topsort-banner
     topsort-api-key="<your api key>"
@@ -25,7 +39,8 @@ npm install @topsort/banners.js
 </body>
 ```
 
-# Attributes
+
+# Banner Attributes
 
 | Name            | Type   | Description                 |
 |-----------------|--------|-----------------------------|
@@ -33,4 +48,22 @@ npm install @topsort/banners.js
 | width           | Number | Banner width                |
 | height          | Number | Banner height               |
 | slot-id         | String | The slot ID for this banner |
+
+
+# Banner Behaviors
+
+| Function Name       | Arg type                    | Return Type   | Description                                              |
+|---------------------|-----------------------------|---------------|----------------------------------------------------------|
+| `getLink`           | [Banner](#banner-interface) | `string`      | Generates a URL from a banner response                   |
+| `getLoadingElement` |                             | `HTMLElement` | A custom element to be shown when the banner is loading. |
+| `getErrorElement`   |                             | `HTMLElement` | A custom element to be shown when the banner errors.     |
+
+
+# Banner Interface
+
+| Name            | Type                                        | Description                                                                  |
+| `type`          | `"product" \| "vendor" \| "brand" \| "url"` | The type of the winning entity, represented by the banner.                   |
+| `id`            | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
+| `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
+| `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
 
