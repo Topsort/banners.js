@@ -5,8 +5,8 @@
   "description": "",
   "type": "module",
   "author": "Topsort",
-  "main": "dist/banners.cjs",
-  "module": "dist/banners.cjs",
+  "main": "dist/banners.esm.js",
+  "module": "dist/banners.esm.js",
   "license": "MIT",
   "keywords": [
     "banners",
@@ -16,7 +16,7 @@
   ],
   "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
-    ".": "./dist/banners.cjs"
+    ".": "./dist/banners.esm.js"
   },
   "types": "types/index.d.ts",
   "files": [

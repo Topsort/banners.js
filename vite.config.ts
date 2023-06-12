@@ -4,7 +4,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: "src/index.ts",
-      formats: ["es", "cjs"],
+      formats: ["es"],
+      fileName: "banners.esm",
     },
     target: "modules",
     sourcemap: true,
