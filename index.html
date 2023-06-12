@@ -2,21 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Topsort Banner</title>
-		<script  type="module"  src="https://unpkg.com/skeleton-webcomponent-loader@1.0.5/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topsort Banner</title>
+    <script type="module"  src="https://unpkg.com/skeleton-webcomponent-loader@1.0.5/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"></script>
+    <script src="https://unpkg.com/@topsort/analytics.js"></script>
     <script
       async
       type="module"
       src="src/index.ts"></script>
   </head>
-	<script>
-		window.TS_BANNERS = {
-			getLoadingElement() {
-				return document.createElement('nb-skeleton');
-			},
-		};
-	</script>
+  <script>
+    window.TS_BANNERS = {
+      getLoadingElement() {
+        return document.createElement('nb-skeleton');
+      },
+    };
+  </script>
   <body>
     <div style="outline 1px solid black">
       <topsort-banner
