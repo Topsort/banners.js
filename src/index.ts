@@ -76,7 +76,7 @@ export class TopsortBanner extends LitElement {
   @property({ type: Number })
   readonly height = 0;
 
-  @property({ type: String })
+  @property({ attribute: "slot-id", type: String })
   readonly slotId?: string;
 
   @state()
@@ -183,10 +183,8 @@ export class TopsortBanner extends LitElement {
   }
 
   protected render() {
-    if (!this.apiKey) {
-      return this.getErrorElement(new TopsortConfigurationError("Missing API Key"));
-    } else if (!this.slotId) {
-      return this.getErrorElement(new TopsortConfigurationError("Missing Slot ID"));
+    if (!this.apiKey || !this.slotId) {
+      return this.getErrorElement(new TopsortConfigurationError(this.apiKey, this.slotId));
     }
     switch (this.state.status) {
       case "ready": {

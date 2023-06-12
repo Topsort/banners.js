@@ -24,8 +24,11 @@
       },
       getErrorElement(error) {
         const div = document.createElement('div');
-        div.innerText = "Error loading banner. Remember to setup the Topsort API key and Slot ID. See console for more details.";
-        console.error(error);
+        if (error.name === "TopsortConfigurationError") {
+          div.innerText = error.message;
+        } else {
+          div.innerText = "Couldn't load Banner. Check console for more details.";
+        }
         return div;
       },
     };
@@ -40,8 +43,8 @@
   <body>
     <div style="outline 1px solid black">
       <topsort-banner
-        topsort-api-key="alala"
-        slot-id="alala"
+        topsort-api-key="<your-topsort-api-key>"
+        slot-id="<your-slot-id>"
         width="600"
         height="400"
         ></topsort-banner>
