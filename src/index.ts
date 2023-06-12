@@ -119,7 +119,7 @@ export class TopsortBanner extends LitElement {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "User-Agent": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}}`,
+          "User-Agent": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
         },
         body: JSON.stringify({
           auctions: [
