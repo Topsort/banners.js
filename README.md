@@ -68,3 +68,18 @@ window.TS_BANNERS = {
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
 | `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
 
+
+# Running the example
+
+You can play around with the provided index.html file. To run it, you'll need to
+install the dependencies and start a local server.
+
+```bash
+git clone https://github.com/Topsort/banners.js.git
+cd banners.js
+npm install
+npm run dev
+```
+
+Remember to also replace the `topsort-api-key` and `slot-id` attributes with your
+own values that you can find at [Topsort](https://app.topsort.com/).
