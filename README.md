@@ -15,7 +15,7 @@ Directly from unpkg.com
 // Custom behavior can be configured for each site.
 window.TS_BANNERS = {
   getLink(banner) {
-    return "https://example.com/" + banner.id;
+    return `https://example.com/${banner.id}`;
   },
   getLoadingElement() {
     const el = document.createElement("div");
