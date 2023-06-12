@@ -9,7 +9,7 @@ declare global {
       getLink(banner: Banner): string;
       getLoadingElement(): HTMLElement;
       getErrorElement(error: Error): HTMLElement;
-    }
+    };
   }
 }
 
@@ -62,8 +62,8 @@ export interface Banner {
 type BannerState = Loading | Errored | NoWinners | Ready;
 
 /**
-  * A banner web component that runs an auction and renders the winning banner.
-  */
+ * A banner web component that runs an auction and renders the winning banner.
+ */
 @customElement("topsort-banner")
 export class TopsortBanner extends LitElement {
   @property({ attribute: "topsort-api-key", type: String })
