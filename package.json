@@ -5,8 +5,8 @@
   "description": "",
   "type": "module",
   "author": "Topsort",
-  "main": "dist/banners.js",
-  "module": "dist/banners.js",
+  "main": "dist/banners.esm.js",
+  "module": "dist/banners.esm.js",
   "license": "MIT",
   "keywords": [
     "banners",
@@ -16,7 +16,7 @@
   ],
   "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
-    ".": "./dist/banners.js"
+    ".": "./dist/banners.esm.js"
   },
   "types": "types/index.d.ts",
   "files": [
@@ -24,19 +24,21 @@
     "types"
   ],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build"
+    "dev": "vite serve",
+    "build": "tsc && vite build",
+    "lint": "eslint --ext .ts,.js .",
+    "lint:fix": "eslint --ext .ts,.js . --fix"
   },
-  "author": "Pablo Reszczynski <pablo@topsort.com>",
   "devDependencies": {
-    "typescript": "^5.1.3",
-    "vite": "^4.3.9",
+    "@types/node": "^20.2.5",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "typescript": "^5.1.3",
+    "vite": "^4.3.9"
   },
   "dependencies": {
     "lit": "^2.3.1"

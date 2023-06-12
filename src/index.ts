@@ -1,5 +1,20 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, TemplateResult, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { TopsortRequestError, TopsortConfigurationError } from "./errors";
+
+/* Set up global environment for TS_BANNERS */
+
+declare global {
+  interface Window {
+    TS_BANNERS: {
+      getLink(banner: Banner): string;
+      getLoadingElement(): HTMLElement;
+      getErrorElement(error: Error): HTMLElement;
+    };
+  }
+}
+
+window.TS_BANNERS = window.TS_BANNERS || {};
 
 const getDeviceType = (): "mobile" | "desktop" => {
   const ua = navigator.userAgent;
@@ -37,16 +52,19 @@ interface Ready {
   href: string;
 }
 
-type BannerState = Loading | Errored | NoWinners | Ready;
-
-function getLink(banner: any) {
-  if (banner.type === "url") {
-    return banner.id;
-  } else {
-    return `${banner.type}/${banner.id}`;
-  }
+/** The banner object returned from the auction request */
+export interface Banner {
+  type: "product" | "vendor" | "brand" | "url";
+  id: string;
+  resolvedBidId: string;
+  asset: [{ url: string }];
 }
 
+type BannerState = Loading | Errored | NoWinners | Ready;
+
+/**
+ * A banner web component that runs an auction and renders the winning banner.
+ */
 @customElement("topsort-banner")
 export class TopsortBanner extends LitElement {
   @property({ attribute: "topsort-api-key", type: String })
@@ -58,24 +76,51 @@ export class TopsortBanner extends LitElement {
   @property({ type: Number })
   readonly height = 0;
 
-  @property({ type: String })
+  @property({ attribute: "slot-id", type: String })
   readonly slotId?: string;
 
   @state()
-  private _state: BannerState = {
+  private state: BannerState = {
     status: "loading",
   };
 
-  async runAuction() {
+  private getLink(banner: Banner): string {
+    if (window.TS_BANNERS.getLink) {
+      return window.TS_BANNERS.getLink(banner);
+    }
+    if (banner.type === "url") {
+      return banner.id;
+    } else {
+      return `${banner.type}/${banner.id}`;
+    }
+  }
+
+  private getLoadingElement(): TemplateResult {
+    if (window.TS_BANNERS.getLoadingElement) {
+      const element = window.TS_BANNERS.getLoadingElement();
+      return html`${element}`;
+    }
+    return html`<div>Loading</div>`;
+  }
+
+  private getErrorElement(error: Error): TemplateResult {
+    if (window.TS_BANNERS.getErrorElement) {
+      const element = window.TS_BANNERS.getErrorElement(error);
+      return html`${element}`;
+    }
+    return html`<pre>${error.message}</pre>`;
+  }
+
+  private async runAuction() {
     const device = getDeviceType();
     try {
-      const res = await fetch("api.topsort.com/v2/auctions", {
+      const res = await fetch("https://api.topsort.com/v2/auctions", {
         method: "POST",
         mode: "cors",
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "User-Agent": "topsort/banners 0.0.1-alpha",
+          "User-Agent": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
         },
         body: JSON.stringify({
           auctions: [
@@ -92,35 +137,40 @@ export class TopsortBanner extends LitElement {
         const data = await res.json();
         if (data.results[0]) {
           if (data.results[0].error) {
-            this._state = {
+            this.state = {
               status: "errored",
               error: Error("Unknown Error"),
             };
           } else if (data.results[0].winners[0]) {
-            this._state = {
+            this.state = {
               status: "ready",
               asset: data.results[0].winners[0].asset,
               resolvedBidId: data.winners[0].resolvedBidId,
-              href: getLink(data.winners[0]),
+              href: this.getLink(data.winners[0]),
             };
           }
         } else {
-          this._state = {
+          this.state = {
             status: "nowinners",
           };
         }
       } else {
         const error = await res.json();
-        this._state = {
+        this.state = {
           status: "errored",
-          error: new Error(error.message),
+          error: new TopsortRequestError(error.message, res.status),
         };
       }
     } catch (err) {
       if (err instanceof Error) {
-        this._state = {
+        this.state = {
           status: "errored",
           error: err,
+        };
+      } else {
+        this.state = {
+          status: "errored",
+          error: Error("Unknown Error"),
         };
       }
     }
@@ -132,11 +182,13 @@ export class TopsortBanner extends LitElement {
     this.runAuction();
   }
 
-  render() {
-    switch (this._state.status) {
+  protected render() {
+    if (!this.apiKey || !this.slotId) {
+      return this.getErrorElement(new TopsortConfigurationError(this.apiKey, this.slotId));
+    }
+    switch (this.state.status) {
       case "ready": {
-        //const srcset = this._state.asset.join(", ");
-        const src = this._state.asset[0].url;
+        const src = this.state.asset[0].url;
         const style = css`
           img {
             width: ${this.width}px;
@@ -144,17 +196,17 @@ export class TopsortBanner extends LitElement {
           }
         `;
         return html`
-        <div style="${style}" data-ts-resolved-bid-id=${this._state.resolvedBidId}>
-          <a href="${this._state.href}">
-            <img src="${src}"></img>
+        <div style="${style}" data-ts-clickable data-ts-resolved-bid-id=${this.state.resolvedBidId}>
+          <a href="${this.state.href}">
+            <img src="${src}" alt="Topsort banner"></img>
           </a>
         </div>
         `;
       }
       case "loading":
-        return html`<marquee>Loading</marquee>`;
+        return this.getLoadingElement();
       case "errored":
-        return html`<pre>${this._state.error.message}</pre>`;
+        return this.getErrorElement(this.state.error);
     }
   }
 }
