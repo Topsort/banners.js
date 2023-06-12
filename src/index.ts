@@ -1,5 +1,6 @@
 import { LitElement, TemplateResult, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { TopsortRequestError, TopsortConfigurationError } from "./errors";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -157,7 +158,7 @@ export class TopsortBanner extends LitElement {
         const error = await res.json();
         this.state = {
           status: "errored",
-          error: new Error(error.message),
+          error: new TopsortRequestError(error.message, res.status),
         };
       }
     } catch (err) {
@@ -182,6 +183,11 @@ export class TopsortBanner extends LitElement {
   }
 
   protected render() {
+    if (!this.apiKey) {
+      return this.getErrorElement(new TopsortConfigurationError("Missing API Key"));
+    } else if (!this.slotId) {
+      return this.getErrorElement(new TopsortConfigurationError("Missing Slot ID"));
+    }
     switch (this.state.status) {
       case "ready": {
         const src = this.state.asset[0].url;
