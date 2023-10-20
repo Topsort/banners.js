@@ -2,11 +2,22 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@topsort/banners",
   "version": "0.0.1-alpha2",
-  "description": "",
+  "description": "A web component for displaying Topsort banner ads.",
   "type": "module",
   "author": "Topsort",
-  "main": "dist/banners.esm.js",
-  "module": "dist/banners.esm.js",
+  "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.6.0"
+  },
+  "keywords": [
+    "banners",
+    "web-components",
+    "topsort",
+    "ads"
+  ],
+  "main": "dist/banners.mjs",
+  "module": "dist/banners.mjs",
   "license": "MIT",
   "keywords": [
     "banners",
@@ -16,12 +27,18 @@
   ],
   "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
-    ".": "./dist/banners.esm.js"
+    ".": {
+      "import": "./dist/banners.mjs",
+      "types": "./types/index.d.ts"
+    }
   },
   "types": "types/index.d.ts",
   "files": [
     "dist",
-    "types"
+    "types",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
