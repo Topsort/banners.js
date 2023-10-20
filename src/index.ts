@@ -24,7 +24,7 @@ const getDeviceType = (): "mobile" | "desktop" => {
   }
   if (
     /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
-      ua
+      ua,
     )
   ) {
     return "mobile";
