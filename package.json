@@ -32,7 +32,7 @@
       "types": "./types/index.d.ts"
     }
   },
-  "types": "types/index.d.ts",
+  "types": ["types/index.d.ts", "types/banners.d.ts"],
   "files": [
     "dist",
     "types",
