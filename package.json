@@ -1,12 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@topsort/banners",
-  "version": "0.0.1-alpha",
-  "description": "",
+  "version": "0.0.1-alpha2",
+  "description": "A web component for displaying Topsort banner ads.",
   "type": "module",
   "author": "Topsort",
-  "main": "dist/banners.esm.js",
-  "module": "dist/banners.esm.js",
+  "packageManager": "pnpm@8.6.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.6.0"
+  },
+  "main": "dist/banners.mjs",
+  "module": "dist/banners.mjs",
   "license": "MIT",
   "keywords": [
     "banners",
@@ -16,12 +21,18 @@
   ],
   "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
-    ".": "./dist/banners.esm.js"
+    ".": {
+      "import": "./dist/banners.mjs",
+      "types": "./types/index.d.ts"
+    }
   },
-  "types": "types/index.d.ts",
+  "types": "dist/banners.d.ts",
   "files": [
     "dist",
-    "types"
+    "types",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -39,7 +50,8 @@
     "eslint-plugin-prettier": "^5.0.1",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "vite": "^4.5.0",
+    "vite-plugin-dts": "^3.6.0"
   },
   "dependencies": {
     "lit": "^2.3.1"
