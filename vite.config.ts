@@ -1,5 +1,6 @@
 import { resolve } from "path";
 import { UserConfig } from "vite";
+import dts from "vite-plugin-dts";
 
 export default {
   build: {
@@ -18,4 +19,5 @@ export default {
   define: {
     "import.meta.env.PACKAGE_VERSION": JSON.stringify(process.env.npm_package_version),
   },
+  plugins: [dts({ rollupTypes: true })],
 } satisfies UserConfig;
