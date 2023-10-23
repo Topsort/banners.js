@@ -16,6 +16,12 @@ declare global {
 
 window.TS_BANNERS = window.TS_BANNERS || {};
 
+function logError(error: unknown) {
+  if (import.meta.env.DEV) {
+    console.error(error);
+  }
+}
+
 const getDeviceType = (): "mobile" | "desktop" => {
   const ua = navigator.userAgent;
   if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
@@ -120,7 +126,7 @@ export class TopsortBanner extends LitElement {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "X-User-Agent": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
+          "X-UA": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
         },
         body: JSON.stringify({
           auctions: [
@@ -137,16 +143,18 @@ export class TopsortBanner extends LitElement {
         const data = await res.json();
         if (data.results[0]) {
           if (data.results[0].error) {
+            logError(data.results[0].error);
             this.state = {
               status: "errored",
               error: Error("Unknown Error"),
             };
           } else if (data.results[0].winners[0]) {
+            const winner = data.results[0].winners[0];
             this.state = {
               status: "ready",
-              asset: data.results[0].winners[0].asset,
-              resolvedBidId: data.winners[0].resolvedBidId,
-              href: this.getLink(data.winners[0]),
+              asset: winner.asset,
+              resolvedBidId: winner.resolvedBidId,
+              href: this.getLink(winner),
             };
           }
         } else {
@@ -156,12 +164,14 @@ export class TopsortBanner extends LitElement {
         }
       } else {
         const error = await res.json();
+        logError(error);
         this.state = {
           status: "errored",
           error: new TopsortRequestError(error.message, res.status),
         };
       }
     } catch (err) {
+      logError(err);
       if (err instanceof Error) {
         this.state = {
           status: "errored",
