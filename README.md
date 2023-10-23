@@ -10,7 +10,7 @@
 Directly from unpkg.com
 
 ```html
-<script async type="module" src="unpkg.com/@topsort/banners@0.0.1-alpha2/dist/banners.js"></script>
+<script async type="module" src="unpkg.com/@topsort/banners@0.0.1-alpha4/dist/banners.js"></script>
 <script>
 // Custom behavior can be configured for each site.
 window.TS_BANNERS = {
