@@ -42,12 +42,14 @@ window.TS_BANNERS = {
 
 # Banner Attributes
 
-| Name            | Type   | Description                 |
-|-----------------|--------|-----------------------------|
-| topsort-api-key | String | Your Topsort API key        |
-| width           | Number | Banner width                |
-| height          | Number | Banner height               |
-| slot-id         | String | The slot ID for this banner |
+| Name            | Type            | Description                          |
+|-----------------|-----------------|--------------------------------------|
+| topsort-api-key | String          | Your Topsort API key                 |
+| width           | Number          | Banner width                         |
+| height          | Number          | Banner height                        |
+| slot-id         | String          | The slot ID for this banner          |
+| category-id     | Optional String | The category ID of the current page  |
+| search-query    | Optional String | The search query of the current page |
 
 
 # Banner Behaviors

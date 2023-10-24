@@ -58,6 +58,17 @@ interface Ready {
   href: string;
 }
 
+interface Auction {
+  type: "banners";
+  slots: 1;
+  device: "mobile" | "desktop";
+  slotId: string;
+  category?: {
+    id: string;
+  };
+  searchQuery?: string;
+}
+
 /** The banner object returned from the auction request */
 export interface Banner {
   type: "product" | "vendor" | "brand" | "url";
@@ -84,6 +95,12 @@ export class TopsortBanner extends LitElement {
 
   @property({ attribute: "slot-id", type: String })
   readonly slotId?: string;
+
+  @property({ attribute: "category-id", type: String })
+  readonly categoryId?: string;
+
+  @property({ attribute: "search-query", type: String })
+  readonly searchQuery?: string;
 
   @state()
   private state: BannerState = {
@@ -120,6 +137,19 @@ export class TopsortBanner extends LitElement {
   private async runAuction() {
     const device = getDeviceType();
     try {
+      const auction: Auction = {
+        type: "banners",
+        slots: 1,
+        device,
+        slotId: this.slotId!,
+      };
+      if (this.categoryId) {
+        auction.category = {
+          id: this.categoryId,
+        };
+      } else if (this.searchQuery) {
+        auction.searchQuery = this.searchQuery;
+      }
       const res = await fetch("https://api.topsort.com/v2/auctions", {
         method: "POST",
         mode: "cors",
@@ -129,27 +159,21 @@ export class TopsortBanner extends LitElement {
           "X-UA": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
         },
         body: JSON.stringify({
-          auctions: [
-            {
-              type: "banners",
-              slots: 1,
-              device,
-              slotId: this.slotId,
-            },
-          ],
+          auctions: [auction],
         }),
       });
       if (res.ok) {
         const data = await res.json();
-        if (data.results[0]) {
-          if (data.results[0].error) {
-            logError(data.results[0].error);
+        const result = data.results[0];
+        if (result) {
+          if (result.error) {
+            logError(result.error);
             this.state = {
               status: "errored",
               error: Error("Unknown Error"),
             };
-          } else if (data.results[0].winners[0]) {
-            const winner = data.results[0].winners[0];
+          } else if (result.winners[0]) {
+            const winner = result.winners[0];
             this.state = {
               status: "ready",
               asset: winner.asset,
