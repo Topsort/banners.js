@@ -32,8 +32,6 @@ window.TS_BANNERS = {
 <body>
   <topsort-banner
     topsort-api-key="<your api key>"
-    width="600"
-    height="400"
     slot-id="<your slot id>"
     ></topsort-banner>
 </body>
@@ -45,8 +43,6 @@ window.TS_BANNERS = {
 | Name            | Type            | Description                          |
 |-----------------|-----------------|--------------------------------------|
 | topsort-api-key | String          | Your Topsort API key                 |
-| width           | Number          | Banner width                         |
-| height          | Number          | Banner height                        |
 | slot-id         | String          | The slot ID for this banner          |
 | category-id     | Optional String | The category ID of the current page  |
 | search-query    | Optional String | The search query of the current page |
@@ -71,6 +67,18 @@ window.TS_BANNERS = {
 | `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
 
 
+# Styling
+
+The component will inherit all styles from its parent elements, but you add
+custom styling to the banner itself.
+To add custom styling to the banner, you can use the following CSS variables:
+
+- `--ts-banner-width`: The width of the banner. Defaults to `100%`.
+- `--ts-banner-height`: The height of the banner. Defaults to `100%`.
+- `--ts-banner-padding`: The padding of the banner. Defaults to `0`.
+- `--ts-banner-margin`: The margin of the banner. Defaults to `0`.
+
+
 # Running the example
 
 You can play around with the provided index.html file. To run it, you'll need to
@@ -79,8 +87,8 @@ install the dependencies and start a local server.
 ```bash
 git clone https://github.com/Topsort/banners.js.git
 cd banners.js
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Remember to also replace the `topsort-api-key` and `slot-id` attributes with your

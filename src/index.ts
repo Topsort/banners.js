@@ -87,12 +87,6 @@ export class TopsortBanner extends LitElement {
   @property({ attribute: "topsort-api-key", type: String })
   readonly apiKey?: string;
 
-  @property({ type: Number })
-  readonly width = 0;
-
-  @property({ type: Number })
-  readonly height = 0;
-
   @property({ attribute: "slot-id", type: String })
   readonly slotId?: string;
 
@@ -216,6 +210,18 @@ export class TopsortBanner extends LitElement {
     this.runAuction();
   }
 
+  static styles = css`
+    :host img {
+      width: var(--ts-banner-width, 100%);
+      height: var(--ts-banner-height, 100%);
+    }
+    :host {
+      display: block;
+      padding: var(--ts-banner-padding, 0);
+      margin: var(--ts-banner-margin, 0);
+    }
+  `;
+
   protected render() {
     if (!this.apiKey || !this.slotId) {
       return this.getErrorElement(new TopsortConfigurationError(this.apiKey, this.slotId));
@@ -223,14 +229,8 @@ export class TopsortBanner extends LitElement {
     switch (this.state.status) {
       case "ready": {
         const src = this.state.asset[0].url;
-        const style = css`
-          img {
-            width: ${this.width}px;
-            height: ${this.height}px;
-          }
-        `;
         return html`
-        <div style="${style}" data-ts-clickable data-ts-resolved-bid-id=${this.state.resolvedBidId}>
+        <div data-ts-clickable data-ts-resolved-bid-id=${this.state.resolvedBidId}>
           <a href="${this.state.href}">
             <img src="${src}" alt="Topsort banner"></img>
           </a>
