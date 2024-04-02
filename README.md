@@ -82,8 +82,8 @@ install the dependencies and start a local server.
 ```bash
 git clone https://github.com/Topsort/banners.js.git
 cd banners.js
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Remember to also replace the `topsort-api-key` and `slot-id` attributes with your
