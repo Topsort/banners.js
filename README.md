@@ -10,24 +10,31 @@
 Directly from unpkg.com
 
 ```html
-<script async type="module" src="unpkg.com/@topsort/banners@0.0.1/dist/banners.js"></script>
+<script
+  async
+  type="module"
+  src="https://unpkg.com/@topsort/banners@0.0.1/dist/banners.mjs"
+></script>
 <script>
-// Custom behavior can be configured for each site.
-window.TS_BANNERS = {
-  getLink(banner) {
-    return `https://example.com/${banner.id}`;
-  },
-  getLoadingElement() {
-    const el = document.createElement("div");
-    el.innerText = "Loading...";
-    return el;
-  },
-  getErrorElement() {
-    const el = document.createElement("div");
-    el.innerText = "Error loading banner";
-    return el;
-  },
-}
+  // Custom behavior can be configured for each site.
+  window.TS_BANNERS = {
+    // handle the destination link
+    getLink(banner) {
+      return `https://example.com/${banner.id}`;
+    },
+    // handle loading/fetching state
+    getLoadingElement() {
+      const el = document.createElement("div");
+      el.innerText = "Loading...";
+      return el;
+    },
+    // handle errors
+    getErrorElement() {
+      const el = document.createElement("div");
+      el.innerText = "Error loading banner";
+      return el;
+    },
+  };
 </script>
 <body>
   <topsort-banner
@@ -35,15 +42,14 @@ window.TS_BANNERS = {
     width="600"
     height="400"
     slot-id="<your slot id>"
-    ></topsort-banner>
+  ></topsort-banner>
 </body>
 ```
-
 
 # Banner Attributes
 
 | Name            | Type            | Description                          |
-|-----------------|-----------------|--------------------------------------|
+| --------------- | --------------- | ------------------------------------ |
 | topsort-api-key | String          | Your Topsort API key                 |
 | width           | Number          | Banner width                         |
 | height          | Number          | Banner height                        |
@@ -51,25 +57,22 @@ window.TS_BANNERS = {
 | category-id     | Optional String | The category ID of the current page  |
 | search-query    | Optional String | The search query of the current page |
 
-
 # Banner Behaviors
 
 | Function Name       | Arg type                    | Return Type   | Description                                              |
-|---------------------|-----------------------------|---------------|----------------------------------------------------------|
+| ------------------- | --------------------------- | ------------- | -------------------------------------------------------- |
 | `getLink`           | [Banner](#banner-interface) | `string`      | Generates a URL from a banner response                   |
 | `getLoadingElement` |                             | `HTMLElement` | A custom element to be shown when the banner is loading. |
 | `getErrorElement`   |                             | `HTMLElement` | A custom element to be shown when the banner errors.     |
 
-
 # Banner Interface
 
 | Name            | Type                                        | Description                                                                  |
-|-----------------|---------------------------------------------|------------------------------------------------------------------------------|
+| --------------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
 | `type`          | `"product" \| "vendor" \| "brand" \| "url"` | The type of the winning entity, represented by the banner.                   |
 | `id`            | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
 | `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
-
 
 # Running the example
 
