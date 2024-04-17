@@ -1,6 +1,6 @@
-import { LitElement, TemplateResult, html, css } from "lit";
+import { LitElement, type TemplateResult, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { TopsortRequestError, TopsortConfigurationError } from "./errors";
+import { TopsortConfigurationError, TopsortRequestError } from "./errors";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -10,6 +10,10 @@ declare global {
       getLink(banner: Banner): string;
       getLoadingElement(): HTMLElement;
       getErrorElement(error: Error): HTMLElement;
+    };
+    TS: {
+      readonly token: string;
+      readonly url?: string;
     };
   }
 }
@@ -84,9 +88,6 @@ type BannerState = Loading | Errored | NoWinners | Ready;
  */
 @customElement("topsort-banner")
 export class TopsortBanner extends LitElement {
-  @property({ attribute: "topsort-api-key", type: String })
-  readonly apiKey?: string;
-
   @property({ type: Number })
   readonly width = 0;
 
@@ -94,7 +95,7 @@ export class TopsortBanner extends LitElement {
   readonly height = 0;
 
   @property({ attribute: "slot-id", type: String })
-  readonly slotId?: string;
+  readonly slotId: string = "";
 
   @property({ attribute: "category-id", type: String })
   readonly categoryId?: string;
@@ -113,9 +114,8 @@ export class TopsortBanner extends LitElement {
     }
     if (banner.type === "url") {
       return banner.id;
-    } else {
-      return `${banner.type}/${banner.id}`;
     }
+    return `${banner.type}/${banner.id}`;
   }
 
   private getLoadingElement(): TemplateResult {
@@ -141,7 +141,7 @@ export class TopsortBanner extends LitElement {
         type: "banners",
         slots: 1,
         device,
-        slotId: this.slotId!,
+        slotId: this.slotId,
       };
       if (this.categoryId) {
         auction.category = {
@@ -150,11 +150,13 @@ export class TopsortBanner extends LitElement {
       } else if (this.searchQuery) {
         auction.searchQuery = this.searchQuery;
       }
-      const res = await fetch("https://api.topsort.com/v2/auctions", {
+      const token = window.TS.token;
+      const url = window.TS.url || "https://api.topsort.com";
+      const res = await fetch(new URL(`${url}/v2/auctions`), {
         method: "POST",
-        mode: "cors",
+        mode: "no-cors",
         headers: {
-          Authorization: `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           "X-UA": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
         },
@@ -217,8 +219,8 @@ export class TopsortBanner extends LitElement {
   }
 
   protected render() {
-    if (!this.apiKey || !this.slotId) {
-      return this.getErrorElement(new TopsortConfigurationError(this.apiKey, this.slotId));
+    if (!window.TS.token || !this.slotId) {
+      return this.getErrorElement(new TopsortConfigurationError(window.TS.token, this.slotId));
     }
     switch (this.state.status) {
       case "ready": {

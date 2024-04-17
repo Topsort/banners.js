@@ -5,20 +5,15 @@
   "description": "A web component for displaying Topsort banner ads.",
   "type": "module",
   "author": "Topsort",
-  "packageManager": "pnpm@8.6.0",
+  "packageManager": "pnpm@9.0.1",
   "engines": {
     "node": ">=20.0.0",
-    "pnpm": ">=8.6.0"
+    "pnpm": ">=9"
   },
   "main": "dist/banners.mjs",
   "module": "dist/banners.mjs",
   "license": "MIT",
-  "keywords": [
-    "banners",
-    "web-components",
-    "topsort",
-    "ads"
-  ],
+  "keywords": ["banners", "web-components", "topsort", "ads"],
   "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
     ".": {
@@ -27,38 +22,22 @@
     }
   },
   "types": "dist/banners.d.ts",
-  "files": [
-    "dist",
-    "types",
-    "package.json",
-    "README.md",
-    "CHANGELOG.md"
-  ],
+  "files": ["dist", "types", "package.json", "README.md", "CHANGELOG.md"],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve",
     "build": "tsc && vite build",
-    "lint": "eslint --ext .ts,.js .",
-    "lint:fix": "eslint --ext .ts,.js . --fix"
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply ."
   },
   "devDependencies": {
-    "@types/node": "^20.8.7",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
-    "eslint": "^8.51.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "prettier": "^3.0.3",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0",
-    "vite-plugin-dts": "^3.6.0"
+    "@biomejs/biome": "^1.7.0",
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.9",
+    "vite-plugin-dts": "^3.8.3"
   },
   "dependencies": {
-    "lit": "^2.3.1"
-  },
-  "prettier": {
-    "useTabs": false,
-    "tabWidth": 2,
-    "printWidth": 100
+    "lit": "^3.1.3"
   }
 }

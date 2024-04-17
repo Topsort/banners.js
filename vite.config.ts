@@ -1,5 +1,5 @@
-import { resolve } from "path";
-import { UserConfig } from "vite";
+import { resolve } from "node:path";
+import type { UserConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 export default {

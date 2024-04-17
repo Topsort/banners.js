@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Topsort Banner</title>
-    <script type="module"  src="https://unpkg.com/skeleton-webcomponent-loader@1.0.5/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"></script>
     <script
-      async
       type="module"
-      src="src/index.ts"></script>
+      src="https://unpkg.com/skeleton-webcomponent-loader@2.1.4/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"
+    ></script>
+    <script async type="module" src="src/index.ts"></script>
   </head>
   <script>
-    // Setup @topsort/analytics.js
+    // Set up autentication for auctions and events
     window.TS = {
       token: "<your-topsort-token",
       url: "https://api.topsort.com",
@@ -20,10 +20,10 @@
     // Setup @topsort/banners.js
     window.TS_BANNERS = {
       getLoadingElement() {
-        return document.createElement('nb-skeleton');
+        return document.createElement("nb-skeleton");
       },
       getErrorElement(error) {
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         if (error.name === "TopsortConfigurationError") {
           div.innerText = error.message;
         } else {
@@ -42,14 +42,8 @@
   </style>
   <body>
     <div style="outline 1px solid black">
-      <topsort-banner
-        topsort-api-key="<your-topsort-api-key>"
-        slot-id="<your-slot-id>"
-        width="600"
-        height="400"
-        ></topsort-banner>
+      <topsort-banner slot-id="<your-slot-id>" width="600" height="400"></topsort-banner>
     </div>
   </body>
   <script src="https://unpkg.com/@topsort/analytics.js"></script>
 </html>
-
