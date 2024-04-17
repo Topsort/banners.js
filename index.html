@@ -6,8 +6,9 @@
     <title>Topsort Banner</title>
     <script
       type="module"
-      src="https://unpkg.com/skeleton-webcomponent-loader@2.1.4/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"
+      src="node_modules/skeleton-webcomponent-loader/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"
     ></script>
+    <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
     <script async type="module" src="src/index.ts"></script>
   </head>
   <script>
@@ -44,5 +45,4 @@
       <topsort-banner slot-id="<your-slot-id>" width="600" height="400"></topsort-banner>
     </div>
   </body>
-  <script src="https://unpkg.com/@topsort/analytics.js"></script>
 </html>

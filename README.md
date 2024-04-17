@@ -15,6 +15,7 @@ Directly from unpkg.com
   type="module"
   src="https://unpkg.com/@topsort/banners@0.0.1/dist/banners.mjs"
 ></script>
+<script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
   // Set API key for auctions and events
   window.TS = {
