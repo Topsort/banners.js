@@ -85,5 +85,5 @@ pnpm install
 pnpm run dev
 ```
 
-Remember to also replace the `topsort-api-key` and `slot-id` attributes with your
+Remember to add `window.TS.token` and modify the `slot-id` attribute with your
 own values that you can find at [Topsort](https://app.topsort.com/).
