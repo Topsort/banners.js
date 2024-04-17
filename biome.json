@@ -23,26 +23,6 @@
     "lineWidth": 100
   },
   "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "suspicious": {
-        "noConsoleLog": "error",
-        "noExplicitAny": "off"
-      },
-      "correctness": {
-        "noUnusedVariables": "error",
-        "noUnusedImports": "error"
-      },
-      "nursery": {
-        "noDuplicateJsonKeys": "error"
-      },
-      "style": {
-        "useConsistentArrayType": "error",
-        "useNumberNamespace": "error",
-        "useImportType": "error",
-        "useExportType": "error"
-      }
-    }
+    "enabled": true
   }
 }
