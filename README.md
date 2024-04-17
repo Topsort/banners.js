@@ -16,6 +16,10 @@ Directly from unpkg.com
   src="https://unpkg.com/@topsort/banners@0.0.1/dist/banners.mjs"
 ></script>
 <script>
+  // Set API key for auctions and events
+  window.TS = {
+    token: "<your topsort api key>",
+  };
   // Custom behavior can be configured for each site.
   window.TS_BANNERS = {
     // handle the destination link
@@ -43,14 +47,13 @@ Directly from unpkg.com
 
 # Banner Attributes
 
-| Name            | Type            | Description                          |
-| --------------- | --------------- | ------------------------------------ |
-| topsort-api-key | String          | Your Topsort API key                 |
-| width           | Number          | Banner width                         |
-| height          | Number          | Banner height                        |
-| slot-id         | String          | The slot ID for this banner          |
-| category-id     | Optional String | The category ID of the current page  |
-| search-query    | Optional String | The search query of the current page |
+| Name         | Type            | Description                          |
+| ------------ | --------------- | ------------------------------------ |
+| width        | Number          | Banner width                         |
+| height       | Number          | Banner height                        |
+| slot-id      | String          | The slot ID for this banner          |
+| category-id  | Optional String | The category ID of the current page  |
+| search-query | Optional String | The search query of the current page |
 
 # Banner Behaviors
 
