@@ -37,12 +37,7 @@ Directly from unpkg.com
   };
 </script>
 <body>
-  <topsort-banner
-    topsort-api-key="<your api key>"
-    width="600"
-    height="400"
-    slot-id="<your slot id>"
-  ></topsort-banner>
+  <topsort-banner width="600" height="400" slot-id="<your slot id>"></topsort-banner>
 </body>
 ```
 
