@@ -15,7 +15,12 @@ Directly from unpkg.com
   type="module"
   src="https://unpkg.com/@topsort/banners@0.0.1/dist/banners.mjs"
 ></script>
+<script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
+  // Set API key for auctions and events
+  window.TS = {
+    token: "<your topsort api key>",
+  };
   // Custom behavior can be configured for each site.
   window.TS_BANNERS = {
     // handle the destination link
@@ -37,25 +42,19 @@ Directly from unpkg.com
   };
 </script>
 <body>
-  <topsort-banner
-    topsort-api-key="<your api key>"
-    width="600"
-    height="400"
-    slot-id="<your slot id>"
-  ></topsort-banner>
+  <topsort-banner width="600" height="400" slot-id="<your slot id>"></topsort-banner>
 </body>
 ```
 
 # Banner Attributes
 
-| Name            | Type            | Description                          |
-| --------------- | --------------- | ------------------------------------ |
-| topsort-api-key | String          | Your Topsort API key                 |
-| width           | Number          | Banner width                         |
-| height          | Number          | Banner height                        |
-| slot-id         | String          | The slot ID for this banner          |
-| category-id     | Optional String | The category ID of the current page  |
-| search-query    | Optional String | The search query of the current page |
+| Name         | Type            | Description                          |
+| ------------ | --------------- | ------------------------------------ |
+| width        | Number          | Banner width                         |
+| height       | Number          | Banner height                        |
+| slot-id      | String          | The slot ID for this banner          |
+| category-id  | Optional String | The category ID of the current page  |
+| search-query | Optional String | The search query of the current page |
 
 # Banner Behaviors
 
@@ -86,5 +85,5 @@ pnpm install
 pnpm run dev
 ```
 
-Remember to also replace the `topsort-api-key` and `slot-id` attributes with your
+Remember to add `window.TS.token` and modify the `slot-id` attribute with your
 own values that you can find at [Topsort](https://app.topsort.com/).
