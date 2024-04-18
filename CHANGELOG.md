@@ -1,3 +1,12 @@
+### 0.0.2
+
+- updated dependencies
+- improved documentation
+- change how we read api token
+- add boilerplate dependencies
+
+### 0.0.1
+
 - fix version in readme
 - decorate package.json
 - release: 0.0.1-alpha2
