@@ -1,3 +1,7 @@
+### 0.0.3
+
+- documentation updates
+
 ### 0.0.2
 
 - updated dependencies

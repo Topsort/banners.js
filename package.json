@@ -1,11 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@topsort/banners",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A web component for displaying Topsort banner ads.",
   "type": "module",
   "author": "Topsort",
-  "packageManager": "pnpm@9.0.1",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9"
