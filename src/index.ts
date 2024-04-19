@@ -154,7 +154,7 @@ export class TopsortBanner extends LitElement {
       const url = window.TS.url || "https://api.topsort.com";
       const res = await fetch(new URL(`${url}/v2/auctions`), {
         method: "POST",
-        mode: "no-cors",
+        mode: "cors",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -232,7 +232,7 @@ export class TopsortBanner extends LitElement {
           }
         `;
         return html`
-        <div style="${style}" data-ts-clickable data-ts-resolved-bid-id=${this.state.resolvedBidId}>
+        <div style="${style}" data-ts-clickable data-ts-resolved-bid=${this.state.resolvedBidId}>
           <a href="${this.state.href}">
             <img src="${src}" alt="Topsort banner"></img>
           </a>
