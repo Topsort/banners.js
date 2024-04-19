@@ -1,3 +1,9 @@
+### 0.1.0
+
+- fix incorrect bid attribute
+- disable shadow dom for lit components so analytics.js can propagate events
+- enable cors so we can pass authorization headers
+
 ### 0.0.3
 
 - documentation updates
