@@ -245,4 +245,9 @@ export class TopsortBanner extends LitElement {
         return this.getErrorElement(this.state.error);
     }
   }
+
+  // avoid shadow dom since we cannot attach to events via analytics.js
+  protected createRenderRoot() {
+    return this;
+  }
 }
