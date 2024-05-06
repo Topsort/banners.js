@@ -5,7 +5,6 @@
     "lib": ["es2020", "DOM", "DOM.Iterable"],
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": true,
     "outDir": "./types",
     "strict": true,
     "noUnusedLocals": true,

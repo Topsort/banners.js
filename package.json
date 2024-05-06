@@ -25,9 +25,10 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "lint": "biome check .",
-    "lint:fix": "biome check --apply ."
+    "lint:fix": "biome check --apply .",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.7.0",
