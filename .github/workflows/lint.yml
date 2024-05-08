@@ -1,0 +1,71 @@
+name: Lint
+on:
+  pull_request:
+
+env:
+  LEFTHOOK: 0 # Don't run lefthook in CI
+  lockfile: pnpm-lock.yaml
+  node_version: "20"
+
+jobs:
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Actionlint
+        env:
+          version: "1.6.27"
+        run: curl -Ls "https://github.com/rhysd/actionlint/releases/download/v${{ env.version }}/actionlint_${{ env.version }}_linux_amd64.tar.gz" | sudo tar -x -z -C /usr/local/bin actionlint
+      - name: Run Actionlint
+        run: |
+          echo "::add-matcher::.github/matchers/actionlint.json"
+          actionlint -color
+
+  typos:
+    name: Check for language typos
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # No major tag unfortunately
+        # https://github.com/crate-ci/typos/issues/857
+      - uses: crate-ci/typos@v1.20.10
+
+  tsc:
+    name: Type checks
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        name: Install PNPM
+        id: pnpm-install
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          cache: pnpm
+          cache-dependency-path: ${{ env.lockfile }}
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run TSC
+        run: tsc --noEmit
+
+  lint:
+    name: Biome Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+
+      - name: Run Biome
+        run: biome ci .
