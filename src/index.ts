@@ -70,6 +70,9 @@ interface Auction {
   category?: {
     id: string;
   };
+  geoTargeting?: {
+    location: string;
+  };
   searchQuery?: string;
 }
 
@@ -102,6 +105,9 @@ export class TopsortBanner extends LitElement {
 
   @property({ attribute: "search-query", type: String })
   readonly searchQuery?: string;
+
+  @property({ attribute: "location", type: String })
+  readonly location?: string;
 
   @state()
   private state: BannerState = {
@@ -149,6 +155,11 @@ export class TopsortBanner extends LitElement {
         };
       } else if (this.searchQuery) {
         auction.searchQuery = this.searchQuery;
+      }
+      if (this.location) {
+        auction.geoTargeting = {
+          location: this.location,
+        };
       }
       const token = window.TS.token;
       const url = window.TS.url || "https://api.topsort.com";
