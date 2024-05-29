@@ -55,6 +55,7 @@ Directly from unpkg.com
 | slot-id      | String          | The slot ID for this banner          |
 | category-id  | Optional String | The category ID of the current page  |
 | search-query | Optional String | The search query of the current page |
+| location     | Optional String | The location for geotargeting        |
 
 # Banner Behaviors
 
