@@ -1,3 +1,7 @@
+### 0.1.1
+
+- Adds `location` optional attribute to banner component to allow for geotargeting
+
 ### 0.1.0
 
 - fix incorrect bid attribute
