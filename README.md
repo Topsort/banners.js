@@ -52,27 +52,40 @@ Directly from unpkg.com
 | ------------ | --------------- | ------------------------------------ |
 | width        | Number          | Banner width                         |
 | height       | Number          | Banner height                        |
-| slot-id      | String          | The slot ID for this banner          |
+| id           | String          | The slot ID for this banner          |
 | category-id  | Optional String | The category ID of the current page  |
 | search-query | Optional String | The search query of the current page |
 | location     | Optional String | The location for geotargeting        |
 
 # Banner Behaviors
 
-| Function Name       | Arg type                    | Return Type   | Description                                              |
-| ------------------- | --------------------------- | ------------- | -------------------------------------------------------- |
-| `getLink`           | [Banner](#banner-interface) | `string`      | Generates a URL from a banner response                   |
-| `getLoadingElement` |                             | `HTMLElement` | A custom element to be shown when the banner is loading. |
-| `getErrorElement`   |                             | `HTMLElement` | A custom element to be shown when the banner errors.     |
+| Function Name         | Arg type                                                                                        | Return Type   | Description                                                      |
+| -------------------   | ---------------------------                                                                     | ------------- | --------------------------------------------------------         |
+| `getLink`             | [Banner](#banner-interface)                                                                     | `string`      | Generates a URL from a banner response                           |
+| `getLoadingElement`   |                                                                                                 | `HTMLElement` | A custom element to be shown when the banner is loading.         |
+| `getErrorElement`     | [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `HTMLElement` | A custom element to be shown when the banner errors.             |
+| `getNoWinnersElement` |                                                                                                 | `HTMLElement` | A custom element to be shown when the auction returns no banner. |
+| `getBannerElement`    | [Banner](#banner-interface)                                                                     | `HTMLElement` | A custom clement to be shown when a banner is loaded.            |
 
 # Banner Interface
 
 | Name            | Type                                        | Description                                                                  |
 | --------------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
 | `type`          | `"product" \| "vendor" \| "brand" \| "url"` | The type of the winning entity, represented by the banner.                   |
-| `id`            | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
+| `slotId`        | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
 | `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
+
+# Listening to events
+The banner component emits an event when the state changes. You can listen to this event to write custom logic.
+The various states are `loading`, `ready`, `error`, and `nowinners`.
+
+
+```javascript
+document.querySelector('#my-slot-id').addEventListener('statechange', (event) => {
+  console.log(event.detail); // { status: 'ready', banner: { ... } }
+});
+```
 
 # Running the example
 
