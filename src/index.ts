@@ -10,6 +10,8 @@ declare global {
       getLink(banner: Banner): string;
       getLoadingElement(): HTMLElement;
       getErrorElement(error: Error): HTMLElement;
+      getNoWinnersElement(): HTMLElement;
+      getBannerElement(banner: Banner): HTMLElement;
     };
     TS: {
       readonly token: string;
@@ -57,9 +59,7 @@ interface NoWinners {
 
 interface Ready {
   status: "ready";
-  asset: [{ url: string }];
-  resolvedBidId: string;
-  href: string;
+  banner: Banner;
 }
 
 interface Auction {
@@ -97,7 +97,7 @@ export class TopsortBanner extends LitElement {
   @property({ type: Number })
   readonly height = 0;
 
-  @property({ attribute: "slot-id", type: String })
+  @property({ attribute: "id", type: String })
   readonly slotId: string = "";
 
   @property({ attribute: "category-id", type: String })
@@ -129,7 +129,7 @@ export class TopsortBanner extends LitElement {
       const element = window.TS_BANNERS.getLoadingElement();
       return html`${element}`;
     }
-    return html`<div>Loading</div>`;
+    return html`<div class="ts-banner-${this.state.status}">Loading</div>`;
   }
 
   private getErrorElement(error: Error): TemplateResult {
@@ -137,7 +137,52 @@ export class TopsortBanner extends LitElement {
       const element = window.TS_BANNERS.getErrorElement(error);
       return html`${element}`;
     }
-    return html`<pre>${error.message}</pre>`;
+    return html`<div class="ts-banner-${this.state.status}>
+      <pre>${error.message}</pre>
+    </div>`;
+  }
+
+  private getNoWinnersElement(): TemplateResult {
+    if (window.TS_BANNERS.getNoWinnersElement) {
+      const element = window.TS_BANNERS.getNoWinnersElement();
+      return html`${element}`;
+    }
+    return html`<div class="ts-banner-${this.state.status}"></div>`;
+  }
+
+  private getBannerElement(banner: Banner): TemplateResult {
+    if (window.TS_BANNERS.getBannerElement) {
+      const element = window.TS_BANNERS.getBannerElement(banner);
+      return html`${element}`;
+    }
+    const src = banner.asset[0].url;
+    const style = css`
+      img {
+        width: ${this.width}px;
+        height: ${this.height}px;
+      }
+    `;
+    const href = this.getLink(banner);
+    return html`
+        <div style="${style}"
+             data-ts-clickable
+             data-ts-resolved-bid=${banner.resolvedBidId}
+             class="ts-banner-${this.state.status}">
+          <a href="${href}">
+            <img src="${src}" alt="Topsort banner"></img>
+          </a>
+        </div>
+        `;
+  }
+
+  private setState(state: BannerState) {
+    this.state = state;
+    const event = new CustomEvent("statechange", {
+      detail: { state, slotId: this.slotId },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
   }
 
   private async runAuction() {
@@ -181,44 +226,42 @@ export class TopsortBanner extends LitElement {
         if (result) {
           if (result.error) {
             logError(result.error);
-            this.state = {
+            this.setState({
               status: "errored",
               error: Error("Unknown Error"),
-            };
+            });
           } else if (result.winners[0]) {
             const winner = result.winners[0];
-            this.state = {
+            this.setState({
               status: "ready",
-              asset: winner.asset,
-              resolvedBidId: winner.resolvedBidId,
-              href: this.getLink(winner),
-            };
+              banner: winner,
+            });
+          } else {
+            this.setState({
+              status: "nowinners",
+            });
           }
-        } else {
-          this.state = {
-            status: "nowinners",
-          };
         }
       } else {
         const error = await res.json();
         logError(error);
-        this.state = {
+        this.setState({
           status: "errored",
           error: new TopsortRequestError(error.message, res.status),
-        };
+        });
       }
     } catch (err) {
       logError(err);
       if (err instanceof Error) {
-        this.state = {
+        this.setState({
           status: "errored",
           error: err,
-        };
+        });
       } else {
-        this.state = {
+        this.setState({
           status: "errored",
           error: Error("Unknown Error"),
-        };
+        });
       }
     }
   }
@@ -234,22 +277,10 @@ export class TopsortBanner extends LitElement {
       return this.getErrorElement(new TopsortConfigurationError(window.TS.token, this.slotId));
     }
     switch (this.state.status) {
-      case "ready": {
-        const src = this.state.asset[0].url;
-        const style = css`
-          img {
-            width: ${this.width}px;
-            height: ${this.height}px;
-          }
-        `;
-        return html`
-        <div style="${style}" data-ts-clickable data-ts-resolved-bid=${this.state.resolvedBidId}>
-          <a href="${this.state.href}">
-            <img src="${src}" alt="Topsort banner"></img>
-          </a>
-        </div>
-        `;
-      }
+      case "ready":
+        return this.getBannerElement(this.state.banner);
+      case "nowinners":
+        return this.getNoWinnersElement();
       case "loading":
         return this.getLoadingElement();
       case "errored":
