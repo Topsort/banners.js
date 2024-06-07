@@ -98,6 +98,9 @@ export class TopsortBanner extends LitElement {
   readonly height = 0;
 
   @property({ attribute: "id", type: String })
+  readonly callerId: string = "";
+
+  @property({ attribute: "slot-id", type: String })
   readonly slotId: string = "";
 
   @property({ attribute: "category-id", type: String })
@@ -178,7 +181,7 @@ export class TopsortBanner extends LitElement {
   private setState(state: BannerState) {
     this.state = state;
     const event = new CustomEvent("statechange", {
-      detail: { state, slotId: this.slotId },
+      detail: { state, caller: this.callerId },
       bubbles: true,
       composed: true,
     });
