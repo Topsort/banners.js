@@ -13,7 +13,7 @@ Directly from unpkg.com
 <script
   async
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.1.0/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.2.0/dist/banners.mjs"
 ></script>
 <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
