@@ -17,6 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        name: Install PNPM
+        id: pnpm-install
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
