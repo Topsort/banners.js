@@ -11,6 +11,21 @@
     <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
     <script async type="module" src="src/index.ts"></script>
   </head>
+  
+  <style>
+    body {
+      justify-content: center;
+      padding: 20px;
+    }
+  </style>
+  <body>
+    <div>
+      <topsort-banner id="first-banner" slot-id="fr_728x90" width="728" height="90"></topsort-banner>
+    </div>
+    <div>
+      <topsort-banner id="second-banner" slot-id="fr_728x90" width="728" height="90"></topsort-banner>
+    </div>
+  </body>
   <script>
     // Set up authentication for auctions and events
     window.TS = {
@@ -32,17 +47,13 @@
         return div;
       },
     };
+
+    document.querySelector('#first-banner').addEventListener('statechange', (event) => {
+      console.log(event.detail);
+    });
+
+    document.querySelector('#second-banner').addEventListener('statechange', (event) => {  
+      console.log(event.detail);
+    });
   </script>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-  </style>
-  <body>
-    <div style="outline 1px solid black">
-      <topsort-banner id="<your-slot-id>" width="600" height="400"></topsort-banner>
-    </div>
-  </body>
 </html>

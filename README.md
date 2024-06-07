@@ -13,9 +13,12 @@ Directly from unpkg.com
 <script
   async
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.2.0/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.3.0/dist/banners.mjs"
 ></script>
 <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
+<body>
+  <topsort-banner width="600" height="400" id="<your html element id>" slot-id="<your slot id>"></topsort-banner>
+</body>
 <script>
   // Set API key for auctions and events
   window.TS = {
@@ -40,10 +43,11 @@ Directly from unpkg.com
       return el;
     },
   };
+
+  document.querySelector('<your html element id>').addEventListener('statechange', (event) => {
+    console.log(event.detail.caller);
+  });
 </script>
-<body>
-  <topsort-banner width="600" height="400" slot-id="<your slot id>"></topsort-banner>
-</body>
 ```
 
 # Banner Attributes
@@ -52,7 +56,8 @@ Directly from unpkg.com
 | ------------ | --------------- | ------------------------------------ |
 | width        | Number          | Banner width                         |
 | height       | Number          | Banner height                        |
-| id           | String          | The slot ID for this banner          |
+| id           | String          | The html element ID for this banner          |
+| slot-id           | String          | The slot ID for this banner          |
 | category-id  | Optional String | The category ID of the current page  |
 | search-query | Optional String | The search query of the current page |
 | location     | Optional String | The location for geotargeting        |
@@ -83,7 +88,7 @@ The various states are `loading`, `ready`, `error`, and `nowinners`.
 
 ```javascript
 document.querySelector('#my-slot-id').addEventListener('statechange', (event) => {
-  console.log(event.detail); // { status: 'ready', banner: { ... } }
+  console.log(event.detail); // { slotId: slotid, caller: id, state: {status: 'ready', banner: { ... }} }
 });
 ```
 
