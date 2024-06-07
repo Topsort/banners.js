@@ -181,7 +181,7 @@ export class TopsortBanner extends LitElement {
   private setState(state: BannerState) {
     this.state = state;
     const event = new CustomEvent("statechange", {
-      detail: { state, caller: this.callerId },
+      detail: { state, slotId: this.slotId, callerId: this.callerId },
       bubbles: true,
       composed: true,
     });

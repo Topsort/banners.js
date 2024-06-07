@@ -88,7 +88,7 @@ The various states are `loading`, `ready`, `error`, and `nowinners`.
 
 ```javascript
 document.querySelector('#my-slot-id').addEventListener('statechange', (event) => {
-  console.log(event.detail); // { status: 'ready', banner: { ... } }
+  console.log(event.detail); // { slotId: slotid, caller: id, state: {status: 'ready', banner: { ... }} }
 });
 ```
 

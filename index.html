@@ -29,7 +29,7 @@
   <script>
     // Set up authentication for auctions and events
     window.TS = {
-      token: "<your-topsort-token>",
+      token: "TSE_82aEvxbOAQIYL7FJ9uHThK8VPE0Q1b2POA2D",
     };
 
     // Setup @topsort/banners.js
@@ -49,11 +49,11 @@
     };
 
     document.querySelector('#first-banner').addEventListener('statechange', (event) => {
-      console.log(event.detail.caller);
+      console.log(event.detail);
     });
 
     document.querySelector('#second-banner').addEventListener('statechange', (event) => {  
-      console.log(event.detail.caller);
+      console.log(event.detail);
     });
   </script>
 </html>
