@@ -1,3 +1,10 @@
+### 0.2.0
+
+- Breaking change: The attribute slot-id is renamed to id in the banner element. This is to support event listeners
+- Introduces 2 new ways to override the elements for displaying a banner and displaying the nowinners state
+- Introduces event emitter for state changes
+- Adds a class for each element type, so users can customize the banner.
+
 ### 0.1.1
 
 - Adds `location` optional attribute to banner component to allow for geotargeting
