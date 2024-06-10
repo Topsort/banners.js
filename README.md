@@ -42,7 +42,7 @@ Directly from unpkg.com
   };
 </script>
 <body>
-  <topsort-banner width="600" height="400" slot-id="<your slot id>"></topsort-banner>
+  <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
 </body>
 ```
 
