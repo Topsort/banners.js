@@ -70,7 +70,7 @@ interface Auction {
   category?: {
     id?: string;
     ids?: string[];
-    disjunctions?: string[];
+    disjunctions?: string[][];
   };
   geoTargeting?: {
     location: string;
@@ -212,7 +212,7 @@ export class TopsortBanner extends LitElement {
         };
       } else if (this.categoryDisjunctions) {
         auction.category = {
-          disjunctions: this.categoryDisjunctions.split(",").map((item) => item.trim()),
+          disjunctions: [this.categoryDisjunctions.split(",").map((item) => item.trim())],
         };
       } else if (this.searchQuery) {
         auction.searchQuery = this.searchQuery;
