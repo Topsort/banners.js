@@ -208,11 +208,11 @@ export class TopsortBanner extends LitElement {
         };
       } else if (this.categoryIds) {
         auction.category = {
-          ids: this.categoryIds.split(","),
+          ids: this.categoryIds.split(",").map((item) => item.trim()),
         };
       } else if (this.categoryDisjunctions) {
         auction.category = {
-          disjunctions: this.categoryDisjunctions.split(","),
+          disjunctions: this.categoryDisjunctions.split(",").map((item) => item.trim()),
         };
       } else if (this.searchQuery) {
         auction.searchQuery = this.searchQuery;
