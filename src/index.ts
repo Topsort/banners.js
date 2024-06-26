@@ -68,7 +68,9 @@ interface Auction {
   device: "mobile" | "desktop";
   slotId: string;
   category?: {
-    id: string;
+    id?: string;
+    ids?: string[];
+    disjunctions?: string[][];
   };
   geoTargeting?: {
     location: string;
@@ -102,6 +104,12 @@ export class TopsortBanner extends LitElement {
 
   @property({ attribute: "category-id", type: String })
   readonly categoryId?: string;
+
+  @property({ attribute: "category-ids", type: String })
+  readonly categoryIds?: string;
+
+  @property({ attribute: "category-disjunctions", type: String })
+  readonly categoryDisjunctions?: string;
 
   @property({ attribute: "search-query", type: String })
   readonly searchQuery?: string;
@@ -197,6 +205,14 @@ export class TopsortBanner extends LitElement {
       if (this.categoryId) {
         auction.category = {
           id: this.categoryId,
+        };
+      } else if (this.categoryIds) {
+        auction.category = {
+          ids: this.categoryIds.split(",").map((item) => item.trim()),
+        };
+      } else if (this.categoryDisjunctions) {
+        auction.category = {
+          disjunctions: [this.categoryDisjunctions.split(",").map((item) => item.trim())],
         };
       } else if (this.searchQuery) {
         auction.searchQuery = this.searchQuery;
