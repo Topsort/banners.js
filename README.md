@@ -13,7 +13,7 @@ Directly from unpkg.com
 <script
   async
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.2.0/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.3.0/dist/banners.mjs"
 ></script>
 <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
@@ -60,7 +60,7 @@ Directly from unpkg.com
 | location               | Optional String  | The location for geotargeting                                               |
 | new-tab                | Optional Boolean | Opens the banner's link in a new tab (defaults to false)                             |
 
-\* Only one of `[category-id, category-ids, category-disjunctions]` must be set.  
+\* Only one of `[category-id, category-ids, category-disjunctions]` must be set.
 If multiple are set, only the first will be considered, in that order.
 
 # Banner Behaviors

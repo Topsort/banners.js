@@ -1,3 +1,7 @@
+### 0.3.0
+
+- Add multicategory query support.
+
 ### 0.2.0
 
 - Breaking change: The attribute slot-id is renamed to id in the banner element. This is to support event listeners
