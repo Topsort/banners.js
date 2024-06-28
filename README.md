@@ -48,16 +48,17 @@ Directly from unpkg.com
 
 # Banner Attributes
 
-| Name                   | Type            | Description                                                        |
-| ---------------------- | --------------- | ------------------------------------------------------------------ |
-| width                  | Number          | Banner width                                                       |
-| height                 | Number          | Banner height                                                      |
-| id                     | String          | The slot ID for this banner                                        |
-| category-id*           | Optional String | The category ID of the current page                                |
-| category-ids*          | Optional String | Comma (,) separated list of category IDs, the item must match all  |
-| category-disjunctions* | Optional String | Comma (,) separated list of category IDs, the item must match any  |
-| search-query           | Optional String | The search query of the current page                               |
-| location               | Optional String | The location for geotargeting                                      |
+| Name                   | Type            | Description                                                                 |
+| ---------------------- | --------------- | --------------------------------------------------------------------------- |
+| width                  | Number          | Banner width                                                                |
+| height                 | Number          | Banner height                                                               |
+| id                     | String          | The slot ID for this banner                                                 |
+| category-id*           | Optional String | The category ID of the current page                                         |
+| category-ids*          | Optional String | Comma (,) separated list of category IDs, the item must match all           |
+| category-disjunctions* | Optional String | Comma (,) separated list of category IDs, the item must match any           |
+| search-query           | Optional String | The search query of the current page                                        |
+| location               | Optional String | The location for geotargeting                                               |
+| new-tab                | Boolean         | Opens the link in a new tab (defaults to false)                             |
 
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.  
 If multiple are set, only the first will be considered, in that order.

@@ -75,6 +75,9 @@ export class TopsortBanner extends LitElement {
   @property({ attribute: "location", type: String })
   readonly location?: string;
 
+  @property({ attribute: "new-tab", type: Boolean })
+  readonly newTab?: boolean;
+
   private task = new Task(this, {
     task: (...args) => this.runAuction(...args),
     args: () => [],
@@ -130,14 +133,16 @@ export class TopsortBanner extends LitElement {
       }
     `;
     const href = this.getLink(banner);
+        const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
+    const atag = this.newTab
+      ? html`<a href="${href}" target="_blank">${imgtag}</a>`
+      : html`<a href="${href}">${imgtag}</a>`;
     return html`
         <div style="${style}"
              data-ts-clickable
              data-ts-resolved-bid=${banner.resolvedBidId}
              class="ts-banner">
-          <a href="${href}">
-            <img src="${src}" alt="Topsort banner"></img>
-          </a>
+          ${atag}
         </div>
         `;
   }
