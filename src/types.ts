@@ -1,12 +1,3 @@
-export interface NoWinners {
-  status: "nowinners";
-}
-
-export interface Ready {
-  status: "ready";
-  banners: Banner[];
-}
-
 export interface Auction {
   type: "banners";
   slots: 1;
@@ -30,5 +21,3 @@ export interface Banner {
   resolvedBidId: string;
   asset: [{ url: string }];
 }
-
-export type BannerState = NoWinners | Ready;

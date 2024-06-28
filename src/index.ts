@@ -2,7 +2,7 @@ import { Task } from "@lit/task";
 import { LitElement, type TemplateResult, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { TopsortConfigurationError, TopsortRequestError } from "./errors";
-import type { Auction, Banner, BannerState } from "./types";
+import type { Auction, Banner } from "./types";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -77,7 +77,7 @@ export class TopsortBanner extends LitElement {
 
   private task = new Task(this, {
     task: this.runAuction,
-    args: () => [this.buildAuction()],
+    args: () => [],
   });
 
   private getLink(banner: Banner): string {
@@ -182,10 +182,9 @@ export class TopsortBanner extends LitElement {
     return auction;
   }
 
-  private async runAuction(
-    [auction]: Auction[],
-    { signal }: { signal: AbortSignal },
-  ): Promise<BannerState> {
+  private async runAuction(_: never[], { signal }: { signal: AbortSignal }): Promise<Banner[]> {
+    const auction = this.buildAuction();
+    console.debug("Running auction", auction);
     const device = getDeviceType();
     const token = window.TS.token;
     const url = window.TS.url || "https://api.topsort.com";
@@ -214,15 +213,7 @@ export class TopsortBanner extends LitElement {
       logError(result.error);
       throw new Error(result.error);
     }
-    if (result.winners.length) {
-      return {
-        status: "ready",
-        banners: result.winners,
-      };
-    }
-    return {
-      status: "nowinners",
-    };
+    return result.winners;
   }
 
   protected render() {
@@ -231,12 +222,12 @@ export class TopsortBanner extends LitElement {
     }
     return this.task.render({
       pending: () => this.getLoadingElement(),
-      complete: (value) => {
-        this.emitEvent(value.status);
-        if (value.status === "nowinners") {
+      complete: (banners) => {
+        this.emitEvent(banners.length ? "ready" : "nowinners");
+        if (!banners.length) {
           return this.getNoWinnersElement();
         }
-        return this.getBannerElement(value.banners[0]);
+        return this.getBannerElement(banners[0]);
       },
       error: (error) => this.getErrorElement(error),
     });
