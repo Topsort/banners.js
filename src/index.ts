@@ -1,8 +1,8 @@
+import { Task } from "@lit/task";
 import { LitElement, type TemplateResult, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { TopsortConfigurationError, TopsortRequestError } from "./errors";
 import type { Auction, Banner, BannerState } from "./types";
-import { Task } from "@lit/task";
 
 /* Set up global environment for TS_BANNERS */
 

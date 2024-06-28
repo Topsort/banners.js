@@ -13,12 +13,7 @@
   "main": "dist/banners.mjs",
   "module": "dist/banners.mjs",
   "license": "MIT",
-  "keywords": [
-    "banners",
-    "web-components",
-    "topsort",
-    "ads"
-  ],
+  "keywords": ["banners", "web-components", "topsort", "ads"],
   "homepage": "https://github.com/Topsort/banners.js#readme",
   "exports": {
     ".": {
@@ -27,13 +22,7 @@
     }
   },
   "types": "dist/banners.d.ts",
-  "files": [
-    "dist",
-    "types",
-    "package.json",
-    "README.md",
-    "CHANGELOG.md"
-  ],
+  "files": ["dist", "types", "package.json", "README.md", "CHANGELOG.md"],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve",

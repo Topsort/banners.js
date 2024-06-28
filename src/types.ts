@@ -32,4 +32,3 @@ export interface Banner {
 }
 
 export type BannerState = NoWinners | Ready;
-
