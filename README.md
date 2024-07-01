@@ -58,7 +58,7 @@ Directly from unpkg.com
 | category-disjunctions* | Optional String  | Comma (,) separated list of category IDs, the item must match any           |
 | search-query           | Optional String  | The search query of the current page                                        |
 | location               | Optional String  | The location for geotargeting                                               |
-| new-tab                | Optional Boolean | Opens the link in a new tab (defaults to false)                             |
+| new-tab                | Optional Boolean | Opens the banner's link in a new tab (defaults to false)                             |
 
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.  
 If multiple are set, only the first will be considered, in that order.
