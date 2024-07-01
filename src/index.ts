@@ -133,7 +133,7 @@ export class TopsortBanner extends LitElement {
       }
     `;
     const href = this.getLink(banner);
-        const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
+    const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
     const atag = this.newTab
       ? html`<a href="${href}" target="_blank">${imgtag}</a>`
       : html`<a href="${href}">${imgtag}</a>`;
