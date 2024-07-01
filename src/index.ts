@@ -76,7 +76,7 @@ export class TopsortBanner extends LitElement {
   readonly location?: string;
 
   private task = new Task(this, {
-    task: this.runAuction,
+    task: (...args) => this.runAuction(...args),
     args: () => [],
   });
 
