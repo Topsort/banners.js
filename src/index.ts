@@ -85,14 +85,16 @@ function getBannerElement(banner: Banner, width: number, height: number): Templa
       }
     `;
   const href = getLink(banner);
+    const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
+    const atag = this.newTab
+      ? html`<a href="${href}" target="_blank">${imgtag}</a>`
+      : html`<a href="${href}">${imgtag}</a>`;
   return html`
         <div style="${style}"
              data-ts-clickable
              data-ts-resolved-bid=${banner.resolvedBidId}
              class="ts-banner">
-          <a href="${href}">
-            <img src="${src}" alt="Topsort banner"></img>
-          </a>
+          ${atag}
         </div>
         `;
 }
