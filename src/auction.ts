@@ -26,11 +26,9 @@ export async function runAuction(
   auction: Auction,
   { signal, logError }: AuctionOptions,
 ): Promise<Banner[]> {
-  console.debug("Running auction", auction);
   const device = getDeviceType();
   const token = window.TS.token;
   const url = window.TS.url || "https://api.topsort.com";
-  console.debug(JSON.stringify({ auctions: [auction] }, null, 2));
   const res = await fetch(new URL(`${url}/v2/auctions`), {
     method: "POST",
     mode: "cors",
@@ -50,7 +48,6 @@ export async function runAuction(
     throw new Error(error.message);
   }
   const data = await res.json();
-  console.debug(data);
   const result = data.results[0];
   if (!result) throw new TopsortRequestError("No auction results", res.status);
   if (result.error) {

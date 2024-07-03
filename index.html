@@ -8,13 +8,12 @@
       type="module"
       src="node_modules/skeleton-webcomponent-loader/dist/skeleton-webcomponent/skeleton-webcomponent.esm.js"
     ></script>
-    <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
     <script async type="module" src="src/index.ts"></script>
   </head>
   <script>
     // Set up authentication for auctions and events
     window.TS = {
-      token: "<your-topsort-token>",
+      token: "%VITE_TS_TOKEN%",
     };
 
     // Setup @topsort/banners.js
@@ -25,11 +24,14 @@
       },
       getErrorElement(error) {
         const div = document.createElement("div");
+        const pre = document.createElement("pre");
         if (error.name === "TopsortConfigurationError") {
-          div.innerText = error.message;
+          pre.innerText = error.message;
         } else {
-          div.innerText = "Couldn't load Banner. Check console for more details.";
+          pre.innerText = "Couldn't load Banner. Check console for more details.";
+          pre.innerText = `${error.name}: ${error.message}`;
         }
+        div.appendChild(pre);
         return div;
       },
     };
@@ -42,8 +44,48 @@
     }
   </style>
   <body>
+    <div style="padding-right: 1rem">
+      <h3>Standalone Banner</h3>
+      <pre>
+        <code>
+          &lt;topsort-banner id="an-example-slot" width="800" height="400"&gt;&lt;/topsort-banner&gt;
+        </code>
+      </pre>
+      <div style="outline 1px solid black">
+        <topsort-banner id="an-example-slot" width="800" height="400"></topsort-banner>
+      </div>
+    </div>
     <div style="outline 1px solid black">
-      <topsort-banner id="<your-slot-id>" width="600" height="400"></topsort-banner>
+      <h3>Multiple Banners under one context</h3>
+      <pre>
+        <code>
+          &lt;topsort-banner-context id="an-example-slot" width="800" height="400" context&gt;
+            &lt;div&gt;
+              &lt;h3&gt;First Banner&lt;/h3&gt;
+              &lt;pre&gt;
+                &lt;code&gt;
+                  &lt;topsort-banner-slot rank="1"&gt;&lt;/topsort-banner-slot&gt;
+                &lt;/code&gt;
+              &lt;/pre&gt;
+              &lt;topsort-banner-slot rank="1"&gt;&lt;/topsort-banner-slot&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+              &lt;h3&gt;Second Banner&lt;/h3&gt;
+              &lt;topsort-banner-slot rank="2"&gt;&lt;/topsort-banner-slot&gt;
+            &lt;/div&gt;
+          &lt;/topsort-banner-context&gt;
+        </code>
+      </pre>
+      <topsort-banner-context id="an-example-slot" width="800" height="400" context>
+        <div>
+          <h3>First Banner</h3>
+          <topsort-banner-slot rank="1"></topsort-banner-slot>
+        </div>
+        <div>
+          <h3>Second Banner</h3>
+          <topsort-banner-slot rank="2"></topsort-banner-slot>
+        </div>
+      </topsort-banner-context>
     </div>
   </body>
 </html>

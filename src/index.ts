@@ -1,7 +1,7 @@
-import { ContextProvider, consume, createContext, provide } from "@lit/context";
+import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { LitElement, type TemplateResult, css, html } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
@@ -159,11 +159,6 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
     height: this.height,
   };
 
-  // task = new Task(this, {
-  //   task: async (_, options) => await runAuction(this.buildAuction(), { ...options, logError }),
-  //   args: () => [],
-  // });
-
   buildAuction(): Auction {
     const auction = super.buildAuction();
     const slots = this.querySelectorAll("topsort-banner-slot").length;
@@ -189,7 +184,6 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
       signal,
     })
       .then((banners) => {
-        console.log("banners", banners);
         this.context = {
           width: this.width,
           height: this.height,
@@ -197,7 +191,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
         };
       })
       .catch((error) => {
-        console.error(error);
+        logError(error);
         this.context = {
           width: this.width,
           height: this.height,
@@ -209,7 +203,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
 
 @customElement("topsort-banner-slot")
 export class TopsortBannerSlot extends LitElement {
-  @consume({ context: bannerContext })
+  @consume({ context: bannerContext, subscribe: true })
   @property({ attribute: false })
   public context?: BannerContext;
 
@@ -217,7 +211,6 @@ export class TopsortBannerSlot extends LitElement {
   readonly rank = 0;
 
   protected render() {
-    console.log("render", this, this.context);
     if (this.context?.error) {
       return getErrorElement(this.context.error);
     }

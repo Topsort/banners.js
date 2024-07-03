@@ -1,5 +1,3 @@
-import type { Task } from "@lit/task";
-
 export interface Auction {
   type: "banners";
   slots: number;
