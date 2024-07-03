@@ -27,4 +27,5 @@ export interface BannerContext {
   height: number;
   banners?: Banner[];
   error?: unknown;
+  newTab: boolean;
 }

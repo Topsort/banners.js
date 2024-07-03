@@ -71,7 +71,12 @@ function getNoWinnersElement(): TemplateResult {
   return html``;
 }
 
-function getBannerElement(banner: Banner, width: number, height: number): TemplateResult {
+function getBannerElement(
+  banner: Banner,
+  width: number,
+  height: number,
+  newTab: boolean,
+): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
     return html`${element}`;
@@ -85,10 +90,10 @@ function getBannerElement(banner: Banner, width: number, height: number): Templa
       }
     `;
   const href = getLink(banner);
-    const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
-    const atag = this.newTab
-      ? html`<a href="${href}" target="_blank">${imgtag}</a>`
-      : html`<a href="${href}">${imgtag}</a>`;
+  const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
+  const atag = newTab
+    ? html`<a href="${href}" target="_blank">${imgtag}</a>`
+    : html`<a href="${href}">${imgtag}</a>`;
   return html`
         <div style="${style}"
              data-ts-clickable
@@ -120,7 +125,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.height, this.width);
+        return getBannerElement(banners[0], this.height, this.width, this.newTab);
       },
       error: (error) => getErrorElement(error),
     });
@@ -159,6 +164,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
   protected context: BannerContext = {
     width: this.width,
     height: this.height,
+		newTab: this.newTab,
   };
 
   buildAuction(): Auction {
@@ -180,6 +186,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
     this.context = {
       width: this.width,
       height: this.height,
+      newTab: this.newTab,
     };
     runAuction(this.buildAuction(), {
       logError,
@@ -189,6 +196,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
         this.context = {
           width: this.width,
           height: this.height,
+          newTab: this.newTab,
           banners,
         };
       })
@@ -197,6 +205,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
         this.context = {
           width: this.width,
           height: this.height,
+          newTab: this.newTab,
           error,
         };
       });
@@ -223,7 +232,7 @@ export class TopsortBannerSlot extends LitElement {
     if (!banner) {
       return html``;
     }
-    return getBannerElement(banner, this.context.width, this.context.height);
+    return getBannerElement(banner, this.context.width, this.context.height, this.context.newTab);
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
