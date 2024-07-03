@@ -46,6 +46,21 @@ Directly from unpkg.com
 </body>
 ```
 
+## Rendering multiple banners with one slot ID
+
+You can render multiple banners using the same slot ID and dimensions by setting up
+a banner context. This is useful when you want to run an auction with multiple results.
+To do that you have to use the `topsort-banner-context` and `topsort-banner-slot` elements.
+`topsort-banner-context` takes the same properties as the regular `topsort-banner` element.
+
+```html
+<topsort-banner-context width="600" height="400" id="<your slot id>">
+  <topsort-banner-slot rank="1"></topsort-banner-slot>
+  <topsort-banner-slot rank="2"></topsort-banner-slot>
+  <topsort-banner-slot rank="3"></topsort-banner-slot>
+</topsort-banner-context>
+```
+
 # Banner Attributes
 
 | Name                   | Type             | Description                                                                 |
