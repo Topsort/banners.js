@@ -164,7 +164,7 @@ export class TopsortBannerContext extends BannerComponent(LitElement) {
   protected context: BannerContext = {
     width: this.width,
     height: this.height,
-		newTab: this.newTab,
+    newTab: this.newTab,
   };
 
   buildAuction(): Auction {
