@@ -35,7 +35,7 @@ export async function runAuction(
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
-      "X-UA": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device}})`,
+      "X-UA": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device})`,
     },
     body: JSON.stringify({
       auctions: [auction],
