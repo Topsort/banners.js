@@ -18,7 +18,7 @@ export declare class BannerComponentInterface {
   newTab: boolean;
 
   emitEvent(status: string): void;
-  buildAuction(): Auction;
+  buildAuction(slots: number): Auction;
 }
 
 export const BannerComponent = <T extends Constructor<LitElement>>(Base: T) => {
@@ -50,11 +50,11 @@ export const BannerComponent = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ attribute: "new-tab", type: Boolean })
     readonly newTab: boolean = false;
 
-    buildAuction(): Auction {
+    buildAuction(slots: number): Auction {
       const device = getDeviceType();
       const auction: Auction = {
         type: "banners",
-        slots: 1,
+        slots: slots,
         device,
         slotId: this.slotId,
       };

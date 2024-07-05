@@ -25,7 +25,7 @@ export interface Banner {
 export interface BannerContext {
   width: number;
   height: number;
+  newTab: boolean;
   banners?: Banner[];
   error?: unknown;
-  newTab: boolean;
 }
