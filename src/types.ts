@@ -1,6 +1,6 @@
 export interface Auction {
   type: "banners";
-  slots: 1;
+  slots: number;
   device: "mobile" | "desktop";
   slotId: string;
   category?: {
@@ -20,4 +20,12 @@ export interface Banner {
   id: string;
   resolvedBidId: string;
   asset: [{ url: string }];
+}
+
+export interface BannerContext {
+  width: number;
+  height: number;
+  newTab: boolean;
+  banners?: Banner[];
+  error?: unknown;
 }

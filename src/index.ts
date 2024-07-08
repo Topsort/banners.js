@@ -1,8 +1,11 @@
+import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { LitElement, type TemplateResult, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { TopsortConfigurationError, TopsortRequestError } from "./errors";
-import type { Auction, Banner } from "./types";
+import { runAuction } from "./auction";
+import { TopsortConfigurationError } from "./errors";
+import { BannerComponent } from "./mixin";
+import type { Banner, BannerContext } from "./types";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -30,114 +33,67 @@ function logError(error: unknown) {
   }
 }
 
-const getDeviceType = (): "mobile" | "desktop" => {
-  const ua = navigator.userAgent;
-  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
-    //return "tablet";
-    return "mobile";
+// The following methods are used to customize the appearance of the banner component.
+function getLink(banner: Banner): string {
+  if (window.TS_BANNERS.getLink) {
+    return window.TS_BANNERS.getLink(banner);
   }
-  if (
-    /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
-      ua,
-    )
-  ) {
-    return "mobile";
+  if (banner.type === "url") {
+    return banner.id;
   }
-  return "desktop";
-};
+  return `${banner.type}/${banner.id}`;
+}
 
-/**
- * A banner web component that runs an auction and renders the winning banner.
- */
-@customElement("topsort-banner")
-export class TopsortBanner extends LitElement {
-  @property({ type: Number })
-  readonly width = 0;
-
-  @property({ type: Number })
-  readonly height = 0;
-
-  @property({ attribute: "id", type: String })
-  readonly slotId: string = "";
-
-  @property({ attribute: "category-id", type: String })
-  readonly categoryId?: string;
-
-  @property({ attribute: "category-ids", type: String })
-  readonly categoryIds?: string;
-
-  @property({ attribute: "category-disjunctions", type: String })
-  readonly categoryDisjunctions?: string;
-
-  @property({ attribute: "search-query", type: String })
-  readonly searchQuery?: string;
-
-  @property({ attribute: "location", type: String })
-  readonly location?: string;
-
-  @property({ attribute: "new-tab", type: Boolean })
-  readonly newTab?: boolean;
-
-  private task = new Task(this, {
-    task: (...args) => this.runAuction(...args),
-    args: () => [],
-  });
-
-  private getLink(banner: Banner): string {
-    if (window.TS_BANNERS.getLink) {
-      return window.TS_BANNERS.getLink(banner);
-    }
-    if (banner.type === "url") {
-      return banner.id;
-    }
-    return `${banner.type}/${banner.id}`;
+function getLoadingElement(): TemplateResult {
+  if (window.TS_BANNERS.getLoadingElement) {
+    const element = window.TS_BANNERS.getLoadingElement();
+    return html`${element}`;
   }
+  // By default, hide the component while loading
+  return html``;
+}
 
-  private getLoadingElement(): TemplateResult {
-    if (window.TS_BANNERS.getLoadingElement) {
-      const element = window.TS_BANNERS.getLoadingElement();
-      return html`${element}`;
-    }
-    // By default, hide the component while loading
-    return html``;
+function getErrorElement(error: unknown): TemplateResult {
+  if (window.TS_BANNERS.getErrorElement) {
+    const element = window.TS_BANNERS.getErrorElement(error);
+    return html`${element}`;
   }
+  // By default, hide the component if there is an error
+  return html``;
+}
 
-  private getErrorElement(error: unknown): TemplateResult {
-    if (window.TS_BANNERS.getErrorElement) {
-      const element = window.TS_BANNERS.getErrorElement(error);
-      return html`${element}`;
-    }
-    // By default, hide the component if there is an error
-    return html``;
+function getNoWinnersElement(): TemplateResult {
+  if (window.TS_BANNERS.getNoWinnersElement) {
+    const element = window.TS_BANNERS.getNoWinnersElement();
+    return html`${element}`;
   }
+  // By default, hide the component if there are no winners
+  return html``;
+}
 
-  private getNoWinnersElement(): TemplateResult {
-    if (window.TS_BANNERS.getNoWinnersElement) {
-      const element = window.TS_BANNERS.getNoWinnersElement();
-      return html`${element}`;
-    }
-    // By default, hide the component if there are no winners
-    return html``;
+function getBannerElement(
+  banner: Banner,
+  width: number,
+  height: number,
+  newTab: boolean,
+): TemplateResult {
+  if (window.TS_BANNERS.getBannerElement) {
+    const element = window.TS_BANNERS.getBannerElement(banner);
+    return html`${element}`;
   }
-
-  private getBannerElement(banner: Banner): TemplateResult {
-    if (window.TS_BANNERS.getBannerElement) {
-      const element = window.TS_BANNERS.getBannerElement(banner);
-      return html`${element}`;
-    }
-    const src = banner.asset[0].url;
-    const style = css`
+  const src = banner.asset[0].url;
+  const style = css`
       img {
-        width: ${this.width}px;
-        height: ${this.height}px;
+        width: ${width}px;
+        height: ${height}px;
       }
     `;
-    const href = this.getLink(banner);
-    const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
-    const atag = this.newTab
-      ? html`<a href="${href}" target="_blank">${imgtag}</a>`
-      : html`<a href="${href}">${imgtag}</a>`;
-    return html`
+  const href = getLink(banner);
+  const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
+  const atag = newTab
+    ? html`<a href="${href}" target="_blank">${imgtag}</a>`
+    : html`<a href="${href}">${imgtag}</a>`;
+  return html`
         <div style="${style}"
              data-ts-clickable
              data-ts-resolved-bid=${banner.resolvedBidId}
@@ -145,97 +101,142 @@ export class TopsortBanner extends LitElement {
           ${atag}
         </div>
         `;
-  }
+}
 
-  private emitEvent(status: string) {
-    const event = new CustomEvent("statechange", {
-      detail: { slotId: this.slotId, status },
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(event);
+const bannerContext = createContext<BannerContext>(Symbol("banner-context"));
+const bannerContextHasChanged = (newVal: BannerContext, oldVal?: BannerContext) => {
+  if (!oldVal && newVal) {
+    return true;
   }
+  if (newVal == null || oldVal == null) {
+    return false;
+  }
+  return (
+    newVal.width !== oldVal.width ||
+    newVal.height !== oldVal.height ||
+    newVal.newTab !== oldVal.newTab ||
+    !!newVal.error !== !!oldVal.error ||
+    newVal.banners?.length !== oldVal.banners?.length
+  );
+};
 
-  private buildAuction(): Auction {
-    const device = getDeviceType();
-    const auction: Auction = {
-      type: "banners",
-      slots: 1,
-      device,
-      slotId: this.slotId,
-    };
-    if (this.categoryId) {
-      auction.category = {
-        id: this.categoryId,
-      };
-    } else if (this.categoryIds) {
-      auction.category = {
-        ids: this.categoryIds.split(",").map((item) => item.trim()),
-      };
-    } else if (this.categoryDisjunctions) {
-      auction.category = {
-        disjunctions: [this.categoryDisjunctions.split(",").map((item) => item.trim())],
-      };
-    } else if (this.searchQuery) {
-      auction.searchQuery = this.searchQuery;
-    }
-    if (this.location) {
-      auction.geoTargeting = {
-        location: this.location,
-      };
-    }
-    return auction;
-  }
+/**
+ * A banner web component that runs an auction and renders the winning banner.
+ */
+@customElement("topsort-banner")
+export class TopsortBanner extends BannerComponent(LitElement) {
+  private task = new Task(this, {
+    task: ([slots], options) =>
+      runAuction(this.buildAuction(slots), { ...options, logError })
+        .then((winners) => {
+          options.signal.throwIfAborted();
+          if (this.isContext) {
+            this.context = { ...this.context, banners: winners };
+          }
+          return winners;
+        })
+        .catch((error) => {
+          options.signal.throwIfAborted();
+          if (this.isContext) {
+            this.context = { ...this.context, error };
+          }
+          throw error;
+        }),
+    args: () => [this.slots?.length || 1],
+  });
 
-  private async runAuction(_: never[], { signal }: { signal: AbortSignal }): Promise<Banner[]> {
-    const auction = this.buildAuction();
-    console.debug("Running auction", auction);
-    const device = getDeviceType();
-    const token = window.TS.token;
-    const url = window.TS.url || "https://api.topsort.com";
-    const res = await fetch(new URL(`${url}/v2/auctions`), {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        "X-UA": `topsort/banners-${import.meta.env.PACKAGE_VERSION} (${device})`,
-      },
-      body: JSON.stringify({
-        auctions: [auction],
-      }),
-      signal,
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      logError(error);
-      throw new Error(error.message);
-    }
-    const data = await res.json();
-    const result = data.results[0];
-    if (!result) throw new TopsortRequestError("No auction results", res.status);
-    if (result.error) {
-      logError(result.error);
-      throw new Error(result.error);
-    }
-    return result.winners;
-  }
+  @provide({ context: bannerContext })
+  @property({ attribute: false, hasChanged: bannerContextHasChanged })
+  private context: BannerContext = {
+    width: this.width,
+    height: this.height,
+    newTab: this.newTab,
+  };
+
+  @property({ type: Boolean, attribute: "context" })
+  readonly isContext: boolean = false;
+
+  @property({ attribute: false, state: true })
+  private slots?: NodeListOf<Element>;
 
   protected render() {
     if (!window.TS.token || !this.slotId) {
-      return this.getErrorElement(new TopsortConfigurationError(window.TS.token, this.slotId));
+      return getErrorElement(new TopsortConfigurationError(window.TS.token, this.slotId));
+    }
+    if (this.isContext) {
+      return html``;
     }
     return this.task.render({
-      pending: () => this.getLoadingElement(),
+      pending: () => getLoadingElement(),
       complete: (banners) => {
         this.emitEvent(banners.length ? "ready" : "nowinners");
         if (!banners.length) {
-          return this.getNoWinnersElement();
+          return getNoWinnersElement();
         }
-        return this.getBannerElement(banners[0]);
+        return getBannerElement(banners[0], this.height, this.width, this.newTab);
       },
-      error: (error) => this.getErrorElement(error),
+      error: (error) => getErrorElement(error),
     });
+  }
+
+  updated(changedProperties: Map<string | number | symbol, unknown>) {
+    super.updated(changedProperties);
+
+    if (this.isContext && !changedProperties.has("slots")) {
+      Promise.resolve().then(() => {
+        this.slots = this.renderRoot.querySelectorAll("topsort-banner-slot");
+      });
+    }
+
+    if (
+      changedProperties.has("width") ||
+      changedProperties.has("height") ||
+      changedProperties.has("newTab")
+    ) {
+      Promise.resolve().then(() => {
+        this.context = {
+          width: this.width,
+          height: this.height,
+          newTab: this.newTab,
+        };
+      });
+    }
+  }
+
+  // avoid shadow dom since we cannot attach to events via analytics.js
+  protected createRenderRoot() {
+    return this;
+  }
+}
+
+@customElement("topsort-banner-slot")
+export class TopsortBannerSlot extends LitElement {
+  @consume({ context: bannerContext, subscribe: true })
+  @property({ attribute: false })
+  readonly context?: BannerContext;
+
+  @property({ attribute: "rank", type: Number })
+  readonly rank = 0;
+
+  protected render() {
+    if (!this.context) {
+      return html``;
+    }
+    if (!this.context.banners) {
+      return getLoadingElement();
+    }
+    if (this.context.error) {
+      return getErrorElement(this.context.error);
+    }
+    if (!this.context.banners.length || this.context.banners.length < this.rank) {
+      return getNoWinnersElement();
+    }
+    return getBannerElement(
+      this.context.banners[this.rank - 1],
+      this.context.width,
+      this.context.height,
+      this.context.newTab,
+    );
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js

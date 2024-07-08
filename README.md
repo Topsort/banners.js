@@ -46,6 +46,21 @@ Directly from unpkg.com
 </body>
 ```
 
+## Rendering multiple banners with one slot ID
+
+You can render multiple banners using the same slot ID and dimensions by setting up
+a banner context. This is useful when you want to run an auction with multiple results.
+To do that you have to pass the attribute `context="true"` to the `topsort-banner` and
+use `topsort-banner-slot` as children elements.
+
+```html
+<topsort-banner context="true" width="600" height="400" id="<your slot id>">
+  <topsort-banner-slot rank="1"></topsort-banner-slot>
+  <topsort-banner-slot rank="2"></topsort-banner-slot>
+  <topsort-banner-slot rank="3"></topsort-banner-slot>
+</topsort-banner-context>
+```
+
 # Banner Attributes
 
 | Name                   | Type             | Description                                                                 |
@@ -58,10 +73,16 @@ Directly from unpkg.com
 | category-disjunctions* | Optional String  | Comma (,) separated list of category IDs, the item must match any           |
 | search-query           | Optional String  | The search query of the current page                                        |
 | location               | Optional String  | The location for geotargeting                                               |
-| new-tab                | Optional Boolean | Opens the banner's link in a new tab (defaults to false)                             |
+| new-tab                | Optional Boolean | Opens the banner's link in a new tab (defaults to false)                    |
+| context                | Optional Boolean | Uses the element as a context provider to render multiple banners           |
 
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.
 If multiple are set, only the first will be considered, in that order.
+
+# Banner Slot Attributes
+| Name | Type   | Description                                                                                                           |
+|------|--------|-----------------------------------------------------------------------------------------------------------------------|
+| rank | Number | The ranking of the slot. Ranks should be sorted the same as the winning bids. The lower the rank, the higher the bid  |
 
 # Banner Behaviors
 
