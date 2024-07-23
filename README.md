@@ -58,7 +58,7 @@ use `topsort-banner-slot` as children elements.
   <topsort-banner-slot rank="1"></topsort-banner-slot>
   <topsort-banner-slot rank="2"></topsort-banner-slot>
   <topsort-banner-slot rank="3"></topsort-banner-slot>
-</topsort-banner-context>
+</topsort-banner>
 ```
 
 # Banner Attributes
