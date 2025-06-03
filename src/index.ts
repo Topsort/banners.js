@@ -2,11 +2,11 @@ import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { LitElement, type TemplateResult, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import getVideoAssetUrl from "../utils/transform-video-urls";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
 import type { Banner, BannerContext } from "./types";
-import getVideoAssetUrl from "../utils/transform-video-urls";
 
 /* Set up global environment for TS_BANNERS */
 
