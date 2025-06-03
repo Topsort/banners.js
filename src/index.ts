@@ -83,8 +83,7 @@ function getBannerElement(
     return html`${element}`;
   }
   const src = banner.asset[0].url;
-  console.log(src);
-
+  
   // classifying if the banner is a video
   const isVideo = src.endsWith(".mp4") || src.endsWith(".mov") || src.endsWith(".m3u8")
   const media = isVideo
@@ -107,7 +106,6 @@ function getBannerElement(
       `;
   
   const href = getLink(banner);
-  // const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
   const wrappedMedia = newTab
     ? html`<a href="${href}" target="_blank">${media}</a>`
     : html`<a href="${href}">${media}</a>`;
