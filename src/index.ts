@@ -6,6 +6,7 @@ import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
 import type { Banner, BannerContext } from "./types";
+import getVideoAssetUrl from "../utils/transform-video-urls";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -82,25 +83,43 @@ function getBannerElement(
     return html`${element}`;
   }
   const src = banner.asset[0].url;
-  const style = css`
-      img {
-        width: ${width}px;
-        height: ${height}px;
-      }
-    `;
+  console.log(src);
+
+  // classifying if the banner is a video
+  const isVideo = src.endsWith(".mp4") || src.endsWith(".mov") || src.endsWith(".m3u8")
+  const media = isVideo
+    ? html`
+        <iframe
+          src="${getVideoAssetUrl(src)}"
+          autoplay
+          muted
+          loop
+          playsinline
+          style="width:${width}px; height:${height}px; object-fit:cover;"
+        ></iframe>
+      `
+    : html`
+        <img
+          src="${src}"
+          alt="Topsort banner"
+          style="width:${width}px; height:${height}px; object-fit:cover;"
+        />
+      `;
+  
   const href = getLink(banner);
-  const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
-  const atag = newTab
-    ? html`<a href="${href}" target="_blank">${imgtag}</a>`
-    : html`<a href="${href}">${imgtag}</a>`;
-  return html`
-        <div style="${style}"
-             data-ts-clickable
-             data-ts-resolved-bid=${banner.resolvedBidId}
-             class="ts-banner">
-          ${atag}
-        </div>
-        `;
+  // const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
+  const wrappedMedia = newTab
+    ? html`<a href="${href}" target="_blank">${media}</a>`
+    : html`<a href="${href}">${media}</a>`;
+    return html`
+    <div
+      data-ts-clickable
+      data-ts-resolved-bid=${banner.resolvedBidId}
+      class="ts-banner"
+    >
+      ${wrappedMedia}
+    </div>
+  `;
 }
 
 const bannerContext = createContext<BannerContext>(Symbol("banner-context"));
