@@ -1,6 +1,6 @@
 import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { LitElement, type TemplateResult, css, html } from "lit";
+import { LitElement, type TemplateResult, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
@@ -83,9 +83,9 @@ function getBannerElement(
     return html`${element}`;
   }
   const src = banner.asset[0].url;
-  
+
   // classifying if the banner is a video
-  const isVideo = src.endsWith(".mp4") || src.endsWith(".mov") || src.endsWith(".m3u8")
+  const isVideo = src.endsWith(".mp4") || src.endsWith(".mov") || src.endsWith(".m3u8");
   const media = isVideo
     ? html`
         <iframe
@@ -104,12 +104,12 @@ function getBannerElement(
           style="width:${width}px; height:${height}px; object-fit:cover;"
         />
       `;
-  
+
   const href = getLink(banner);
   const wrappedMedia = newTab
     ? html`<a href="${href}" target="_blank">${media}</a>`
     : html`<a href="${href}">${media}</a>`;
-    return html`
+  return html`
     <div
       data-ts-clickable
       data-ts-resolved-bid=${banner.resolvedBidId}
