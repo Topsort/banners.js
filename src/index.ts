@@ -82,10 +82,27 @@ function getBannerElement(
     const element = window.TS_BANNERS.getBannerElement(banner);
     return html`${element}`;
   }
+
+  if (!banner.asset?.[0]?.url) {
+    logError(new Error("Invalid banner asset: missing URL"));
+    return html``;
+  }
   const src = banner.asset[0].url;
 
-  // classifying if the banner is a video
-  const isVideo = src.endsWith(".mp4") || src.endsWith(".mov") || src.endsWith(".m3u8");
+  const isVideo = (() => {
+    try {
+      const url = new URL(src);
+      const parts = url.pathname.split("/");
+      const manifestIndex = parts.indexOf("manifest");
+      if (manifestIndex >= 0) {
+        const nextSegment = parts[manifestIndex + 1];
+        return nextSegment?.startsWith("video") ?? false;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  })();
   const media = isVideo
     ? html`
         <iframe
