@@ -1,7 +1,8 @@
 import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { LitElement, type TemplateResult, css, html } from "lit";
+import { LitElement, type TemplateResult, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import getVideoAssetUrl from "../utils/transform-video-urls";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
@@ -81,26 +82,59 @@ function getBannerElement(
     const element = window.TS_BANNERS.getBannerElement(banner);
     return html`${element}`;
   }
+
+  if (!banner.asset?.[0]?.url) {
+    logError(new Error("Invalid banner asset: missing URL"));
+    return html``;
+  }
   const src = banner.asset[0].url;
-  const style = css`
-      img {
-        width: ${width}px;
-        height: ${height}px;
+
+  const isVideo = (() => {
+    try {
+      const url = new URL(src);
+      const parts = url.pathname.split("/");
+      const manifestIndex = parts.indexOf("manifest");
+      if (manifestIndex >= 0) {
+        const nextSegment = parts[manifestIndex + 1];
+        return nextSegment?.startsWith("video") ?? false;
       }
-    `;
+      return false;
+    } catch {
+      return false;
+    }
+  })();
+  const media = isVideo
+    ? html`
+        <iframe
+          src="${getVideoAssetUrl(src)}"
+          autoplay
+          muted
+          loop
+          playsinline
+          style="width:${width}px; height:${height}px; object-fit:cover;"
+        ></iframe>
+      `
+    : html`
+        <img
+          src="${src}"
+          alt="Topsort banner"
+          style="width:${width}px; height:${height}px; object-fit:cover;"
+        />
+      `;
+
   const href = getLink(banner);
-  const imgtag = html`<img src="${src}" alt="Topsort banner"></img>`;
-  const atag = newTab
-    ? html`<a href="${href}" target="_blank">${imgtag}</a>`
-    : html`<a href="${href}">${imgtag}</a>`;
+  const wrappedMedia = newTab
+    ? html`<a href="${href}" target="_blank">${media}</a>`
+    : html`<a href="${href}">${media}</a>`;
   return html`
-        <div style="${style}"
-             data-ts-clickable
-             data-ts-resolved-bid=${banner.resolvedBidId}
-             class="ts-banner">
-          ${atag}
-        </div>
-        `;
+    <div
+      data-ts-clickable
+      data-ts-resolved-bid=${banner.resolvedBidId}
+      class="ts-banner"
+    >
+      ${wrappedMedia}
+    </div>
+  `;
 }
 
 const bannerContext = createContext<BannerContext>(Symbol("banner-context"));
