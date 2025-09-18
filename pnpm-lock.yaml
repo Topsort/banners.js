@@ -9,32 +9,32 @@ importers:
   .:
     dependencies:
       '@lit/context':
-        specifier: ^1.1.2
+        specifier: 1.1.2
         version: 1.1.2
       '@lit/task':
-        specifier: ^1.0.1
+        specifier: 1.0.1
         version: 1.0.1
       lit:
-        specifier: ^3.1.3
+        specifier: 3.1.3
         version: 3.1.3
       skeleton-webcomponent-loader:
-        specifier: ^2.1.4
+        specifier: 2.1.4
         version: 2.1.4
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.7.0
+        specifier: 1.7.0
         version: 1.7.0
       '@types/node':
-        specifier: ^20.12.7
+        specifier: 20.12.7
         version: 20.12.7
       typescript:
-        specifier: ^5.4.5
+        specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: ^5.2.9
+        specifier: 5.2.9
         version: 5.2.9(@types/node@20.12.7)
       vite-plugin-dts:
-        specifier: ^3.8.3
+        specifier: 3.8.3
         version: 3.8.3(@types/node@20.12.7)(rollup@4.14.3)(typescript@5.4.5)(vite@5.2.9(@types/node@20.12.7))
 
 packages:
@@ -399,9 +399,6 @@ packages:
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
 
-  '@types/estree@1.0.3':
-    resolution: {integrity: sha512-CS2rOaoQ/eAgAfcTfq6amKG7bsN+EMcgGY4FAFQdvSj2y1ixvOZTUA9mOtCai7E1SYu283XNw7urKK30nP3wkQ==}
-
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
@@ -545,9 +542,11 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -618,10 +617,6 @@ packages:
   skeleton-webcomponent-loader@2.1.4:
     resolution: {integrity: sha512-PFbjOB2pTgHEJF2rhuutOyk+HOWLpHqOXhRjIRJqcud+LhvV92QlWeTb2Y7zxj89gpSZb3NIp0ZsJ0ns3/4SYQ==}
     engines: {node: '>=12'}
-
-  source-map-js@1.0.2:
-    resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
-    engines: {node: '>=0.10.0'}
 
   source-map-js@1.2.0:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}
@@ -906,7 +901,7 @@ snapshots:
 
   '@rollup/pluginutils@5.1.0(rollup@4.14.3)':
     dependencies:
-      '@types/estree': 1.0.3
+      '@types/estree': 1.0.5
       estree-walker: 2.0.2
       picomatch: 2.3.1
     optionalDependencies:
@@ -1000,8 +995,6 @@ snapshots:
 
   '@types/argparse@1.0.38': {}
 
-  '@types/estree@1.0.3': {}
-
   '@types/estree@1.0.5': {}
 
   '@types/node@20.12.7':
@@ -1028,7 +1021,7 @@ snapshots:
       '@babel/parser': 7.23.0
       '@vue/shared': 3.3.4
       estree-walker: 2.0.2
-      source-map-js: 1.0.2
+      source-map-js: 1.2.0
 
   '@vue/compiler-dom@3.3.4':
     dependencies:
@@ -1256,8 +1249,6 @@ snapshots:
     dependencies:
       '@stencil/core': 2.22.3
       '@stencil/sass': 1.5.2(@stencil/core@2.22.3)
-
-  source-map-js@1.0.2: {}
 
   source-map-js@1.2.0: {}
 
