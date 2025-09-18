@@ -16,7 +16,12 @@
   "main": "dist/banners.mjs",
   "module": "dist/banners.mjs",
   "license": "MIT",
-  "keywords": ["banners", "web-components", "topsort", "ads"],
+  "keywords": [
+    "banners",
+    "web-components",
+    "topsort",
+    "ads"
+  ],
   "homepage": "https://github.com/Topsort/banners.js",
   "exports": {
     ".": {
@@ -25,7 +30,13 @@
     }
   },
   "types": "dist/banners.d.ts",
-  "files": ["dist", "types", "package.json", "README.md", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "types",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve",
@@ -35,7 +46,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.0",
+    "@biomejs/biome": "2.2.4",
     "@types/node": "20.12.7",
     "typescript": "5.4.5",
     "vite": "5.2.9",
