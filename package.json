@@ -1,11 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@topsort/banners",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A web component for displaying Topsort banner ads.",
   "type": "module",
   "author": "Topsort",
   "packageManager": "pnpm@9.0.6",
+  "repository": {
+    "url": "https://github.com/Topsort/banners.js"
+  },
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9"
@@ -13,8 +16,13 @@
   "main": "dist/banners.mjs",
   "module": "dist/banners.mjs",
   "license": "MIT",
-  "keywords": ["banners", "web-components", "topsort", "ads"],
-  "homepage": "https://github.com/Topsort/banners.js#readme",
+  "keywords": [
+    "banners",
+    "web-components",
+    "topsort",
+    "ads"
+  ],
+  "homepage": "https://github.com/Topsort/banners.js",
   "exports": {
     ".": {
       "import": "./dist/banners.mjs",
@@ -22,7 +30,13 @@
     }
   },
   "types": "dist/banners.d.ts",
-  "files": ["dist", "types", "package.json", "README.md", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "types",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve",
@@ -32,16 +46,16 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.0",
-    "@types/node": "^20.12.7",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.9",
-    "vite-plugin-dts": "^3.8.3"
+    "@biomejs/biome": "2.2.4",
+    "@types/node": "20.12.7",
+    "typescript": "5.4.5",
+    "vite": "5.2.9",
+    "vite-plugin-dts": "3.8.3"
   },
   "dependencies": {
-    "@lit/context": "^1.1.2",
-    "@lit/task": "^1.0.1",
-    "lit": "^3.1.3",
-    "skeleton-webcomponent-loader": "^2.1.4"
+    "@lit/context": "1.1.2",
+    "@lit/task": "1.0.1",
+    "lit": "3.1.3",
+    "skeleton-webcomponent-loader": "2.1.4"
   }
 }

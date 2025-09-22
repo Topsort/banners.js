@@ -11,7 +11,7 @@ export default function getVideoAssetUrl(url: string | undefined) {
       urlObj.search
     }`;
     return videoUrl;
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

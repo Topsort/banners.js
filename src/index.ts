@@ -1,6 +1,6 @@
 import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { LitElement, type TemplateResult, html } from "lit";
+import { html, LitElement, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import getVideoAssetUrl from "../utils/transform-video-urls";
 import { runAuction } from "./auction";

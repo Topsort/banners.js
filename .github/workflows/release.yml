@@ -4,6 +4,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  id-token: write
+  contents: read
+
 env:
   lockfile: pnpm-lock.yaml
   node_version: "20"
@@ -11,7 +15,7 @@ env:
 jobs:
   npm-publish:
     name: Publish to NPM
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -34,8 +38,9 @@ jobs:
       - name: Build dist
         run: pnpm run build
 
+      - name: Update npm
+        run: npm install -g npm@latest
+  
       - name: Publish to npm
         id: publish
-        run: |
-          pnpm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-          pnpm publish --access public --no-git-checks
+        run: npm publish --no-git-checks
