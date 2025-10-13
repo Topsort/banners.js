@@ -106,12 +106,10 @@ function getBannerElement(
   const media = isVideo
     ? html`
         <iframe
-          src="${getVideoAssetUrl(src)}"
-          autoplay
-          muted
-          loop
-          playsinline
-          style="width:${width}px; height:${height}px; object-fit:cover;"
+          src="${getVideoAssetUrl(src)}?autoplay=1&muted=1&loop=1&controls=0"
+          style="width:${width}px; height:${height}px; object-fit:cover; border:none;"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
         ></iframe>
       `
     : html`
