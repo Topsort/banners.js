@@ -1,8 +1,7 @@
 import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { html, LitElement, type TemplateResult } from "lit";
+import { css, html, LitElement, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import getVideoAssetUrl from "../utils/transform-video-urls";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
@@ -105,12 +104,10 @@ function getBannerElement(
   })();
   const media = isVideo
     ? html`
-        <iframe
-          src="${getVideoAssetUrl(src)}?autoplay=1&muted=1&loop=1&controls=0"
-          style="width:${width}px; height:${height}px; object-fit:cover; border:none;"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-        ></iframe>
+        <hls-video
+          src="${src}"
+          style="width:800px; height:400px;"
+        ></hls-video>
       `
     : html`
         <img
@@ -274,5 +271,43 @@ export class TopsortBannerSlot extends LitElement {
   // avoid shadow dom since we cannot attach to events via analytics.js
   protected createRenderRoot() {
     return this;
+  }
+}
+
+@customElement('hls-video')
+export class HlsVideo extends LitElement {
+  static styles = css`
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  `;
+
+  @property({ type: String }) src = ''; // HLS manifest URL
+
+  render() {
+    return html`<video
+      id="${this.src.split('/')[3]}"
+      muted
+      autoplay
+      loop
+      playsinline
+    ></video>`;
+  }
+
+  firstUpdated() {
+    const video = this.shadowRoot!.getElementById(this.src.split('/')[3]) as HTMLVideoElement;
+    console.log("Here: ", this.src.split('/')[3]);
+    if (!video) {
+      return null;
+    }
+    const hls = new (window as any).Hls();
+    hls.attachMedia(video);
+    hls.on((window as any).Hls.Events.MEDIA_ATTACHED, () => {
+      hls.loadSource(this.src);
+    });
+    video.play();
   }
 }
