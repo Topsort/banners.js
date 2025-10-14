@@ -1,6 +1,6 @@
 import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { css, html, LitElement, type TemplateResult } from "lit";
+import { html, LitElement, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
@@ -275,18 +275,17 @@ export class TopsortBannerSlot extends LitElement {
   }
 }
 
-@customElement('hls-video')
+@customElement("hls-video")
 export class HlsVideo extends LitElement {
-
-  @property({ type: String }) src = ''; // HLS manifest URL
-  @property({ type: String }) width = '800px';
-  @property({ type: String }) height = '400px';
+  @property({ type: String }) src = ""; // HLS manifest URL
+  @property({ type: String }) width = "800px";
+  @property({ type: String }) height = "400px";
 
   private get videoId() {
     try {
-      return new URL(this.src).pathname.split('/')[1]; // safer and clearer
+      return new URL(this.src).pathname.split("/")[1]; // safer and clearer
     } catch {
-      return 'hls-video';
+      return "hls-video";
     }
   }
 
@@ -302,19 +301,17 @@ export class HlsVideo extends LitElement {
     `;
   }
 
-  
-
   firstUpdated() {
     const video = this.shadowRoot!.getElementById(this.videoId) as HTMLVideoElement;
     if (!video) return;
 
     video.style.width = this.width;
     video.style.height = this.height;
-    video.style.objectFit = 'cover';
+    video.style.objectFit = "cover";
 
     const Hls = (window as any).Hls;
     if (!Hls) {
-      console.error('Hls.js not loaded');
+      console.error("Hls.js not loaded");
       return;
     }
 
@@ -322,9 +319,7 @@ export class HlsVideo extends LitElement {
     hls.loadSource(this.src);
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      video.play().catch(err => console.warn('Autoplay failed:', err));
+      video.play().catch((err) => console.warn("Autoplay failed:", err));
     });
   }
 }
-
-
