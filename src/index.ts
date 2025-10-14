@@ -106,7 +106,8 @@ function getBannerElement(
     ? html`
         <hls-video
           src="${src}"
-          style="width:800px; height:400px;"
+          width="${width}px"
+          height="${height}px"
         ></hls-video>
       `
     : html`
@@ -202,7 +203,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.height, this.width, this.newTab);
+        return getBannerElement(banners[0], this.width, this.height, this.newTab);
       },
       error: (error) => getErrorElement(error),
     });
@@ -276,38 +277,54 @@ export class TopsortBannerSlot extends LitElement {
 
 @customElement('hls-video')
 export class HlsVideo extends LitElement {
-  static styles = css`
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  `;
 
   @property({ type: String }) src = ''; // HLS manifest URL
+  @property({ type: String }) width = '800px';
+  @property({ type: String }) height = '400px';
+
+  private get videoId() {
+    try {
+      return new URL(this.src).pathname.split('/')[1]; // safer and clearer
+    } catch {
+      return 'hls-video';
+    }
+  }
 
   render() {
-    return html`<video
-      id="${this.src.split('/')[3]}"
-      muted
-      autoplay
-      loop
-      playsinline
-    ></video>`;
+    return html`
+      <video
+        id="${this.videoId}"
+        muted
+        autoplay
+        loop
+        playsinline
+      ></video>
+    `;
   }
 
+  
+
   firstUpdated() {
-    const video = this.shadowRoot!.getElementById(this.src.split('/')[3]) as HTMLVideoElement;
-    console.log("Here: ", this.src.split('/')[3]);
-    if (!video) {
-      return null;
+    const video = this.shadowRoot!.getElementById(this.videoId) as HTMLVideoElement;
+    if (!video) return;
+
+    video.style.width = this.width;
+    video.style.height = this.height;
+    video.style.objectFit = 'cover';
+
+    const Hls = (window as any).Hls;
+    if (!Hls) {
+      console.error('Hls.js not loaded');
+      return;
     }
-    const hls = new (window as any).Hls();
+
+    const hls = new Hls();
+    hls.loadSource(this.src);
     hls.attachMedia(video);
-    hls.on((window as any).Hls.Events.MEDIA_ATTACHED, () => {
-      hls.loadSource(this.src);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      video.play().catch(err => console.warn('Autoplay failed:', err));
     });
-    video.play();
   }
 }
+
+
