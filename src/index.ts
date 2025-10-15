@@ -341,21 +341,18 @@ class HlsDependency {
 
     // Inject the script and wait for it to load
     this.loadPromise = new Promise<any>((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js';
-      
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js";
       script.onload = () => {
         if ((window as any).Hls) {
           resolve((window as any).Hls);
         } else {
-          reject(new Error('HLS.js loaded but not available'));
+          reject(new Error("HLS.js loaded but not available"));
         }
       };
-      
       script.onerror = () => {
-        reject(new Error('Failed to load HLS.js'));
+        reject(new Error("Failed to load HLS.js"));
       };
-      
       document.head.appendChild(script);
     });
 
