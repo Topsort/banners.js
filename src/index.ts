@@ -301,7 +301,7 @@ export class HlsVideo extends LitElement {
     `;
   }
 
-  firstUpdated() {
+  async firstUpdated() {
     const video = this.shadowRoot!.getElementById(this.videoId) as HTMLVideoElement;
     if (!video) return;
 
@@ -309,7 +309,7 @@ export class HlsVideo extends LitElement {
     video.style.height = this.height;
     video.style.objectFit = "cover";
 
-    const Hls = (window as any).Hls;
+    const Hls = await hlsDependency.load();
     if (!Hls) {
       console.error("Hls.js not loaded");
       return;
@@ -323,3 +323,46 @@ export class HlsVideo extends LitElement {
     });
   }
 }
+
+class HlsDependency {
+  private loadPromise: Promise<any> | null = null;
+
+  load(): Promise<any> {
+    // Return existing promise if already loading/loaded
+    if (this.loadPromise) {
+      return this.loadPromise;
+    }
+
+    // Check if already loaded
+    if ((window as any).Hls) {
+      this.loadPromise = Promise.resolve((window as any).Hls);
+      return this.loadPromise;
+    }
+
+    // Inject the script and wait for it to load
+    this.loadPromise = new Promise<any>((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js';
+      
+      script.onload = () => {
+        if ((window as any).Hls) {
+          resolve((window as any).Hls);
+        } else {
+          reject(new Error('HLS.js loaded but not available'));
+        }
+      };
+      
+      script.onerror = () => {
+        reject(new Error('Failed to load HLS.js'));
+      };
+      
+      document.head.appendChild(script);
+    });
+
+    return this.loadPromise;
+  }
+}
+
+
+// Create a singleton instance
+const hlsDependency = new HlsDependency();
