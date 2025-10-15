@@ -2,7 +2,6 @@ import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { html, LitElement, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import getVideoAssetUrl from "../utils/transform-video-urls";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
@@ -105,14 +104,11 @@ function getBannerElement(
   })();
   const media = isVideo
     ? html`
-        <iframe
-          src="${getVideoAssetUrl(src)}"
-          autoplay
-          muted
-          loop
-          playsinline
-          style="width:${width}px; height:${height}px; object-fit:cover;"
-        ></iframe>
+        <hls-video
+          src="${src}"
+          width="${width}px"
+          height="${height}px"
+        ></hls-video>
       `
     : html`
         <img
@@ -207,7 +203,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.height, this.width, this.newTab);
+        return getBannerElement(banners[0], this.width, this.height, this.newTab);
       },
       error: (error) => getErrorElement(error),
     });
@@ -276,5 +272,54 @@ export class TopsortBannerSlot extends LitElement {
   // avoid shadow dom since we cannot attach to events via analytics.js
   protected createRenderRoot() {
     return this;
+  }
+}
+
+@customElement("hls-video")
+export class HlsVideo extends LitElement {
+  @property({ type: String }) src = ""; // HLS manifest URL
+  @property({ type: String }) width = "800px";
+  @property({ type: String }) height = "400px";
+
+  private get videoId() {
+    try {
+      return new URL(this.src).pathname.split("/")[1]; // safer and clearer
+    } catch {
+      return "hls-video";
+    }
+  }
+
+  render() {
+    return html`
+      <video
+        id="${this.videoId}"
+        muted
+        autoplay
+        loop
+        playsinline
+      ></video>
+    `;
+  }
+
+  firstUpdated() {
+    const video = this.shadowRoot!.getElementById(this.videoId) as HTMLVideoElement;
+    if (!video) return;
+
+    video.style.width = this.width;
+    video.style.height = this.height;
+    video.style.objectFit = "cover";
+
+    const Hls = (window as any).Hls;
+    if (!Hls) {
+      console.error("Hls.js not loaded");
+      return;
+    }
+
+    const hls = new Hls();
+    hls.loadSource(this.src);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      video.play().catch((err) => console.warn("Autoplay failed:", err));
+    });
   }
 }
