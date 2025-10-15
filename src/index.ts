@@ -363,6 +363,5 @@ class HlsDependency {
   }
 }
 
-
 // Create a singleton instance
 const hlsDependency = new HlsDependency();
