@@ -5,7 +5,7 @@ import { customElement, property } from "lit/decorators.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
-import type { Banner, BannerContext } from "./types";
+import type { Banner, BannerContext, HlsConstructor } from "./types";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -309,9 +309,16 @@ export class HlsVideo extends LitElement {
     video.style.height = this.height;
     video.style.objectFit = "cover";
 
-    const Hls = await hlsDependency.load();
+    let Hls;
+    try {
+      Hls = await hlsDependency.load();
+    } catch (err) {
+      console.error("Failed to load HLS.js:", err);
+      return;
+    }
+
     if (!Hls) {
-      console.error("Hls.js not loaded");
+      console.error("HLS.js not available after load");
       return;
     }
 
@@ -325,27 +332,27 @@ export class HlsVideo extends LitElement {
 }
 
 class HlsDependency {
-  private loadPromise: Promise<any> | null = null;
+  private loadPromise: Promise<HlsConstructor> | null = null;
 
-  load(): Promise<any> {
+  load(): Promise<HlsConstructor> {
     // Return existing promise if already loading/loaded
     if (this.loadPromise) {
       return this.loadPromise;
     }
 
     // Check if already loaded
-    if ((window as any).Hls) {
-      this.loadPromise = Promise.resolve((window as any).Hls);
+    if (window.Hls) {
+      this.loadPromise = Promise.resolve(window.Hls);
       return this.loadPromise;
     }
 
     // Inject the script and wait for it to load
-    this.loadPromise = new Promise<any>((resolve, reject) => {
+    this.loadPromise = new Promise<HlsConstructor>((resolve, reject) => {
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js";
       script.onload = () => {
-        if ((window as any).Hls) {
-          resolve((window as any).Hls);
+        if (window.Hls) {
+          resolve(window.Hls);
         } else {
           reject(new Error("HLS.js loaded but not available"));
         }
@@ -354,7 +361,12 @@ class HlsDependency {
         reject(new Error("Failed to load HLS.js"));
       };
       document.head.appendChild(script);
-    });
+    })
+      .catch((err) => {
+        // Reset cached promise so future calls can retry
+        this.loadPromise = null;
+        throw err;
+      });
 
     return this.loadPromise;
   }
