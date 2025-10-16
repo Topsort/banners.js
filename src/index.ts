@@ -302,14 +302,14 @@ export class HlsVideo extends LitElement {
   }
 
   async firstUpdated() {
-    const video = this.shadowRoot!.getElementById(this.videoId) as HTMLVideoElement;
+    const video = this.shadowRoot?.getElementById(this.videoId) as HTMLVideoElement;
     if (!video) return;
 
     video.style.width = this.width;
     video.style.height = this.height;
     video.style.objectFit = "cover";
 
-    let Hls;
+    let Hls: HlsConstructor;
     try {
       Hls = await hlsDependency.load();
     } catch (err) {
@@ -361,12 +361,11 @@ class HlsDependency {
         reject(new Error("Failed to load HLS.js"));
       };
       document.head.appendChild(script);
-    })
-      .catch((err) => {
-        // Reset cached promise so future calls can retry
-        this.loadPromise = null;
-        throw err;
-      });
+    }).catch((err) => {
+      // Reset cached promise so future calls can retry
+      this.loadPromise = null;
+      throw err;
+    });
 
     return this.loadPromise;
   }
