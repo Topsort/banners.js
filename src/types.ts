@@ -29,3 +29,23 @@ export interface BannerContext {
   banners?: Banner[];
   error?: unknown;
 }
+
+export type HlsConstructor = {
+  new (): {
+    loadSource(src: string): void;
+    attachMedia(video: HTMLVideoElement): void;
+    on(event: string, callback: () => void): void;
+    destroy(): void;
+  };
+  Events: {
+    MANIFEST_PARSED: string;
+    [key: string]: string;
+  };
+  isSupported?(): boolean;
+};
+
+declare global {
+  interface Window {
+    Hls?: HlsConstructor;
+  }
+}
