@@ -1,3 +1,9 @@
+### 0.6.0
+
+- Add support for sending opaque user ID in auction requests
+- Integrate with analytics.js getUserId() for consistent user identification across auctions and events
+- Support custom user ID override via window.TS.getUserId()
+
 ### 0.3.0
 
 - Add multicategory query support.

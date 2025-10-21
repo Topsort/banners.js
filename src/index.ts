@@ -21,6 +21,7 @@ declare global {
     TS: {
       readonly token: string;
       readonly url?: string;
+      getUserId?: () => string;
     };
   }
 }
