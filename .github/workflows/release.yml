@@ -33,7 +33,6 @@ jobs:
           registry-url: https://registry.npmjs.org
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-          registry-url: https://registry.npmjs.org
 
 
       - name: Install dependencies
