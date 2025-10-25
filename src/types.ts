@@ -12,6 +12,7 @@ export interface Auction {
     location: string;
   };
   searchQuery?: string;
+  opaqueUserId?: string;
 }
 
 /** The banner object returned from the auction request */
