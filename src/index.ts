@@ -71,7 +71,12 @@ function getNoWinnersElement(): TemplateResult {
   return html``;
 }
 
-function getBannerElement(banner: Banner, newTab: boolean): TemplateResult {
+function getBannerElement(
+  banner: Banner,
+  newTab: boolean,
+  width?: number,
+  height?: number,
+): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
     return html`${element}`;
@@ -97,18 +102,20 @@ function getBannerElement(banner: Banner, newTab: boolean): TemplateResult {
       return false;
     }
   })();
+  const resolvedWidth = width ? `${width}px` : "100%";
+  const resolvedHeight = height ? `${height}px` : "100%";
   const media = isVideo
     ? html`
         <hls-video
           src="${src}"
-          style="width: var(--ts-banner-width, 100%); height: var(--ts-banner-height, 100%); object-fit: cover;"
+          styles="width: var(--ts-banner-width, ${resolvedWidth}); height: var(--ts-banner-height, ${resolvedHeight}); object-fit: cover;"
         ></hls-video>
       `
     : html`
         <img
           src="${src}"
           alt="Topsort banner"
-          style="width: var(--ts-banner-width, 100%); height: var(--ts-banner-height, 100%);"
+          style="width: var(--ts-banner-width, ${resolvedWidth}); height: var(--ts-banner-height, ${resolvedHeight}));"
         />
       `;
 
@@ -120,7 +127,7 @@ function getBannerElement(banner: Banner, newTab: boolean): TemplateResult {
     <div
       data-ts-clickable
       data-ts-resolved-bid=${banner.resolvedBidId}
-      style={display: block; padding: var(--ts-banner-padding, 0); margin: var(--ts-banner-margin, 0);}
+      style="display: block; padding: var(--ts-banner-padding, 0); margin: var(--ts-banner-margin, 0);"
     >
       ${wrappedMedia}
     </div>
@@ -197,7 +204,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.newTab);
+        return getBannerElement(banners[0], this.newTab, this.width, this.height);
       },
       error: (error) => getErrorElement(error),
     });
@@ -255,7 +262,12 @@ export class TopsortBannerSlot extends LitElement {
     if (!this.context.banners.length || this.context.banners.length < this.rank) {
       return getNoWinnersElement();
     }
-    return getBannerElement(this.context.banners[this.rank - 1], this.context.newTab);
+    return getBannerElement(
+      this.context.banners[this.rank - 1],
+      this.context.newTab,
+      this.context.width,
+      this.context.height,
+    );
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
@@ -267,8 +279,7 @@ export class TopsortBannerSlot extends LitElement {
 @customElement("hls-video")
 export class HlsVideo extends LitElement {
   @property({ type: String }) src = ""; // HLS manifest URL
-  @property({ type: String }) width = "800px";
-  @property({ type: String }) height = "400px";
+  @property({ type: String }) styles = "";
 
   private get videoId() {
     try {
@@ -286,6 +297,7 @@ export class HlsVideo extends LitElement {
         autoplay
         loop
         playsinline
+        style=${this.styles}"
       ></video>
     `;
   }
@@ -293,10 +305,6 @@ export class HlsVideo extends LitElement {
   async firstUpdated() {
     const video = this.shadowRoot?.getElementById(this.videoId) as HTMLVideoElement;
     if (!video) return;
-
-    video.style.width = this.width;
-    video.style.height = this.height;
-    video.style.objectFit = "cover";
 
     let Hls: HlsConstructor;
     try {

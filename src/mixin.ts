@@ -23,6 +23,12 @@ export declare class BannerComponentInterface {
 
 export const BannerComponent = <T extends Constructor<LitElement>>(Base: T) => {
   class BannerComponent extends Base {
+    @property({ type: Number })
+    readonly width: number = 0;
+
+    @property({ type: Number })
+    readonly height: number = 0;
+
     @property({ attribute: "id", type: String })
     readonly slotId: string = "";
 
