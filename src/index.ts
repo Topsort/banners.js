@@ -73,9 +73,7 @@ function getNoWinnersElement(): TemplateResult {
 
 function getBannerElement(
   banner: Banner,
-  width: number,
-  height: number,
-  newTab: boolean,
+  newTab: boolean
 ): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
@@ -106,15 +104,14 @@ function getBannerElement(
     ? html`
         <hls-video
           src="${src}"
-          width="${width}px"
-          height="${height}px"
+          style="width: var(--ts-banner-width, 100%); height: var(--ts-banner-height, 100%); object-fit: cover;"
         ></hls-video>
       `
     : html`
         <img
           src="${src}"
           alt="Topsort banner"
-          style="width:${width}px; height:${height}px; object-fit:cover;"
+          style="width: var(--ts-banner-width, 100%); height: var(--ts-banner-height, 100%);"
         />
       `;
 
@@ -126,7 +123,7 @@ function getBannerElement(
     <div
       data-ts-clickable
       data-ts-resolved-bid=${banner.resolvedBidId}
-      class="ts-banner"
+      style={display: block; padding: var(--ts-banner-padding, 0); margin: var(--ts-banner-margin, 0);}
     >
       ${wrappedMedia}
     </div>
@@ -203,7 +200,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.width, this.height, this.newTab);
+        return getBannerElement(banners[0], this.newTab);
       },
       error: (error) => getErrorElement(error),
     });
@@ -263,8 +260,6 @@ export class TopsortBannerSlot extends LitElement {
     }
     return getBannerElement(
       this.context.banners[this.rank - 1],
-      this.context.width,
-      this.context.height,
       this.context.newTab,
     );
   }

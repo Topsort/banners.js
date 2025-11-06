@@ -43,24 +43,30 @@
       justify-content: center;
       padding: 20px;
     }
+    topsort-banner {
+      --ts-banner-width: 200px;
+      --ts-banner-height: 50%;
+      --ts-banner-padding: 10px;
+      --ts-banner-margin: 10px;
+    }
   </style>
   <body>
     <div style="padding-right: 1rem">
       <h3>Standalone Banner</h3>
       <pre>
         <code>
-          &lt;topsort-banner id="an-example-slot" width="800" height="400"&gt;&lt;/topsort-banner&gt;
+          &lt;topsort-banner id="an-example-slot"&gt;&lt;/topsort-banner&gt;
         </code>
       </pre>
-      <div style="outline 1px solid black">
-        <topsort-banner id="an-example-slot" width="800" height="400"></topsort-banner>
+      <div style="outline: 1px solid black">
+        <topsort-banner id="an-example-slot"></topsort-banner>
       </div>
     </div>
-    <div style="outline 1px solid black">
+    <div style="outline: 1px solid black">
       <h3>Multiple Banners under one context</h3>
       <pre>
         <code>
-          &lt;topsort-banner id="an-example-slot" width="800" height="400" context&gt;
+          &lt;topsort-banner id="an-example-slot" context&gt;
             &lt;div&gt;
               &lt;h3&gt;First Banner&lt;/h3&gt;
               &lt;pre&gt;
@@ -77,7 +83,7 @@
           &lt;/topsort-banner&gt;
         </code>
       </pre>
-      <topsort-banner id="an-example-slot" width="800" height="400" context="true">
+      <topsort-banner id="an-example-slot" context="true">
         <div>
           <h3>First Banner</h3>
           <topsort-banner-slot rank="1"></topsort-banner-slot>

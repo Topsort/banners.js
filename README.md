@@ -42,7 +42,7 @@ Directly from unpkg.com
   };
 </script>
 <body>
-  <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
+  <topsort-banner id="<your slot id>"></topsort-banner>
 </body>
 ```
 
@@ -54,7 +54,7 @@ To do that you have to pass the attribute `context="true"` to the `topsort-banne
 use `topsort-banner-slot` as children elements.
 
 ```html
-<topsort-banner context="true" width="600" height="400" id="<your slot id>">
+<topsort-banner context="true" id="<your slot id>">
   <topsort-banner-slot rank="1"></topsort-banner-slot>
   <topsort-banner-slot rank="2"></topsort-banner-slot>
   <topsort-banner-slot rank="3"></topsort-banner-slot>
@@ -65,8 +65,6 @@ use `topsort-banner-slot` as children elements.
 
 | Name                   | Type             | Description                                                                 |
 | ---------------------- | ---------------- | --------------------------------------------------------------------------- |
-| width                  | Number           | Banner width                                                                |
-| height                 | Number           | Banner height                                                               |
 | id                     | String           | The slot ID for this banner                                                 |
 | category-id*           | Optional String  | The category ID of the current page                                         |
 | category-ids*          | Optional String  | Comma (,) separated list of category IDs, the item must match all           |
@@ -78,6 +76,17 @@ use `topsort-banner-slot` as children elements.
 
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.
 If multiple are set, only the first will be considered, in that order.
+
+# Styling
+
+The component will inherit all styles from its parent elements, but you add
+custom styling to the banner itself.
+To add custom styling to the banner, you can use the following CSS variables:
+
+- `--ts-banner-width`: The width of the banner. Defaults to `100%`.
+- `--ts-banner-height`: The height of the banner. Defaults to `100%`.
+- `--ts-banner-padding`: The padding of the banner. Defaults to `0`.
+- `--ts-banner-margin`: The margin of the banner. Defaults to `0`.
 
 # Banner Slot Attributes
 | Name | Type   | Description                                                                                                           |
