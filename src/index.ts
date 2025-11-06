@@ -71,10 +71,7 @@ function getNoWinnersElement(): TemplateResult {
   return html``;
 }
 
-function getBannerElement(
-  banner: Banner,
-  newTab: boolean
-): TemplateResult {
+function getBannerElement(banner: Banner, newTab: boolean): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
     return html`${element}`;
@@ -258,10 +255,7 @@ export class TopsortBannerSlot extends LitElement {
     if (!this.context.banners.length || this.context.banners.length < this.rank) {
       return getNoWinnersElement();
     }
-    return getBannerElement(
-      this.context.banners[this.rank - 1],
-      this.context.newTab,
-    );
+    return getBannerElement(this.context.banners[this.rank - 1], this.context.newTab);
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
