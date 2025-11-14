@@ -43,11 +43,14 @@
       justify-content: center;
       padding: 20px;
     }
-    topsort-banner {
-      --ts-banner-width: 200px;
-      --ts-banner-height: 50%;
-      --ts-banner-padding: 10px;
-      --ts-banner-margin: 10px;
+    /* Example: Style all banner containers */
+    .ts-banner {
+      padding: 10px;
+      margin: 10px;
+    }
+    /* Example: Target banners with specific width */
+    .ts-banner[data-ts-width="800"] {
+      border: 1px solid #ddd;
     }
   </style>
   <body>

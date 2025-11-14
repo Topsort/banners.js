@@ -76,6 +76,7 @@ function getBannerElement(
   newTab: boolean,
   width?: number,
   height?: number,
+  className?: string,
 ): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
@@ -102,20 +103,41 @@ function getBannerElement(
       return false;
     }
   })();
-  const resolvedWidth = width ? `${width}px` : "100%";
-  const resolvedHeight = height ? `${height}px` : "100%";
+
+  // Build class string: use existing ts-banner class, plus any custom class
+  const containerClass = className ? `ts-banner ${className}` : "ts-banner";
+
+  // Build style string with CSS custom properties for width/height (easily retrievable)
+  const containerStyle = [
+    "display: block",
+    width ? `--ts-banner-width: ${width}px` : "",
+    height ? `--ts-banner-height: ${height}px` : "",
+  ]
+    .filter(Boolean)
+    .join("; ");
+
+  // Media element styles - minimal, let CSS cascade
+  const mediaStyle =
+    width && height
+      ? `width: ${width}px; height: ${height}px; object-fit: cover;`
+      : width
+        ? `width: ${width}px; height: auto; object-fit: cover;`
+        : height
+          ? `width: 100%; height: ${height}px; object-fit: cover;`
+          : "width: 100%; height: auto; object-fit: cover;";
+
   const media = isVideo
     ? html`
         <hls-video
           src="${src}"
-          styles="width: var(--ts-banner-width, ${resolvedWidth}); height: var(--ts-banner-height, ${resolvedHeight}); object-fit: cover;"
+          styles=${mediaStyle}
         ></hls-video>
       `
     : html`
         <img
           src="${src}"
           alt="Topsort banner"
-          style="width: var(--ts-banner-width, ${resolvedWidth}); height: var(--ts-banner-height, ${resolvedHeight}));"
+          style=${mediaStyle}
         />
       `;
 
@@ -125,9 +147,12 @@ function getBannerElement(
     : html`<a href="${href}">${media}</a>`;
   return html`
     <div
+      class=${containerClass}
       data-ts-clickable
       data-ts-resolved-bid=${banner.resolvedBidId}
-      style="display: block; padding: var(--ts-banner-padding, 0); margin: var(--ts-banner-margin, 0);"
+      data-ts-width=${width ?? ""}
+      data-ts-height=${height ?? ""}
+      style=${containerStyle}
     >
       ${wrappedMedia}
     </div>
@@ -146,6 +171,7 @@ const bannerContextHasChanged = (newVal: BannerContext, oldVal?: BannerContext) 
     newVal.width !== oldVal.width ||
     newVal.height !== oldVal.height ||
     newVal.newTab !== oldVal.newTab ||
+    newVal.className !== oldVal.className ||
     !!newVal.error !== !!oldVal.error ||
     newVal.banners?.length !== oldVal.banners?.length
   );
@@ -182,6 +208,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     width: this.width,
     height: this.height,
     newTab: this.newTab,
+    className: this.className,
   };
 
   @property({ type: Boolean, attribute: "context" })
@@ -204,7 +231,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.newTab, this.width, this.height);
+        return getBannerElement(banners[0], this.newTab, this.width, this.height, this.className);
       },
       error: (error) => getErrorElement(error),
     });
@@ -222,13 +249,15 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     if (
       changedProperties.has("width") ||
       changedProperties.has("height") ||
-      changedProperties.has("newTab")
+      changedProperties.has("newTab") ||
+      changedProperties.has("className")
     ) {
       Promise.resolve().then(() => {
         this.context = {
           width: this.width,
           height: this.height,
           newTab: this.newTab,
+          className: this.className,
         };
       });
     }
@@ -267,6 +296,7 @@ export class TopsortBannerSlot extends LitElement {
       this.context.newTab,
       this.context.width,
       this.context.height,
+      this.context.className,
     );
   }
 
@@ -297,7 +327,7 @@ export class HlsVideo extends LitElement {
         autoplay
         loop
         playsinline
-        style=${this.styles}"
+        style=${this.styles}
       ></video>
     `;
   }
