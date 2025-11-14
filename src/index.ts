@@ -104,10 +104,8 @@ function getBannerElement(
     }
   })();
 
-  // Build class string: use existing ts-banner class, plus any custom class
   const containerClass = bannerClass ? `ts-banner ${bannerClass}` : "ts-banner";
 
-  // Build style string with CSS custom properties for width/height (easily retrievable)
   const containerStyle = [
     "display: block",
     width ? `--ts-banner-width: ${width}px` : "",
@@ -116,7 +114,7 @@ function getBannerElement(
     .filter(Boolean)
     .join("; ");
 
-  // Media element styles - minimal, let CSS cascade
+  // let CSS cascade
   const mediaStyle =
     width && height
       ? `width: ${width}px; height: ${height}px; object-fit: cover;`
