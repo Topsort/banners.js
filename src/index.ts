@@ -76,7 +76,7 @@ function getBannerElement(
   newTab: boolean,
   width?: number,
   height?: number,
-  className?: string,
+  bannerClass?: string,
 ): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
@@ -105,7 +105,7 @@ function getBannerElement(
   })();
 
   // Build class string: use existing ts-banner class, plus any custom class
-  const containerClass = className ? `ts-banner ${className}` : "ts-banner";
+  const containerClass = bannerClass ? `ts-banner ${bannerClass}` : "ts-banner";
 
   // Build style string with CSS custom properties for width/height (easily retrievable)
   const containerStyle = [
@@ -171,7 +171,7 @@ const bannerContextHasChanged = (newVal: BannerContext, oldVal?: BannerContext) 
     newVal.width !== oldVal.width ||
     newVal.height !== oldVal.height ||
     newVal.newTab !== oldVal.newTab ||
-    newVal.className !== oldVal.className ||
+    newVal.bannerClass !== oldVal.bannerClass ||
     !!newVal.error !== !!oldVal.error ||
     newVal.banners?.length !== oldVal.banners?.length
   );
@@ -208,7 +208,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     width: this.width,
     height: this.height,
     newTab: this.newTab,
-    className: this.className,
+    bannerClass: this.bannerClass,
   };
 
   @property({ type: Boolean, attribute: "context" })
@@ -231,7 +231,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.newTab, this.width, this.height, this.className);
+        return getBannerElement(banners[0], this.newTab, this.width, this.height, this.bannerClass);
       },
       error: (error) => getErrorElement(error),
     });
@@ -246,21 +246,21 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       });
     }
 
-    if (
-      changedProperties.has("width") ||
-      changedProperties.has("height") ||
-      changedProperties.has("newTab") ||
-      changedProperties.has("className")
-    ) {
-      Promise.resolve().then(() => {
-        this.context = {
-          width: this.width,
-          height: this.height,
-          newTab: this.newTab,
-          className: this.className,
-        };
-      });
-    }
+     if (
+       changedProperties.has("width") ||
+       changedProperties.has("height") ||
+       changedProperties.has("newTab") ||
+       changedProperties.has("bannerClass")
+     ) {
+       Promise.resolve().then(() => {
+         this.context = {
+           width: this.width,
+           height: this.height,
+           newTab: this.newTab,
+           bannerClass: this.bannerClass,
+         };
+       });
+     }
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
@@ -296,7 +296,7 @@ export class TopsortBannerSlot extends LitElement {
       this.context.newTab,
       this.context.width,
       this.context.height,
-      this.context.className,
+      this.context.bannerClass,
     );
   }
 

@@ -16,7 +16,7 @@ export declare class BannerComponentInterface {
   searchQuery?: string;
   location?: string;
   newTab: boolean;
-  className?: string;
+  bannerClass?: string;
 
   emitEvent(status: string): void;
   buildAuction(slots: number): Auction;
@@ -52,7 +52,7 @@ export const BannerComponent = <T extends Constructor<LitElement>>(Base: T) => {
     readonly newTab: boolean = false;
 
     @property({ attribute: "class", type: String })
-    readonly className?: string;
+    readonly bannerClass?: string;
 
     buildAuction(slots: number): Auction {
       const device = getDeviceType();

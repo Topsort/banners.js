@@ -26,7 +26,7 @@ export interface BannerContext {
   width: number;
   height: number;
   newTab: boolean;
-  className?: string;
+  bannerClass?: string;
   banners?: Banner[];
   error?: unknown;
 }
