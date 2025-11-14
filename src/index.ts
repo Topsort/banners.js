@@ -244,21 +244,21 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       });
     }
 
-     if (
-       changedProperties.has("width") ||
-       changedProperties.has("height") ||
-       changedProperties.has("newTab") ||
-       changedProperties.has("bannerClass")
-     ) {
-       Promise.resolve().then(() => {
-         this.context = {
-           width: this.width,
-           height: this.height,
-           newTab: this.newTab,
-           bannerClass: this.bannerClass,
-         };
-       });
-     }
+    if (
+      changedProperties.has("width") ||
+      changedProperties.has("height") ||
+      changedProperties.has("newTab") ||
+      changedProperties.has("bannerClass")
+    ) {
+      Promise.resolve().then(() => {
+        this.context = {
+          width: this.width,
+          height: this.height,
+          newTab: this.newTab,
+          bannerClass: this.bannerClass,
+        };
+      });
+    }
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
