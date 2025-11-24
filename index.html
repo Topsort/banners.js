@@ -43,6 +43,13 @@
       justify-content: center;
       padding: 20px;
     }
+    .ts-banner {
+      padding: 10px;
+      margin: 10px;
+    }
+    .ts-banner[data-ts-width="800"] {
+      border: 1px solid #ddd;
+    }
   </style>
   <body>
     <div style="padding-right: 1rem">
@@ -52,11 +59,11 @@
           &lt;topsort-banner id="an-example-slot" width="800" height="400"&gt;&lt;/topsort-banner&gt;
         </code>
       </pre>
-      <div style="outline 1px solid black">
+      <div style="outline: 1px solid black">
         <topsort-banner id="an-example-slot" width="800" height="400"></topsort-banner>
       </div>
     </div>
-    <div style="outline 1px solid black">
+    <div style="outline: 1px solid black">
       <h3>Multiple Banners under one context</h3>
       <pre>
         <code>

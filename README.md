@@ -75,9 +75,65 @@ use `topsort-banner-slot` as children elements.
 | location               | Optional String  | The location for geotargeting                                               |
 | new-tab                | Optional Boolean | Opens the banner's link in a new tab (defaults to false)                    |
 | context                | Optional Boolean | Uses the element as a context provider to render multiple banners           |
+| class                  | Optional String  | Custom CSS class to apply to the banner container                            |
 
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.
 If multiple are set, only the first will be considered, in that order.
+
+# Styling
+
+The banner component is designed to integrate seamlessly with your existing CSS system.
+Each banner is rendered inside a container div with the class `ts-banner`,
+making it easy to target with CSS selectors.
+
+## CSS Targeting
+
+You can style banners using standard CSS selectors:
+
+```css
+/* Target all banner containers */
+.ts-banner {
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ccc;
+}
+
+/* Target banners with specific dimensions */
+.ts-banner[data-ts-width="800"] {
+  max-width: 800px;
+}
+```
+
+## Custom CSS Classes
+
+You can pass custom CSS classes to the banner component using the `class` attribute:
+
+```html
+<topsort-banner width="600" height="400" id="my-slot" class="my-custom-banner"></topsort-banner>
+```
+
+The custom class will be applied alongside the `ts-banner` class, allowing you to
+integrate the banner into your existing CSS system.
+
+## Retrieving Width and Height
+
+The width and height values are easily accessible via:
+
+- **Data attributes**: `data-ts-width` and `data-ts-height` on the container element
+- **CSS custom properties**: `--ts-banner-width` and `--ts-banner-height` on the container element
+
+```css
+/* Use data attributes in CSS */
+.ts-banner[data-ts-width] {
+  /* Styles for banners with width set */
+}
+
+/* Use CSS custom properties */
+.ts-banner {
+  width: var(--ts-banner-width, 100%);
+  height: var(--ts-banner-height, auto);
+}
+```
 
 # Banner Slot Attributes
 | Name | Type   | Description                                                                                                           |
