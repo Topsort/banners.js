@@ -10,7 +10,7 @@ export default {
       formats: ["es"],
       fileName: () => "banners.mjs",
     },
-    target: "modules",
+    target: "esnext",
     sourcemap: true,
   },
   define: {
