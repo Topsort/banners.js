@@ -26,11 +26,14 @@ jobs:
         id: pnpm-install
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.node_version }}
           cache: pnpm
-          cache-dependency-path: ${{ env.lockfile }}
+          node-version-file: package.json
+          registry-url: https://registry.npmjs.org
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+
 
       - name: Install dependencies
         run: pnpm install
