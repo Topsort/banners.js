@@ -1,5 +1,6 @@
 import { TopsortRequestError } from "./errors";
 import type { Auction, Banner } from "./types";
+import { getOpaqueUserId } from "./user-id";
 
 export const getDeviceType = (): "mobile" | "desktop" => {
   const ua = navigator.userAgent;
@@ -29,6 +30,12 @@ export async function runAuction(
   const device = getDeviceType();
   const token = window.TS.token;
   const url = window.TS.url || "https://api.topsort.com";
+
+  const opaqueUserId = getOpaqueUserId();
+  if (opaqueUserId) {
+    auction.opaqueUserId = opaqueUserId;
+  }
+
   const res = await fetch(new URL(`${url}/v2/auctions`), {
     method: "POST",
     mode: "cors",

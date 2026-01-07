@@ -13,7 +13,7 @@ Directly from unpkg.com
 <script
   async
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.5.2/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.6.0/dist/banners.mjs"
 ></script>
 <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
@@ -102,6 +102,25 @@ If multiple are set, only the first will be considered, in that order.
 | `slotId`        | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
 | `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
+
+## Custom User ID (Optional)
+
+If you want to use your own user identification system instead of the automatic opaque user ID, you can override the `getUserId` function in the `window.TS` configuration.
+
+Your custom `getUserId` function should return the user's ID as a string. You are responsible for generating and persisting the ID (e.g., in a cookie or local storage).
+
+```javascript
+window.TS = {
+  token: "<your topsort api key>",
+  getUserId() {
+    // Return your custom user ID
+    // This will be used for both auction requests and event reporting
+    return globalUserId ?? generateAndStoreUserId();
+  },
+};
+```
+
+This configuration needs to be set before analytics.js is loaded or imported.
 
 # Listening to events
 The banner component emits an event when the state changes. You can listen to this event to write custom logic.
