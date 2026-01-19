@@ -1,3 +1,7 @@
+### 0.7.0
+
+- Add IIFE bundle for legacy systems that don't support ES modules (e.g., Magento)
+
 ### 0.6.0
 
 - Add support for sending opaque user ID in auction requests
