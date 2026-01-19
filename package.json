@@ -27,6 +27,9 @@
     ".": {
       "import": "./dist/banners.mjs",
       "types": "./types/index.d.ts"
+    },
+    "./iife": {
+      "default": "./dist/banners.iife.js"
     }
   },
   "types": "dist/banners.d.ts",
