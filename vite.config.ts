@@ -7,8 +7,8 @@ export default {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "banners",
-      formats: ["es"],
-      fileName: () => "banners.mjs",
+      formats: ["es", "iife"],
+      fileName: (format) => (format === "iife" ? "banners.iife.js" : "banners.mjs"),
     },
     target: "esnext",
     sourcemap: true,

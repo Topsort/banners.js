@@ -13,7 +13,7 @@ Directly from unpkg.com
 <script
   async
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.6.0/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners/dist/banners.mjs"
 ></script>
 <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
@@ -45,6 +45,19 @@ Directly from unpkg.com
   <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
 </body>
 ```
+
+## Legacy Systems (IIFE Bundle)
+
+For environments that don't support ES modules (e.g., Magento), use the IIFE bundle:
+
+```html
+<script src="https://unpkg.com/@topsort/banners/dist/banners.iife.js"></script>
+```
+
+| Bundle | Size | Size (gzip) |
+|--------|------|-------------|
+| `banners.mjs` (ES module) | 38.71 kB | 11.17 kB |
+| `banners.iife.js` (IIFE) | 29.93 kB | 10.13 kB |
 
 ## Rendering multiple banners with one slot ID
 
