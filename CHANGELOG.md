@@ -1,3 +1,8 @@
+### Unreleased
+
+- Add support for fallback banners (`isFallback`) returned by the auction API
+- Omit `data-ts-resolved-bid` attribute on fallback banners to prevent false attribution
+
 ### 0.7.0
 
 - Add IIFE bundle for legacy systems that don't support ES modules (e.g., Magento)

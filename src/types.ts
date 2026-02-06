@@ -21,6 +21,7 @@ export interface Banner {
   id: string;
   resolvedBidId: string;
   asset: [{ url: string }];
+  isFallback?: boolean;
 }
 
 export interface BannerContext {
