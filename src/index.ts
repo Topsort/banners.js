@@ -2,6 +2,7 @@ import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
 import { html, LitElement, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
@@ -126,7 +127,7 @@ function getBannerElement(
   return html`
     <div
       data-ts-clickable
-      data-ts-resolved-bid=${banner.resolvedBidId}
+      data-ts-resolved-bid=${ifDefined(banner.isFallback ? undefined : banner.resolvedBidId)}
       class="ts-banner"
     >
       ${wrappedMedia}
