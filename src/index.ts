@@ -1,11 +1,12 @@
 import { consume, createContext, provide } from "@lit/context";
 import { Task } from "@lit/task";
-import { html, LitElement, type TemplateResult } from "lit";
+import { html, LitElement, nothing, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
+import { applyTemplate } from "./template";
 import type { Banner, BannerContext, HlsConstructor } from "./types";
 
 /* Set up global environment for TS_BANNERS */
@@ -188,6 +189,9 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   @property({ type: Boolean, attribute: "context" })
   readonly isContext: boolean = false;
 
+  @property({ type: Boolean })
+  readonly predefined: boolean = false;
+
   @property({ attribute: false, state: true })
   private slots?: NodeListOf<Element>;
 
@@ -197,6 +201,29 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     }
     if (this.isContext) {
       return html``;
+    }
+    if (this.predefined) {
+      return this.task.render({
+        pending: () => nothing,
+        complete: (banners) => {
+          if (!banners.length) {
+            this.emitEvent("nowinners");
+            return nothing;
+          }
+          if (banners[0].asset[0].content) {
+            applyTemplate(this, banners[0]);
+            this.emitEvent("ready");
+            return nothing;
+          }
+          // Winner has no content map — fall back to replacement rendering
+          this.emitEvent("ready");
+          return getBannerElement(banners[0], this.width, this.height, this.newTab);
+        },
+        error: () => {
+          this.emitEvent("error");
+          return nothing;
+        },
+      });
     }
     return this.task.render({
       pending: () => getLoadingElement(),
