@@ -16,7 +16,7 @@ function setFieldValue(el: Element, value: string, attrOverride?: string) {
 }
 
 export function applyTemplate(container: Element, banner: Banner) {
-  const content = banner.asset[0].content;
+  const content = banner.asset?.[0]?.content;
 
   if (content) {
     const fields = container.querySelectorAll<HTMLElement>("[data-ts-field]");
