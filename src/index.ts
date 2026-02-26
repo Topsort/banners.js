@@ -210,7 +210,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
             this.emitEvent("nowinners");
             return nothing;
           }
-          if (banners[0].asset[0].content) {
+          if (banners[0].asset?.[0]?.content) {
             applyTemplate(this, banners[0]);
             this.emitEvent("ready");
             return nothing;
