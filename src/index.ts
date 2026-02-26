@@ -288,8 +288,6 @@ export class TopsortBannerSlot extends LitElement {
   @property({ type: Boolean })
   readonly predefined: boolean = false;
 
-  private _predefinedApplied = false;
-
   private _bannerForRank(): Banner | undefined {
     if (!this.context?.banners?.length || this.context.banners.length < this.rank) {
       return undefined;
@@ -334,17 +332,17 @@ export class TopsortBannerSlot extends LitElement {
   updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
 
-    if (this.predefined && !this._predefinedApplied && changedProperties.has("context")) {
-      if (!this.context || (!this.context.banners && !this.context.error)) {
-        return; // still loading — wait for next context update
+    if (this.predefined && changedProperties.has("context")) {
+      const oldContext = changedProperties.get("context") as BannerContext | undefined;
+      const bannersJustArrived = !oldContext?.banners && !!this.context?.banners;
+      if (bannersJustArrived) {
+        const banner = this._bannerForRank();
+        if (banner?.asset?.[0]?.content) {
+          applyTemplate(this, banner);
+        }
+        // No-winners or fallback: predefined content stays as-is
+        // (fallback case is handled by render() returning getBannerElement)
       }
-      this._predefinedApplied = true;
-      const banner = this._bannerForRank();
-      if (banner?.asset?.[0]?.content) {
-        applyTemplate(this, banner);
-      }
-      // No-winners, error, or fallback: predefined content stays as-is
-      // (fallback case is handled by render() returning getBannerElement)
     }
   }
 
