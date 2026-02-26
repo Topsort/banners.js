@@ -74,6 +74,63 @@ use `topsort-banner-slot` as children elements.
 </topsort-banner>
 ```
 
+## Predefined content mode
+
+Instead of replacing a placeholder with Topsort-generated DOM, you can annotate your own markup with `data-ts-field` attributes and have banners.js mutate only the targeted fields in place. All other markup — classes, ARIA attributes, styles, event listeners — is left untouched. If the auction returns no winners or fails, the predefined content is shown as-is with no changes.
+
+Opt in by adding the `predefined` attribute to `<topsort-banner>` (standalone) or to each `<topsort-banner-slot>` (context mode).
+
+### Binding convention
+
+Add `data-ts-field="<contentKey>"` to any element whose value should be updated from the auction response. The property that gets set is inferred from the element type:
+
+| Element | Property set |
+|---|---|
+| `<a>` | `href` |
+| `<img>`, `<video>`, `<source>` | `src` |
+| All others | `textContent` |
+
+Use `data-ts-attr="<attributeName>"` to override the default and target a specific attribute (e.g. `alt` on an `<img>`).
+
+Add `data-ts-clickable` to the element that should be the click-tracking surface for analytics.js. If omitted, the first child element is used.
+
+### Single winner
+
+```html
+<topsort-banner predefined width="600" height="400" id="slot-1">
+  <div class="brand-banner" data-ts-clickable>
+    <a data-ts-field="target" href="/brands/featured" aria-label="Featured Brand">
+      <img data-ts-field="mainImage" src="/fallbacks/featured.jpg"
+           alt="Explore our featured brands" width="600" height="400" loading="lazy" />
+    </a>
+    <h2 data-ts-field="default-Headline">Featured Brand</h2>
+  </div>
+</topsort-banner>
+```
+
+### Multiple winners (context mode)
+
+```html
+<topsort-banner context="true" width="600" height="400" id="slot-1">
+  <topsort-banner-slot predefined rank="1">
+    <div class="product-card" data-ts-clickable>
+      <a data-ts-field="target" href="/default-1">
+        <img data-ts-field="mainImage" src="/default-1.jpg" />
+      </a>
+      <h3 data-ts-field="default-Headline">Default Product 1</h3>
+    </div>
+  </topsort-banner-slot>
+  <topsort-banner-slot predefined rank="2">
+    <div class="product-card" data-ts-clickable>
+      <a data-ts-field="target" href="/default-2">
+        <img data-ts-field="mainImage" src="/default-2.jpg" />
+      </a>
+      <h3 data-ts-field="default-Headline">Default Product 2</h3>
+    </div>
+  </topsort-banner-slot>
+</topsort-banner>
+```
+
 # Banner Attributes
 
 | Name                   | Type             | Description                                                                 |
@@ -88,14 +145,16 @@ use `topsort-banner-slot` as children elements.
 | location               | Optional String  | The location for geotargeting                                               |
 | new-tab                | Optional Boolean | Opens the banner's link in a new tab (defaults to false)                    |
 | context                | Optional Boolean | Uses the element as a context provider to render multiple banners           |
+| predefined             | Optional Boolean | Mutates annotated child elements in place instead of replacing them         |
 
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.
 If multiple are set, only the first will be considered, in that order.
 
 # Banner Slot Attributes
-| Name | Type   | Description                                                                                                           |
-|------|--------|-----------------------------------------------------------------------------------------------------------------------|
-| rank | Number | The ranking of the slot. Ranks should be sorted the same as the winning bids. The lower the rank, the higher the bid  |
+| Name       | Type             | Description                                                                                                           |
+|------------|------------------|-----------------------------------------------------------------------------------------------------------------------|
+| rank       | Number           | The ranking of the slot. Ranks should be sorted the same as the winning bids. The lower the rank, the higher the bid  |
+| predefined | Optional Boolean | Mutates annotated child elements in place instead of replacing them                                                   |
 
 # Banner Behaviors
 
@@ -114,7 +173,7 @@ If multiple are set, only the first will be considered, in that order.
 | `type`          | `"product" \| "vendor" \| "brand" \| "url"` | The type of the winning entity, represented by the banner.                   |
 | `slotId`        | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
-| `asset`         | `[{ url: string }]`                         | An array of url linking to the assets of the banner.                         |
+| `asset`         | `[{ url: string; content?: Record<string, string> }]` | An array of assets. `content` is a key-value map used in predefined content mode. |
 
 ## Custom User ID (Optional)
 

@@ -2,6 +2,10 @@
 
 - Add support for fallback banners (`isFallback`) returned by the auction API
 - Omit `data-ts-resolved-bid` attribute on fallback banners to prevent false attribution
+- Add `predefined` attribute to `<topsort-banner>` and `<topsort-banner-slot>` for inline predefined content support
+- When `predefined` is set, child elements annotated with `data-ts-field` are mutated in place on auction success, preserving all existing markup, classes, ARIA attributes, and event listeners
+- Support `data-ts-attr` override for targeting a specific attribute instead of the element-type default
+- On auction failure or no winners, predefined content remains untouched and visible
 
 ### 0.7.0
 
