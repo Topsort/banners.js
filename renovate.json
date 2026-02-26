@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageManager": "pnpm",
+  "labels": ["dependencies"],
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "description": "Group all Lit packages together",
+      "matchPackageNames": ["lit", "@lit/**"],
+      "groupName": "lit"
+    },
+    {
+      "description": "Group all dev tooling together",
+      "matchPackageNames": ["vite", "vite-plugin-dts", "@biomejs/biome", "typescript", "@types/**"],
+      "groupName": "dev tooling",
+      "automerge": false
+    },
+    {
+      "description": "Auto-merge patch and minor updates for production deps",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "description": "Require review for major updates",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ]
+}
