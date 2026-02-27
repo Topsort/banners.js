@@ -1,11 +1,12 @@
 import { consume, createContext, provide } from "@lit/context";
-import { Task } from "@lit/task";
-import { html, LitElement, type TemplateResult } from "lit";
+import { Task, TaskStatus } from "@lit/task";
+import { html, LitElement, nothing, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
+import { applyTemplate } from "./template";
 import type { Banner, BannerContext, HlsConstructor } from "./types";
 
 /* Set up global environment for TS_BANNERS */
@@ -188,6 +189,11 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   @property({ type: Boolean, attribute: "context" })
   readonly isContext: boolean = false;
 
+  @property({ type: Boolean })
+  readonly predefined: boolean = false;
+
+  private _predefinedApplied = false;
+
   @property({ attribute: false, state: true })
   private slots?: NodeListOf<Element>;
 
@@ -197,6 +203,17 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     }
     if (this.isContext) {
       return html``;
+    }
+    if (this.predefined) {
+      if (
+        this.task.status === TaskStatus.COMPLETE &&
+        this.task.value?.length &&
+        !this.task.value[0].asset?.[0]?.content
+      ) {
+        // Winner has no content map — fall back to replacement rendering
+        return getBannerElement(this.task.value[0], this.width, this.height, this.newTab);
+      }
+      return nothing;
     }
     return this.task.render({
       pending: () => getLoadingElement(),
@@ -213,6 +230,24 @@ export class TopsortBanner extends BannerComponent(LitElement) {
 
   updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
+
+    if (this.predefined && !this._predefinedApplied) {
+      if (this.task.status === TaskStatus.COMPLETE) {
+        const banners = this.task.value ?? [];
+        this._predefinedApplied = true;
+        if (banners.length) {
+          if (banners[0].asset?.[0]?.content) {
+            applyTemplate(this, banners[0]);
+          }
+          this.emitEvent("ready");
+        } else {
+          this.emitEvent("nowinners");
+        }
+      } else if (this.task.status === TaskStatus.ERROR) {
+        this._predefinedApplied = true;
+        this.emitEvent("error");
+      }
+    }
 
     if (this.isContext && !changedProperties.has("slots")) {
       Promise.resolve().then(() => {
