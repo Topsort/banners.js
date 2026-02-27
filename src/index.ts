@@ -73,10 +73,9 @@ function getNoWinnersElement(): TemplateResult {
 
 function getBannerElement(
   banner: Banner,
+  width: number,
+  height: number,
   newTab: boolean,
-  width?: number,
-  height?: number,
-  bannerClass?: string,
 ): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
@@ -104,38 +103,19 @@ function getBannerElement(
     }
   })();
 
-  const containerClass = bannerClass ? `ts-banner ${bannerClass}` : "ts-banner";
-
-  const containerStyle = [
-    "display: block",
-    width ? `--ts-banner-width: ${width}px` : "",
-    height ? `--ts-banner-height: ${height}px` : "",
-  ]
-    .filter(Boolean)
-    .join("; ");
-
-  // let CSS cascade
-  const mediaStyle =
-    width && height
-      ? `width: ${width}px; height: ${height}px; object-fit: cover;`
-      : width
-        ? `width: ${width}px; height: auto; object-fit: cover;`
-        : height
-          ? `width: 100%; height: ${height}px; object-fit: cover;`
-          : "width: 100%; height: auto; object-fit: cover;";
-
   const media = isVideo
     ? html`
         <hls-video
           src="${src}"
-          styles=${mediaStyle}
+          width="${width}px"
+          height="${height}px"
         ></hls-video>
       `
     : html`
         <img
           src="${src}"
           alt="Topsort banner"
-          style=${mediaStyle}
+          style="width:${width}px; height:${height}px; object-fit:cover;"
         />
       `;
 
@@ -145,12 +125,9 @@ function getBannerElement(
     : html`<a href="${href}">${media}</a>`;
   return html`
     <div
-      class=${containerClass}
       data-ts-clickable
       data-ts-resolved-bid=${banner.resolvedBidId}
-      data-ts-width=${width ?? ""}
-      data-ts-height=${height ?? ""}
-      style=${containerStyle}
+      class="ts-banner"
     >
       ${wrappedMedia}
     </div>
@@ -169,7 +146,6 @@ const bannerContextHasChanged = (newVal: BannerContext, oldVal?: BannerContext) 
     newVal.width !== oldVal.width ||
     newVal.height !== oldVal.height ||
     newVal.newTab !== oldVal.newTab ||
-    newVal.bannerClass !== oldVal.bannerClass ||
     !!newVal.error !== !!oldVal.error ||
     newVal.banners?.length !== oldVal.banners?.length
   );
@@ -206,7 +182,6 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     width: this.width,
     height: this.height,
     newTab: this.newTab,
-    bannerClass: this.bannerClass,
   };
 
   @property({ type: Boolean, attribute: "context" })
@@ -229,7 +204,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        return getBannerElement(banners[0], this.newTab, this.width, this.height, this.bannerClass);
+        return getBannerElement(banners[0], this.width, this.height, this.newTab);
       },
       error: (error) => getErrorElement(error),
     });
@@ -244,18 +219,21 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       });
     }
 
+    if (changedProperties.has("width"))
+      this.style.setProperty("--ts-banner-width", `${this.width}px`);
+    if (changedProperties.has("height"))
+      this.style.setProperty("--ts-banner-height", `${this.height}px`);
+
     if (
       changedProperties.has("width") ||
       changedProperties.has("height") ||
-      changedProperties.has("newTab") ||
-      changedProperties.has("bannerClass")
+      changedProperties.has("newTab")
     ) {
       Promise.resolve().then(() => {
         this.context = {
           width: this.width,
           height: this.height,
           newTab: this.newTab,
-          bannerClass: this.bannerClass,
         };
       });
     }
@@ -291,10 +269,9 @@ export class TopsortBannerSlot extends LitElement {
     }
     return getBannerElement(
       this.context.banners[this.rank - 1],
-      this.context.newTab,
       this.context.width,
       this.context.height,
-      this.context.bannerClass,
+      this.context.newTab,
     );
   }
 
@@ -307,7 +284,8 @@ export class TopsortBannerSlot extends LitElement {
 @customElement("hls-video")
 export class HlsVideo extends LitElement {
   @property({ type: String }) src = ""; // HLS manifest URL
-  @property({ type: String }) styles = "";
+  @property({ type: String }) width = "800px";
+  @property({ type: String }) height = "400px";
 
   private get videoId() {
     try {
@@ -325,7 +303,6 @@ export class HlsVideo extends LitElement {
         autoplay
         loop
         playsinline
-        style=${this.styles}
       ></video>
     `;
   }
@@ -333,6 +310,10 @@ export class HlsVideo extends LitElement {
   async firstUpdated() {
     const video = this.shadowRoot?.getElementById(this.videoId) as HTMLVideoElement;
     if (!video) return;
+
+    video.style.width = this.width;
+    video.style.height = this.height;
+    video.style.objectFit = "cover";
 
     let Hls: HlsConstructor;
     try {
