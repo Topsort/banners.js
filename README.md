@@ -150,6 +150,48 @@ Add `data-ts-clickable` to the element that should be the click-tracking surface
 \* Only one of `[category-id, category-ids, category-disjunctions]` must be set.
 If multiple are set, only the first will be considered, in that order.
 
+# Styling
+
+The banner component exposes `--ts-banner-width` and `--ts-banner-height` CSS custom
+properties on the `<topsort-banner>` element. These reflect the `width` and `height`
+attributes set on the element and are useful for sizing child elements to match the
+configured dimensions.
+
+The inner container uses the class `ts-banner`, making it easy to target with standard
+CSS selectors.
+
+```css
+/* Style the inner container */
+.ts-banner {
+  padding: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Size child elements to match the configured banner dimensions */
+.ts-banner img {
+  width: var(--ts-banner-width);
+  height: var(--ts-banner-height);
+  object-fit: cover;
+}
+```
+
+For responsive layouts, use standard CSS on the host element and its children rather
+than trying to override the custom properties:
+
+```css
+/* Make the banner fill its container */
+topsort-banner {
+  display: block;
+  width: 100%;
+}
+
+.ts-banner img {
+  width: 100%;
+  height: auto;
+}
+```
+
 # Banner Slot Attributes
 | Name       | Type             | Description                                                                                                           |
 |------------|------------------|-----------------------------------------------------------------------------------------------------------------------|

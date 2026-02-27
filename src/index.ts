@@ -105,6 +105,7 @@ function getBannerElement(
       return false;
     }
   })();
+
   const media = isVideo
     ? html`
         <hls-video
@@ -254,6 +255,11 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         this.slots = this.renderRoot.querySelectorAll("topsort-banner-slot");
       });
     }
+
+    if (changedProperties.has("width"))
+      this.style.setProperty("--ts-banner-width", `${this.width}px`);
+    if (changedProperties.has("height"))
+      this.style.setProperty("--ts-banner-height", `${this.height}px`);
 
     if (
       changedProperties.has("width") ||
