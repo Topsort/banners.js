@@ -20,7 +20,7 @@ export interface Banner {
   type: "product" | "vendor" | "brand" | "url";
   id: string;
   resolvedBidId: string;
-  asset: [{ url: string }];
+  asset: [{ url: string; content?: Record<string, string> }];
   isFallback?: boolean;
 }
 
