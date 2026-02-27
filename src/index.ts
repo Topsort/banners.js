@@ -285,7 +285,30 @@ export class TopsortBannerSlot extends LitElement {
   @property({ attribute: "rank", type: Number })
   readonly rank = 0;
 
+  @property({ type: Boolean })
+  readonly predefined: boolean = false;
+
+  private _bannerForRank(): Banner | undefined {
+    if (!this.context?.banners?.length || this.context.banners.length < this.rank) {
+      return undefined;
+    }
+    return this.context.banners[this.rank - 1];
+  }
+
   protected render() {
+    if (this.predefined) {
+      const banner = this._bannerForRank();
+      if (banner && !banner.asset?.[0]?.content && this.context) {
+        // Winner has no content map — fall back to replacement rendering
+        return getBannerElement(
+          banner,
+          this.context.width,
+          this.context.height,
+          this.context.newTab,
+        );
+      }
+      return nothing;
+    }
     if (!this.context) {
       return html``;
     }
@@ -304,6 +327,23 @@ export class TopsortBannerSlot extends LitElement {
       this.context.height,
       this.context.newTab,
     );
+  }
+
+  updated(changedProperties: Map<string | number | symbol, unknown>) {
+    super.updated(changedProperties);
+
+    if (this.predefined && changedProperties.has("context")) {
+      const oldContext = changedProperties.get("context") as BannerContext | undefined;
+      const bannersJustArrived = !oldContext?.banners && !!this.context?.banners;
+      if (bannersJustArrived) {
+        const banner = this._bannerForRank();
+        if (banner?.asset?.[0]?.content) {
+          applyTemplate(this, banner);
+        }
+        // No-winners or fallback: predefined content stays as-is
+        // (fallback case is handled by render() returning getBannerElement)
+      }
+    }
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
