@@ -1,16 +1,10 @@
 # AGENTS.md
 
+Architecture reference for AI agents. For workflow rules, coding constraints, and patterns to follow, see `CLAUDE.md`.
+
 ## Project Overview
 
 `@topsort/banners` is a Web Component library for rendering banner ads via the Topsort retail media platform. It handles auctions, rendering, and telemetry automatically. Built with [Lit](https://lit.dev/) and shipped as both ES module and IIFE bundles.
-
-## Philosophy
-
-**Lightweight first. Ease of use second.**
-
-Lightweight means: zero unnecessary dependencies, no extra abstractions, minimal bundle size, and active resistance to feature creep. Every new file, abstraction, or dependency must justify its existence against bundle weight and maintenance cost. Prefer editing existing files over creating new ones. Keep the component surface area small.
-
-Ease of use means the library must be a `<script>` tag and two HTML attributes away from working. Do not make users think.
 
 ## Architecture
 
@@ -87,15 +81,6 @@ Errors are only logged to console in dev mode (`import.meta.env.DEV`).
 | **pnpm** | Package manager (enforced via `preinstall` script) |
 | **vite-plugin-dts** | TypeScript declaration generation |
 
-## Code Conventions
-
-- **Formatting**: 2-space indentation, 100-char line width (Biome).
-- **Naming**: PascalCase for classes/interfaces, camelCase for functions/variables, kebab-case for custom element names and HTML attributes.
-- **Properties**: Use Lit `@property` decorators with explicit `attribute` mappings for kebab-case HTML attributes (e.g., `category-id` maps to `categoryId`).
-- **Readonly**: Component properties exposed via attributes are marked `readonly`.
-- **TypeScript**: Strict mode enabled. `experimentalDecorators` is required for Lit decorators. `useDefineForClassFields: false` is set for Lit compatibility.
-- **Imports**: Organized automatically by Biome.
-
 ## Build & Development
 
 ```bash
@@ -105,6 +90,7 @@ pnpm run build      # Build ES module + IIFE bundles to dist/
 pnpm run lint       # Run Biome linting
 pnpm run lint:fix   # Auto-fix lint issues
 pnpm run typecheck  # Run tsc --noEmit
+pnpm test:run       # Run all tests (CI mode)
 ```
 
 The `PACKAGE_VERSION` define in `vite.config.ts` injects the npm package version at build time.
@@ -113,7 +99,7 @@ The `PACKAGE_VERSION` define in `vite.config.ts` injects the npm package version
 
 - **Runner**: Vitest 4.x + jsdom 28.x
 - **Config**: `vitest.config.ts` (separate from `vite.config.ts`)
-- **Test files**: `src/__tests__/` — 7 files covering all source modules
+- **Test files**: `src/__tests__/` — 7 files, 69 tests covering all source modules
 - **Commands**: `pnpm test` (watch) / `pnpm test:run` (CI)
 - **CI**: `.github/workflows/test.yml` runs `pnpm test:run` on every PR
 
@@ -122,28 +108,3 @@ The `PACKAGE_VERSION` define in `vite.config.ts` injects the npm package version
 - **Pull requests** trigger `.github/workflows/lint.yml`: actionlint, typos, tsc, and Biome checks.
 - **Pull requests** trigger `.github/workflows/test.yml`: Vitest unit tests.
 - **Releases** trigger `.github/workflows/release.yml`: builds and publishes to npm.
-
-## Git Workflow
-
-- Never commit directly to `main`. All changes must be made on a feature branch and submitted as a pull request.
-- After moving a package between `dependencies` and `devDependencies` in `package.json`, always run `pnpm install` and commit the updated `pnpm-lock.yaml` in the same PR. CI runs `pnpm install --frozen-lockfile` and will fail if the lockfile is out of sync with `package.json`.
-- Admin override (`gh pr merge --admin`) is only appropriate to bypass the **review requirement** when all CI checks pass. Never use it to force-merge a PR with failing CI checks — fix the failures first.
-
-## Key Patterns
-
-- **`updated()` for side effects**: Template mutation (`applyTemplate`) and event emission (`emitEvent`) must happen in `updated()`, not `render()`. `render()` must remain pure. Use a guard flag or `changedProperties` transition check to prevent repeated execution.
-- **Optional chaining on banner assets**: Always use `banner.asset?.[0]?.content` — direct property access on potentially-undefined nested objects has caused Sentry errors.
-- **Predefined content mode**: When `predefined` is set on `<topsort-banner>`, `render()` returns `nothing` (skips Lit-managed DOM). `updated()` calls `applyTemplate()` to mutate the customer's existing markup in place, then emits the event. Fallback: winners with no `content` map fall through to `getBannerElement`.
-- **Context mode comparator**: `bannerContextHasChanged` checks width, height, newTab, error presence, and banners array length — not deep equality. Changes to these fields trigger re-renders in slots.
-
-## Key Constraints
-
-1. **No shadow DOM** on `topsort-banner` and `topsort-banner-slot` — required for analytics.js compatibility.
-2. **`data-ts-clickable` and `data-ts-resolved-bid`** attributes are critical for telemetry — do not remove or rename them.
-3. **Fallback banners** (`isFallback: true`) must not have `data-ts-resolved-bid` to avoid false attribution.
-4. **`window.TS.token`** must be set before the component renders — it is checked synchronously in `render()`.
-5. **External CDN dependencies**: `analytics.js` and `hls.js` are loaded at runtime from CDNs, not bundled.
-
-## Dependency Policy
-
-New runtime dependencies require strong justification — every byte matters in a library loaded on e-commerce pages. Prefer native browser APIs and existing Lit utilities. Nothing goes into `dependencies` without discussion.
