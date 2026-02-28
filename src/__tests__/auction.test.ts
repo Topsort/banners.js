@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getDeviceType, runAuction } from "../auction";
+import { TopsortRequestError } from "../errors";
 import type { Auction } from "../types";
 
 type TSGlobal = { token: string; url?: string; getUserId?: () => string };
@@ -91,14 +92,37 @@ describe("runAuction", () => {
     expect(result).toEqual(winners);
   });
 
-  it("calls logError and throws on HTTP error", async () => {
+  it("calls logError and throws TopsortRequestError on HTTP error", async () => {
     mockFetch({ ok: false, status: 400, data: { message: "Bad Request" } });
     const logError = vi.fn();
 
-    await expect(
-      runAuction({ ...baseAuction }, { signal: new AbortController().signal, logError }),
-    ).rejects.toThrow("Bad Request");
+    const err = await runAuction(
+      { ...baseAuction },
+      { signal: new AbortController().signal, logError },
+    ).catch((e) => e);
+    expect(err).toBeInstanceOf(TopsortRequestError);
+    expect(err.message).toBe("Bad Request");
+    expect(err.status).toBe(400);
     expect(logError).toHaveBeenCalledWith({ message: "Bad Request" });
+  });
+
+  it("throws TopsortRequestError with HTTP status message when body is not JSON", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 503,
+        statusText: "",
+        json: () => Promise.reject(new Error("not json")),
+      }),
+    );
+    const err = await runAuction(
+      { ...baseAuction },
+      { signal: new AbortController().signal, logError: vi.fn() },
+    ).catch((e) => e);
+    expect(err).toBeInstanceOf(TopsortRequestError);
+    expect(err.status).toBe(503);
+    expect(err.message).toBe("HTTP 503");
   });
 
   it("throws TopsortRequestError when results array is empty", async () => {

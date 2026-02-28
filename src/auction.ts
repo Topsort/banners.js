@@ -50,9 +50,11 @@ export async function runAuction(
     signal,
   });
   if (!res.ok) {
-    const error = await res.json();
+    const error = (await res.json().catch((): { message?: string } => ({}))) as {
+      message?: string;
+    };
     logError(error);
-    throw new Error(error.message);
+    throw new TopsortRequestError(error.message ?? `HTTP ${res.status}`, res.status);
   }
   const data = await res.json();
   const result = data.results[0];
