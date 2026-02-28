@@ -127,6 +127,7 @@ The `PACKAGE_VERSION` define in `vite.config.ts` injects the npm package version
 
 - Never commit directly to `main`. All changes must be made on a feature branch and submitted as a pull request.
 - After moving a package between `dependencies` and `devDependencies` in `package.json`, always run `pnpm install` and commit the updated `pnpm-lock.yaml` in the same PR. CI runs `pnpm install --frozen-lockfile` and will fail if the lockfile is out of sync with `package.json`.
+- Admin override (`gh pr merge --admin`) is only appropriate to bypass the **review requirement** when all CI checks pass. Never use it to force-merge a PR with failing CI checks — fix the failures first.
 
 ## Key Patterns
 
