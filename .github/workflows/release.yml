@@ -52,4 +52,4 @@ jobs:
   
       - name: Publish to npm
         id: publish
-        run: npm publish --no-git-checks
+        run: npm publish --no-git-checks --provenance
