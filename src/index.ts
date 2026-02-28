@@ -412,7 +412,7 @@ export class HlsVideo extends LitElement {
 
     let Hls: HlsConstructor;
     try {
-      Hls = await hlsDependency.load();
+      Hls = await loadHls();
     } catch (err) {
       console.error("Failed to load HLS.js:", err);
       return;
@@ -432,45 +432,24 @@ export class HlsVideo extends LitElement {
   }
 }
 
-class HlsDependency {
-  private loadPromise: Promise<HlsConstructor> | null = null;
+let _hlsLoadPromise: Promise<HlsConstructor> | null = null;
 
-  load(): Promise<HlsConstructor> {
-    // Return existing promise if already loading/loaded
-    if (this.loadPromise) {
-      return this.loadPromise;
-    }
-
-    // Check if already loaded
-    if (window.Hls) {
-      this.loadPromise = Promise.resolve(window.Hls);
-      return this.loadPromise;
-    }
-
-    // Inject the script and wait for it to load
-    this.loadPromise = new Promise<HlsConstructor>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js";
-      script.onload = () => {
-        if (window.Hls) {
-          resolve(window.Hls);
-        } else {
-          reject(new Error("HLS.js loaded but not available"));
-        }
-      };
-      script.onerror = () => {
-        reject(new Error("Failed to load HLS.js"));
-      };
-      document.head.appendChild(script);
-    }).catch((err) => {
-      // Reset cached promise so future calls can retry
-      this.loadPromise = null;
-      throw err;
-    });
-
-    return this.loadPromise;
+function loadHls(): Promise<HlsConstructor> {
+  if (_hlsLoadPromise) return _hlsLoadPromise;
+  if (window.Hls) {
+    _hlsLoadPromise = Promise.resolve(window.Hls);
+    return _hlsLoadPromise;
   }
+  _hlsLoadPromise = new Promise<HlsConstructor>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.6.13/dist/hls.min.js";
+    script.onload = () =>
+      window.Hls ? resolve(window.Hls) : reject(new Error("HLS.js loaded but not available"));
+    script.onerror = () => reject(new Error("Failed to load HLS.js"));
+    document.head.appendChild(script);
+  }).catch((err) => {
+    _hlsLoadPromise = null;
+    throw err;
+  });
+  return _hlsLoadPromise;
 }
-
-// Create a singleton instance
-const hlsDependency = new HlsDependency();
