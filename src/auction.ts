@@ -27,7 +27,7 @@ export async function runAuction(
   auction: Auction,
   { signal, logError }: AuctionOptions,
 ): Promise<Banner[]> {
-  const device = getDeviceType();
+  const { device } = auction;
   const token = window.TS.token;
   const url = window.TS.url || "https://api.topsort.com";
 
