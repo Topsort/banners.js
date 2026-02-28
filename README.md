@@ -1,5 +1,7 @@
-![version](https://img.shields.io/npm/v/@topsort/banners)
-![downloads](https://img.shields.io/npm/dw/@topsort/banners)
+[![CI](https://github.com/Topsort/banners.js/actions/workflows/test.yml/badge.svg)](https://github.com/Topsort/banners.js/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/Topsort/banners.js/graph/badge.svg)](https://codecov.io/gh/Topsort/banners.js)
+[![npm version](https://img.shields.io/npm/v/@topsort/banners)](https://www.npmjs.com/package/@topsort/banners)
+[![npm downloads](https://img.shields.io/npm/dw/@topsort/banners)](https://www.npmjs.com/package/@topsort/banners)
 ![license](https://img.shields.io/github/license/Topsort/banners.js)
 ![GitHub Repo stars](https://img.shields.io/github/stars/topsort/banners.js?style=social)
 
@@ -54,10 +56,10 @@ For environments that don't support ES modules (e.g., Magento), use the IIFE bun
 <script src="https://unpkg.com/@topsort/banners/dist/banners.iife.js"></script>
 ```
 
-| Bundle | Size | Size (gzip) |
-|--------|------|-------------|
-| `banners.mjs` (ES module) | 38.71 kB | 11.17 kB |
-| `banners.iife.js` (IIFE) | 29.93 kB | 10.13 kB |
+| Bundle | Size (gzip) | Size (brotli) |
+|--------|-------------|---------------|
+| `banners.mjs` (ES module) | 12.40 kB | 11.01 kB |
+| `banners.iife.js` (IIFE) | 11.18 kB | 10.08 kB |
 
 ## Rendering multiple banners with one slot ID
 
@@ -247,10 +249,15 @@ document.querySelector('#my-slot-id').addEventListener('statechange', (event) =>
 });
 ```
 
-# Running the example
+# Playground
 
-You can play around with the provided index.html file. To run it, you'll need to
-install the dependencies and start a local server.
+Try the library instantly — no setup required — at the live demo:
+
+**[topsort.github.io/banners.js](https://topsort.github.io/banners.js/)**
+
+Enter your API token and a slot ID to render a real banner and copy the resulting HTML snippet.
+
+## Running locally
 
 ```bash
 git clone https://github.com/Topsort/banners.js.git
@@ -259,5 +266,4 @@ pnpm install
 pnpm run dev
 ```
 
-Remember to add `window.TS.token` and modify the `slot-id` attribute with your
-own values that you can find at [Topsort](https://app.topsort.com/).
+You can find your API token and slot IDs at [app.topsort.com](https://app.topsort.com/).
