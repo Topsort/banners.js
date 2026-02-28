@@ -305,7 +305,11 @@ export class TopsortBannerSlot extends LitElement {
   readonly predefined: boolean = false;
 
   private _bannerForRank(): Banner | undefined {
-    if (!this.context?.banners?.length || this.rank < 1 || this.context.banners.length < this.rank) {
+    if (
+      !this.context?.banners?.length ||
+      this.rank < 1 ||
+      this.context.banners.length < this.rank
+    ) {
       return undefined;
     }
     return this.context.banners[this.rank - 1];
