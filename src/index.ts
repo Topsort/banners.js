@@ -237,7 +237,11 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     this._prevTaskStatus = currStatus;
     const banners = this.task.value ?? [];
 
-    if (this.predefined && prevStatus !== TaskStatus.COMPLETE && currStatus === TaskStatus.COMPLETE) {
+    if (
+      this.predefined &&
+      prevStatus !== TaskStatus.COMPLETE &&
+      currStatus === TaskStatus.COMPLETE
+    ) {
       if (banners.length && banners[0].asset?.[0]?.content) {
         try {
           applyTemplate(this, banners[0]);
