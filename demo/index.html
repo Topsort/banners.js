@@ -361,14 +361,15 @@
         return parts.join(" ");
       }
 
-      // Split "</script>" so it never appears literally inside this <script> block.
-      const SC = "</" + "script>";
+      // Avoid literal <script> and </script> inside this block — they confuse HTML parsers.
+      const SO = "<" + "script";
+      const SC = "</" + "script" + ">";
 
       function buildSnippetSingle(fields) {
         const attrs = buildAttrs(fields);
         return [
-          `<script src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
-          `<script>window.TS = { token: "YOUR_TOKEN" };${SC}`,
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}></topsort-banner>`,
         ].join("\n");
@@ -377,8 +378,8 @@
       function buildSnippetContext(fields) {
         const attrs = `${buildAttrs(fields)} context`;
         return [
-          `<script src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
-          `<script>window.TS = { token: "YOUR_TOKEN" };${SC}`,
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}>`,
           `  <topsort-banner-slot rank="1"></topsort-banner-slot>`,
