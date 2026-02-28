@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>banners.js Playground</title>
+    <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
+    <script src="./dist/banners.iife.js"></script>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #1a1a1a;
+        background: #f5f5f5;
+        min-height: 100vh;
+      }
+
+      header {
+        background: #0f0f0f;
+        color: #fff;
+        padding: 16px 24px;
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      header h1 { font-size: 18px; font-weight: 600; }
+      header p { font-size: 13px; color: #999; }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 0;
+        min-height: calc(100vh - 53px);
+      }
+
+      @media (max-width: 720px) {
+        .layout { grid-template-columns: 1fr; }
+        .panel-preview { order: -1; }
+      }
+
+      .panel-form {
+        background: #fff;
+        border-right: 1px solid #e5e5e5;
+        padding: 24px;
+        overflow-y: auto;
+      }
+
+      .panel-preview {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      h2 {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #666;
+        margin-bottom: 16px;
+      }
+
+      fieldset {
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      fieldset legend {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #999;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 4px;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="number"] {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #1a1a1a;
+        background: #fafafa;
+        transition: border-color 0.15s, background 0.15s;
+        outline: none;
+      }
+
+      input[type="text"]:focus,
+      input[type="password"]:focus,
+      input[type="number"]:focus {
+        border-color: #0066cc;
+        background: #fff;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 8px;
+      }
+
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 400;
+        cursor: pointer;
+        padding: 6px 12px;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
+        background: #fafafa;
+        transition: border-color 0.15s, background 0.15s;
+        flex: 1;
+        justify-content: center;
+      }
+
+      .radio-group input[type="radio"] { margin: 0; }
+
+      .radio-group label:has(input:checked) {
+        border-color: #0066cc;
+        background: #e8f0fc;
+        color: #0052a3;
+        font-weight: 500;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 400;
+      }
+
+      .hint {
+        font-size: 11px;
+        color: #999;
+        margin-top: 3px;
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background: #0066cc;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        margin-top: 4px;
+      }
+
+      button[type="submit"]:hover { background: #0052a3; }
+      button[type="submit"]:active { background: #003d7a; }
+
+      .preview-box {
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .preview-box-header {
+        padding: 10px 16px;
+        border-bottom: 1px solid #e5e5e5;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: #fafafa;
+      }
+
+      #preview-area {
+        padding: 24px;
+        min-height: 120px;
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .empty-state {
+        color: #bbb;
+        font-size: 13px;
+        font-style: italic;
+      }
+
+      #snippet-area {
+        padding: 16px;
+        background: #1a1a1a;
+        overflow-x: auto;
+      }
+
+      #snippet-area pre {
+        margin: 0;
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-size: 12px;
+        color: #e5e5e5;
+        white-space: pre;
+        line-height: 1.6;
+      }
+
+      #snippet-area.hidden { display: none; }
+
+      .slot-wrapper { margin-bottom: 8px; }
+      .slot-wrapper h4 {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>banners.js</h1>
+      <p>Interactive Playground</p>
+    </header>
+
+    <div class="layout">
+      <aside class="panel-form">
+        <form id="demo-form" autocomplete="off" novalidate>
+          <fieldset>
+            <legend>Authentication</legend>
+            <div class="field">
+              <label for="token">API Token</label>
+              <input type="password" id="token" name="token" placeholder="ts_live_…" required />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Slot</legend>
+            <div class="field">
+              <label for="slot-id">Slot ID</label>
+              <input type="text" id="slot-id" name="slot-id" placeholder="01HXYZ…" required />
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="width">Width (px)</label>
+                <input type="number" id="width" name="width" value="728" min="1" required />
+              </div>
+              <div class="field">
+                <label for="height">Height (px)</label>
+                <input type="number" id="height" name="height" value="90" min="1" required />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Targeting (optional)</legend>
+            <div class="field">
+              <label for="category-id">Category ID</label>
+              <input type="text" id="category-id" name="category-id" placeholder="cat_…" />
+            </div>
+            <div class="field">
+              <label for="search-query">Search Query</label>
+              <input type="text" id="search-query" name="search-query" placeholder="running shoes" />
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Options</legend>
+            <div class="field">
+              <label class="checkbox-label">
+                <input type="checkbox" id="new-tab" name="new-tab" />
+                Open links in new tab
+              </label>
+            </div>
+            <div class="field">
+              <label>Mode</label>
+              <div class="radio-group">
+                <label>
+                  <input type="radio" name="mode" value="single" checked />
+                  Single
+                </label>
+                <label>
+                  <input type="radio" name="mode" value="context" />
+                  Context (rank 1 + 2)
+                </label>
+              </div>
+              <p class="hint">Context mode renders two banner slots under a shared auction.</p>
+            </div>
+          </fieldset>
+
+          <button type="submit">Render Banner</button>
+        </form>
+      </aside>
+
+      <main class="panel-preview">
+        <div>
+          <h2>Preview</h2>
+          <div class="preview-box">
+            <div class="preview-box-header">Live Output</div>
+            <div id="preview-area">
+              <span class="empty-state">Fill in the form and click Render Banner.</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2>Code Snippet</h2>
+          <div class="preview-box">
+            <div class="preview-box-header">Copy &amp; paste into your site</div>
+            <div id="snippet-area" class="hidden">
+              <pre id="snippet-code"></pre>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const form = document.getElementById("demo-form");
+      const previewArea = document.getElementById("preview-area");
+      const snippetArea = document.getElementById("snippet-area");
+      const snippetCode = document.getElementById("snippet-code");
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function buildAttrs(fields) {
+        const parts = [];
+        if (fields.slotId) parts.push(`id="${escapeHtml(fields.slotId)}"`);
+        if (fields.width) parts.push(`width="${escapeHtml(fields.width)}"`);
+        if (fields.height) parts.push(`height="${escapeHtml(fields.height)}"`);
+        if (fields.categoryId) parts.push(`category-id="${escapeHtml(fields.categoryId)}"`);
+        if (fields.searchQuery) parts.push(`search-query="${escapeHtml(fields.searchQuery)}"`);
+        if (fields.newTab) parts.push(`new-tab`);
+        return parts.join(" ");
+      }
+
+      // Avoid literal <script> and </script> inside this block — they confuse HTML parsers.
+      const SO = "<" + "script";
+      const SC = "</" + "script" + ">";
+
+      function buildSnippetSingle(fields) {
+        const attrs = buildAttrs(fields);
+        return [
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
+          ``,
+          `<topsort-banner ${attrs}></topsort-banner>`,
+        ].join("\n");
+      }
+
+      function buildSnippetContext(fields) {
+        const attrs = `${buildAttrs(fields)} context`;
+        return [
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
+          ``,
+          `<topsort-banner ${attrs}>`,
+          `  <topsort-banner-slot rank="1"></topsort-banner-slot>`,
+          `  <topsort-banner-slot rank="2"></topsort-banner-slot>`,
+          `</topsort-banner>`,
+        ].join("\n");
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const data = new FormData(form);
+        const fields = {
+          token: data.get("token") || "",
+          slotId: data.get("slot-id") || "",
+          width: data.get("width") || "728",
+          height: data.get("height") || "90",
+          categoryId: data.get("category-id") || "",
+          searchQuery: data.get("search-query") || "",
+          newTab: data.get("new-tab") === "on",
+          mode: data.get("mode") || "single",
+        };
+
+        if (!fields.token || !fields.slotId) {
+          alert("API Token and Slot ID are required.");
+          return;
+        }
+
+        // Set token BEFORE inserting the element — checked synchronously in render()
+        window.TS = { token: fields.token };
+
+        // Clear previous preview
+        previewArea.innerHTML = "";
+
+        if (fields.mode === "context") {
+          const banner = document.createElement("topsort-banner");
+          banner.setAttribute("id", fields.slotId);
+          banner.setAttribute("width", fields.width);
+          banner.setAttribute("height", fields.height);
+          if (fields.categoryId) banner.setAttribute("category-id", fields.categoryId);
+          if (fields.searchQuery) banner.setAttribute("search-query", fields.searchQuery);
+          if (fields.newTab) banner.setAttribute("new-tab", "");
+          banner.setAttribute("context", "");
+
+          const slot1 = document.createElement("topsort-banner-slot");
+          slot1.setAttribute("rank", "1");
+          const slot2 = document.createElement("topsort-banner-slot");
+          slot2.setAttribute("rank", "2");
+
+          const wrap1 = document.createElement("div");
+          wrap1.className = "slot-wrapper";
+          const label1 = document.createElement("h4");
+          label1.textContent = "Rank 1";
+          wrap1.appendChild(label1);
+          wrap1.appendChild(slot1);
+
+          const wrap2 = document.createElement("div");
+          wrap2.className = "slot-wrapper";
+          const label2 = document.createElement("h4");
+          label2.textContent = "Rank 2";
+          wrap2.appendChild(label2);
+          wrap2.appendChild(slot2);
+
+          banner.appendChild(wrap1);
+          banner.appendChild(wrap2);
+          previewArea.appendChild(banner);
+
+          snippetCode.textContent = buildSnippetContext(fields);
+        } else {
+          const banner = document.createElement("topsort-banner");
+          banner.setAttribute("id", fields.slotId);
+          banner.setAttribute("width", fields.width);
+          banner.setAttribute("height", fields.height);
+          if (fields.categoryId) banner.setAttribute("category-id", fields.categoryId);
+          if (fields.searchQuery) banner.setAttribute("search-query", fields.searchQuery);
+          if (fields.newTab) banner.setAttribute("new-tab", "");
+
+          previewArea.appendChild(banner);
+
+          snippetCode.textContent = buildSnippetSingle(fields);
+        }
+
+        snippetArea.classList.remove("hidden");
+        snippetArea.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    </script>
+  </body>
+</html>
