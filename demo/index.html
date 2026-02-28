@@ -6,6 +6,7 @@
     <title>banners.js Playground</title>
     <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
     <script>
+      window.TS = {};
       window.TS_BANNERS = {
         getLoadingElement() {
           const el = document.createElement("div");
@@ -433,7 +434,7 @@
         }
 
         // Set token BEFORE inserting the element — checked synchronously in render()
-        window.TS = { token: fields.token };
+        window.TS.token = fields.token;
 
         // Clear previous preview
         previewArea.innerHTML = "";
