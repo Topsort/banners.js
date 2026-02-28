@@ -20,7 +20,7 @@ Three custom elements are defined in `src/index.ts`:
 
 - **`<topsort-banner>`** — Main component. Runs an auction via `@lit/task`, renders the winning banner. Can act as a context provider (`context="true"`) to share auction results with child slots.
 - **`<topsort-banner-slot>`** — Consumes banner context from a parent `<topsort-banner>`. Renders a specific winner by `rank` (1-indexed).
-- **`<hls-video>`** — Plays HLS video assets. Loads `hls.js` dynamically from CDN via a singleton (`HlsDependency`).
+- **`<hls-video>`** — Plays HLS video assets. Loads `hls.js` dynamically from CDN via a module-level `loadHls()` function with promise caching.
 
 ### Shadow DOM is intentionally disabled
 
@@ -126,6 +126,7 @@ The `PACKAGE_VERSION` define in `vite.config.ts` injects the npm package version
 ## Git Workflow
 
 - Never commit directly to `main`. All changes must be made on a feature branch and submitted as a pull request.
+- After moving a package between `dependencies` and `devDependencies` in `package.json`, always run `pnpm install` and commit the updated `pnpm-lock.yaml` in the same PR. CI runs `pnpm install --frozen-lockfile` and will fail if the lockfile is out of sync with `package.json`.
 
 ## Key Patterns
 
