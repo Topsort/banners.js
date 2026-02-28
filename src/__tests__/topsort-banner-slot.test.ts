@@ -1,5 +1,6 @@
 import type { LitElement } from "lit";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as templateModule from "../template";
 import type { Banner, BannerContext } from "../types";
 
 vi.mock("../auction", () => ({
@@ -117,5 +118,19 @@ describe("TopsortBannerSlot", () => {
     await setContext(el, { ...baseCtx, banners: [winner] });
     // Fallback renders the standard <img>
     expect(el.querySelector("img")).not.toBeNull();
+  });
+
+  it("predefined mode: slot survives applyTemplate throw", async () => {
+    const winner = makeBanner({ asset: [{ url: "x", content: { label: "World" } }] });
+    vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
+      throw new Error("DOM error");
+    });
+    const el = mountSlot({ rank: "1", predefined: "" });
+    el.innerHTML = '<span data-ts-field="label">old</span>';
+    await (el as LitElement).updateComplete;
+    await setContext(el, { ...baseCtx, banners: [winner] });
+    // Slot remains connected and no exception propagates
+    expect(el.isConnected).toBe(true);
+    vi.restoreAllMocks();
   });
 });

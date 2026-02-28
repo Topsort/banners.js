@@ -299,13 +299,13 @@ export class TopsortBannerSlot extends LitElement {
   readonly context?: BannerContext;
 
   @property({ attribute: "rank", type: Number })
-  readonly rank = 0;
+  readonly rank = 1;
 
   @property({ type: Boolean })
   readonly predefined: boolean = false;
 
   private _bannerForRank(): Banner | undefined {
-    if (!this.context?.banners?.length || this.context.banners.length < this.rank) {
+    if (!this.context?.banners?.length || this.rank < 1 || this.context.banners.length < this.rank) {
       return undefined;
     }
     return this.context.banners[this.rank - 1];
@@ -354,7 +354,11 @@ export class TopsortBannerSlot extends LitElement {
       if (bannersJustArrived) {
         const banner = this._bannerForRank();
         if (banner?.asset?.[0]?.content) {
-          applyTemplate(this, banner);
+          try {
+            applyTemplate(this, banner);
+          } catch (e) {
+            logError(e);
+          }
         }
         // No-winners or fallback: predefined content stays as-is
         // (fallback case is handled by render() returning getBannerElement)
