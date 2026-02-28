@@ -219,7 +219,6 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     return this.task.render({
       pending: () => getLoadingElement(),
       complete: (banners) => {
-        this.emitEvent(banners.length ? "ready" : "nowinners");
         if (!banners.length) {
           return getNoWinnersElement();
         }
@@ -232,25 +231,30 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
 
-    if (this.predefined) {
-      const prevStatus = this._prevTaskStatus;
-      const currStatus = this.task.status;
-      this._prevTaskStatus = currStatus;
+    // Always track task status transitions — used by both predefined and standard modes
+    const prevStatus = this._prevTaskStatus;
+    const currStatus = this.task.status;
+    this._prevTaskStatus = currStatus;
+    const banners = this.task.value ?? [];
 
-      if (prevStatus !== TaskStatus.COMPLETE && currStatus === TaskStatus.COMPLETE) {
-        const banners = this.task.value ?? [];
-        if (banners.length) {
-          if (banners[0].asset?.[0]?.content) {
-            try {
-              applyTemplate(this, banners[0]);
-            } catch (e) {
-              logError(e);
-            }
-          }
-          this.emitEvent("ready");
-        } else {
-          this.emitEvent("nowinners");
+    if (
+      this.predefined &&
+      prevStatus !== TaskStatus.COMPLETE &&
+      currStatus === TaskStatus.COMPLETE
+    ) {
+      if (banners.length && banners[0].asset?.[0]?.content) {
+        try {
+          applyTemplate(this, banners[0]);
+        } catch (e) {
+          logError(e);
         }
+      }
+    }
+
+    // context-mode banner is a container; event emission is the caller's responsibility
+    if (!this.isContext) {
+      if (prevStatus !== TaskStatus.COMPLETE && currStatus === TaskStatus.COMPLETE) {
+        this.emitEvent(banners.length ? "ready" : "nowinners");
       } else if (prevStatus !== TaskStatus.ERROR && currStatus === TaskStatus.ERROR) {
         this.emitEvent("error");
       }
