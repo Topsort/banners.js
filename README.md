@@ -14,14 +14,8 @@
 Directly from unpkg.com
 
 ```html
-<script
-  async
-  type="module"
-  src="https://unpkg.com/@topsort/banners/dist/banners.mjs"
-></script>
-<script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <script>
-  // Set API key for auctions and events
+  // Must come first — analytics.js reads window.TS on load
   window.TS = {
     token: "<your topsort api key>",
   };
@@ -45,6 +39,12 @@ Directly from unpkg.com
     },
   };
 </script>
+<script
+  async
+  type="module"
+  src="https://unpkg.com/@topsort/banners/dist/banners.mjs"
+></script>
+<script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
 <body>
   <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
 </body>
