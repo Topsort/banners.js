@@ -193,7 +193,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   @property({ type: Boolean })
   readonly predefined: boolean = false;
 
-  private _predefinedApplied = false;
+  private _prevTaskStatus: TaskStatus = TaskStatus.INITIAL;
 
   @property({ attribute: false, state: true })
   private slots?: NodeListOf<Element>;
@@ -232,20 +232,26 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
 
-    if (this.predefined && !this._predefinedApplied) {
-      if (this.task.status === TaskStatus.COMPLETE) {
+    if (this.predefined) {
+      const prevStatus = this._prevTaskStatus;
+      const currStatus = this.task.status;
+      this._prevTaskStatus = currStatus;
+
+      if (prevStatus !== TaskStatus.COMPLETE && currStatus === TaskStatus.COMPLETE) {
         const banners = this.task.value ?? [];
-        this._predefinedApplied = true;
         if (banners.length) {
           if (banners[0].asset?.[0]?.content) {
-            applyTemplate(this, banners[0]);
+            try {
+              applyTemplate(this, banners[0]);
+            } catch (e) {
+              logError(e);
+            }
           }
           this.emitEvent("ready");
         } else {
           this.emitEvent("nowinners");
         }
-      } else if (this.task.status === TaskStatus.ERROR) {
-        this._predefinedApplied = true;
+      } else if (prevStatus !== TaskStatus.ERROR && currStatus === TaskStatus.ERROR) {
         this.emitEvent("error");
       }
     }
