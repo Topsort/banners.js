@@ -394,6 +394,7 @@ export class HlsVideo extends LitElement {
     return html`
       <video
         id="${this.videoId}"
+        style="width:${this.width}; height:${this.height}; object-fit:cover;"
         muted
         autoplay
         loop
@@ -405,10 +406,6 @@ export class HlsVideo extends LitElement {
   async firstUpdated() {
     const video = this.shadowRoot?.getElementById(this.videoId) as HTMLVideoElement;
     if (!video) return;
-
-    video.style.width = this.width;
-    video.style.height = this.height;
-    video.style.objectFit = "cover";
 
     let Hls: HlsConstructor;
     try {
