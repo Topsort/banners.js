@@ -4,7 +4,7 @@ Architecture reference for AI agents. For workflow rules, coding constraints, an
 
 ## Project Overview
 
-`@topsort/banners` is a Web Component library for rendering banner ads via the Topsort retail media platform. It handles auctions, rendering, and telemetry automatically. Built with [Lit](https://lit.dev/) and shipped as both ES module and IIFE bundles.
+`@topsort/banners` is Topsort's official vendor SDK — a Web Component library for rendering banner ads on merchant storefronts via the Topsort retail media platform. It requires a Topsort account and API token; it is not a general-purpose ads library. It handles auctions, rendering, and telemetry automatically. Built with [Lit](https://lit.dev/) and shipped as both ES module and IIFE bundles.
 
 ## Architecture
 
