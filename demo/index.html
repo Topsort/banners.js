@@ -361,7 +361,7 @@
         return parts.join(" ");
       }
 
-      // Avoid literal <script> and </script> inside this block — they confuse HTML parsers.
+      // Avoid literal script open/close tags inside this block — they confuse HTML parsers.
       const SO = "<" + "script";
       const SC = "</" + "script" + ">";
 
