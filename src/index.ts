@@ -222,6 +222,13 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
+        if (banners[0].asset?.[0]?.content) {
+          const err = new Error(
+            "Banner has predefined content but component is not in predefined mode",
+          );
+          logError(err);
+          return getErrorElement(err);
+        }
         return getBannerElement(banners[0], this.width, this.height, this.newTab);
       },
       error: (error) => getErrorElement(error),
@@ -341,12 +348,15 @@ export class TopsortBannerSlot extends LitElement {
     if (!this.context.banners.length || this.context.banners.length < this.rank) {
       return getNoWinnersElement();
     }
-    return getBannerElement(
-      this.context.banners[this.rank - 1],
-      this.context.width,
-      this.context.height,
-      this.context.newTab,
-    );
+    const banner = this.context.banners[this.rank - 1];
+    if (banner.asset?.[0]?.content) {
+      const err = new Error(
+        "Banner has predefined content but component is not in predefined mode",
+      );
+      logError(err);
+      return getErrorElement(err);
+    }
+    return getBannerElement(banner, this.context.width, this.context.height, this.context.newTab);
   }
 
   updated(changedProperties: Map<string | number | symbol, unknown>) {
