@@ -198,4 +198,26 @@ describe("TopsortBanner", () => {
     // Fallback renders the standard <img> element
     expect(el.querySelector("img")).not.toBeNull();
   });
+
+  it("standard mode: transition detection prevents double-emission of ready", async () => {
+    vi.mocked(runAuction).mockResolvedValue([makeBanner()]);
+    const el = mount({ id: "slot-1", width: "300", height: "250" });
+    const events: CustomEvent[] = [];
+    el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
+    await taskSettled(el);
+    // Trigger re-render by changing a property — must NOT re-emit ready
+    el.setAttribute("width", "400");
+    await (el as LitElement).updateComplete;
+    const readyEvents = events.filter((e) => e.detail.status === "ready");
+    expect(readyEvents.length).toBe(1);
+  });
+
+  it("emits statechange with status 'error' on auction failure (standard mode)", async () => {
+    vi.mocked(runAuction).mockRejectedValue(new Error("network error"));
+    const el = mount({ id: "slot-1", width: "300", height: "250" });
+    const events: CustomEvent[] = [];
+    el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
+    await taskSettled(el);
+    expect(events.some((e) => e.detail.status === "error")).toBe(true);
+  });
 });
