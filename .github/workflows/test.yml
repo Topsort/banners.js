@@ -60,3 +60,6 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Check bundle size
+        run: pnpm size

@@ -49,13 +49,16 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "size": "size-limit"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.7",
+    "@size-limit/file": "^11.1.6",
     "@types/node": "24.10.1",
     "@vitest/coverage-v8": "^4.0.18",
     "jsdom": "^28.1.0",
+    "size-limit": "^11.1.6",
     "skeleton-webcomponent-loader": "2.1.4",
     "typescript": "5.9.3",
     "vite": "7.2.4",
@@ -67,6 +70,16 @@
     "@lit/task": "1.0.3",
     "lit": "3.3.1"
   },
+  "size-limit": [
+    {
+      "path": "dist/banners.iife.js",
+      "limit": "13 kB"
+    },
+    {
+      "path": "dist/banners.mjs",
+      "limit": "15 kB"
+    }
+  ],
   "pnpm": {
     "overrides": {
       "brace-expansion": ">=2.0.2"
