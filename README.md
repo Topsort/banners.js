@@ -1,5 +1,5 @@
 [![CI](https://github.com/Topsort/banners.js/actions/workflows/test.yml/badge.svg)](https://github.com/Topsort/banners.js/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/Topsort/banners.js/graph/badge.svg)](https://codecov.io/gh/Topsort/banners.js)
+[![codecov](https://codecov.io/gh/Topsort/banners.js/branch/main/graph/badge.svg)](https://codecov.io/gh/Topsort/banners.js)
 [![npm version](https://img.shields.io/npm/v/@topsort/banners)](https://www.npmjs.com/package/@topsort/banners)
 [![npm downloads](https://img.shields.io/npm/dw/@topsort/banners)](https://www.npmjs.com/package/@topsort/banners)
 ![license](https://img.shields.io/github/license/Topsort/banners.js)
