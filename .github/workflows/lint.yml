@@ -1,9 +1,9 @@
 name: Lint
 on:
   pull_request:
+  workflow_dispatch:
 
 env:
-  LEFTHOOK: 0 # Don't run lefthook in CI
   lockfile: pnpm-lock.yaml
   node_version: "20"
 
@@ -52,7 +52,7 @@ jobs:
           cache-dependency-path: ${{ env.lockfile }}
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run TSC
         run: tsc --noEmit
