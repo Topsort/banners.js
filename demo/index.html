@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>banners.js Playground</title>
     <script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
+    <script>
+      window.TS_BANNERS = {
+        getLoadingElement() {
+          const el = document.createElement("div");
+          el.style.cssText = "padding:16px;color:#999;font:13px system-ui,sans-serif;";
+          el.textContent = "Loading\u2026";
+          return el;
+        },
+        getErrorElement(error) {
+          const el = document.createElement("div");
+          el.style.cssText =
+            "padding:12px 16px;background:#fff3f3;border:1px solid #ffcdd2;border-radius:6px;color:#c62828;font:13px system-ui,sans-serif;";
+          el.textContent = "Error: " + (error instanceof Error ? error.message : String(error));
+          return el;
+        },
+        getNoWinnersElement() {
+          const el = document.createElement("div");
+          el.style.cssText =
+            "padding:12px 16px;background:#f5f5f5;border:1px dashed #ccc;border-radius:6px;color:#999;font:13px system-ui,sans-serif;";
+          el.textContent = "No banner available for this slot.";
+          return el;
+        },
+      };
+    </script>
     <script src="./dist/banners.iife.js"></script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
