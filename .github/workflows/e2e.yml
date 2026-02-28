@@ -1,0 +1,22 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm playwright install --with-deps chromium
+      - run: pnpm e2e

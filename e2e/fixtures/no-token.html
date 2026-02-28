@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      window.TS = { token: "" };
+      window.TS_BANNERS = {
+        getErrorElement() {
+          const el = document.createElement("div");
+          el.setAttribute("data-testid", "error-element");
+          el.textContent = "Error loading banner";
+          return el;
+        },
+        getNoWinnersElement() {
+          const el = document.createElement("div");
+          el.setAttribute("data-testid", "no-winners-element");
+          el.textContent = "No winners";
+          return el;
+        },
+      };
+    </script>
+    <script src="/dist/banners.iife.js"></script>
+  </head>
+  <body>
+    <topsort-banner id="test-slot" width="600" height="400"></topsort-banner>
+  </body>
+</html>
