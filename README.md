@@ -7,6 +7,8 @@
 
 # Topsort Banner Ad Web component
 
+`banners.js` is **Topsort's official Web Component SDK** for rendering sponsored banner ads on merchant storefronts. It handles auction requests, banner rendering, and telemetry automatically. A [Topsort account](https://app.topsort.com) and API token are required.
+
 # Usage
 
 Directly from unpkg.com

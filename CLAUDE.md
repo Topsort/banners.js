@@ -10,6 +10,8 @@ Lightweight means: zero unnecessary dependencies, no extra abstractions, minimal
 
 Ease of use means the library must be a `<script>` tag and two HTML attributes away from working. Do not make users think.
 
+**Vendor SDK, not a general-purpose library**: banners.js is Topsort's official Web Component SDK. It requires a Topsort account and API token to function. Contributions should serve merchants integrating with Topsort's retail media platform — not generalize the library for other use cases.
+
 ## Git Workflow
 
 - Never commit directly to `main`. All changes go through a feature branch and pull request.
