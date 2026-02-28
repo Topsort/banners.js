@@ -48,11 +48,13 @@
     "lint:fix": "biome check --apply .",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.7",
     "@types/node": "24.10.1",
+    "@vitest/coverage-v8": "^4.0.18",
     "jsdom": "^28.1.0",
     "skeleton-webcomponent-loader": "2.1.4",
     "typescript": "5.9.3",
