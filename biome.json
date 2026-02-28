@@ -3,7 +3,7 @@
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!demo"]
+    "includes": ["**", "!demo", "!e2e/**"]
   },
   "json": {
     "formatter": {

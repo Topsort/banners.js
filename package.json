@@ -50,10 +50,12 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "size": "size-limit"
+    "size": "size-limit",
+    "e2e": "playwright test --config e2e/playwright.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.7",
+    "@playwright/test": "^1.58.2",
     "@size-limit/file": "^11.1.6",
     "@types/node": "24.10.1",
     "@vitest/coverage-v8": "^4.0.18",

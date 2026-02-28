@@ -4,3 +4,7 @@ dist/
 types/
 .env
 .claude/
+test-results/
+playwright-report/
+e2e/test-results/
+e2e/.playwright-cache/
