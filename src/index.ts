@@ -223,7 +223,9 @@ export class TopsortBanner extends BannerComponent(LitElement) {
           return getNoWinnersElement();
         }
         if (banners[0].asset?.[0]?.content) {
-          const err = new Error("Banner has predefined content but component is not in predefined mode");
+          const err = new Error(
+            "Banner has predefined content but component is not in predefined mode",
+          );
           logError(err);
           return getErrorElement(err);
         }
@@ -348,7 +350,9 @@ export class TopsortBannerSlot extends LitElement {
     }
     const banner = this.context.banners[this.rank - 1];
     if (banner.asset?.[0]?.content) {
-      const err = new Error("Banner has predefined content but component is not in predefined mode");
+      const err = new Error(
+        "Banner has predefined content but component is not in predefined mode",
+      );
       logError(err);
       return getErrorElement(err);
     }
