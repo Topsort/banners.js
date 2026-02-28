@@ -71,8 +71,14 @@
     "lit": "3.3.1"
   },
   "size-limit": [
-    { "path": "dist/banners.iife.js", "limit": "13 kB" },
-    { "path": "dist/banners.mjs", "limit": "15 kB" }
+    {
+      "path": "dist/banners.iife.js",
+      "limit": "13 kB"
+    },
+    {
+      "path": "dist/banners.mjs",
+      "limit": "15 kB"
+    }
   ],
   "pnpm": {
     "overrides": {
