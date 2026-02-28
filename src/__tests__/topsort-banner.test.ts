@@ -1,5 +1,6 @@
 import type { LitElement } from "lit";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as templateModule from "../template";
 import type { Banner } from "../types";
 
 vi.mock("../auction", () => ({
@@ -158,7 +159,7 @@ describe("TopsortBanner", () => {
     expect(events.some((e) => e.detail.status === "ready")).toBe(true);
   });
 
-  it("predefined mode: guard prevents double-application of template", async () => {
+  it("predefined mode: transition detection prevents double-application of template", async () => {
     const winner = makeBanner({ asset: [{ url: "x", content: { label: "Hello" } }] });
     vi.mocked(runAuction).mockResolvedValue([winner]);
     const el = mount({ id: "slot-1", predefined: "" });
@@ -171,6 +172,22 @@ describe("TopsortBanner", () => {
     await (el as LitElement).updateComplete;
     const readyEvents = events.filter((e) => e.detail.status === "ready");
     expect(readyEvents.length).toBe(1);
+  });
+
+  it("predefined mode: emits ready even if applyTemplate throws", async () => {
+    const winner = makeBanner({ asset: [{ url: "x", content: { label: "Hello" } }] });
+    vi.mocked(runAuction).mockResolvedValue([winner]);
+    vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
+      throw new Error("DOM error");
+    });
+    const el = mount({ id: "slot-1", predefined: "" });
+    el.innerHTML = '<span data-ts-field="label">old</span>';
+    const events: CustomEvent[] = [];
+    el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
+    await taskSettled(el);
+    const readyEvents = events.filter((e) => e.detail.status === "ready");
+    expect(readyEvents.length).toBe(1);
+    vi.restoreAllMocks();
   });
 
   it("predefined mode: winner with no content map falls back to getBannerElement", async () => {
