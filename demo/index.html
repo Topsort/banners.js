@@ -171,6 +171,7 @@
 
       .radio-group {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
       }
 
@@ -358,8 +359,12 @@
                   <input type="radio" name="mode" value="predefined" />
                   Predefined
                 </label>
+                <label>
+                  <input type="radio" name="mode" value="predefined-context" />
+                  Predefined Context
+                </label>
               </div>
-              <p class="hint">Context mode renders two banner slots under a shared auction. Predefined mode fills in your existing HTML template using <code>data-ts-field</code> attributes.</p>
+              <p class="hint">Context mode runs a shared auction across slots. Predefined modes fill in your existing HTML templates using <code>data-ts-field</code> attributes.</p>
             </div>
           </fieldset>
 
@@ -376,6 +381,27 @@
               response. Template fields are only populated when the auction response includes
               <code>content</code> data; otherwise the component logs a warning and leaves the
               template unchanged.
+            </p>
+          </div>
+
+          <div class="field" id="template-context-field" style="display:none">
+            <label for="template-html-1">Rank 1 Template HTML</label>
+            <textarea id="template-html-1" name="template-html-1" rows="6"><div data-ts-clickable>
+  <a data-ts-field="target">
+    <img data-ts-field="imageUrl" src="" alt="" />
+  </a>
+  <p data-ts-field="headline">Headline</p>
+</div></textarea>
+            <label for="template-html-2" style="margin-top:10px">Rank 2 Template HTML</label>
+            <textarea id="template-html-2" name="template-html-2" rows="6"><div data-ts-clickable>
+  <a data-ts-field="target">
+    <img data-ts-field="imageUrl" src="" alt="" />
+  </a>
+  <p data-ts-field="headline">Headline</p>
+</div></textarea>
+            <p class="hint">
+              Each slot mutates its own template independently. Fields are only populated when the
+              auction response includes <code>content</code> data for that rank.
             </p>
           </div>
 
@@ -412,11 +438,13 @@
       const snippetArea = document.getElementById("snippet-area");
       const snippetCode = document.getElementById("snippet-code");
       const templateField = document.getElementById("template-field");
+      const templateContextField = document.getElementById("template-context-field");
 
       document.querySelectorAll('[name="mode"]').forEach((r) =>
         r.addEventListener("change", () => {
           const mode = document.querySelector('[name="mode"]:checked').value;
           templateField.style.display = mode === "predefined" ? "" : "none";
+          templateContextField.style.display = mode === "predefined-context" ? "" : "none";
         }),
       );
 
@@ -477,6 +505,16 @@
         ].join("\n");
       }
 
+      function createSlotWrapper(rank, slotEl) {
+        const wrap = document.createElement("div");
+        wrap.className = "slot-wrapper";
+        const label = document.createElement("h4");
+        label.textContent = "Rank " + rank;
+        wrap.appendChild(label);
+        wrap.appendChild(slotEl);
+        return wrap;
+      }
+
       function buildSnippetContext(fields) {
         const attrs = `${buildAttrs(fields)} context`;
         return [
@@ -486,6 +524,25 @@
           `<topsort-banner ${attrs}>`,
           `  <topsort-banner-slot rank="1"></topsort-banner-slot>`,
           `  <topsort-banner-slot rank="2"></topsort-banner-slot>`,
+          `</topsort-banner>`,
+        ].join("\n");
+      }
+
+      function buildSnippetPredefinedContext(fields) {
+        const attrs = `${buildAttrs(fields)} context`;
+        const indent1 = fields.templateHtml1.split("\n").map((l) => "    " + l).join("\n");
+        const indent2 = fields.templateHtml2.split("\n").map((l) => "    " + l).join("\n");
+        return [
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
+          ``,
+          `<topsort-banner ${attrs}>`,
+          `  <topsort-banner-slot rank="1" predefined>`,
+          indent1,
+          `  </topsort-banner-slot>`,
+          `  <topsort-banner-slot rank="2" predefined>`,
+          indent2,
+          `  </topsort-banner-slot>`,
           `</topsort-banner>`,
         ].join("\n");
       }
@@ -525,22 +582,8 @@
           const slot2 = document.createElement("topsort-banner-slot");
           slot2.setAttribute("rank", "2");
 
-          const wrap1 = document.createElement("div");
-          wrap1.className = "slot-wrapper";
-          const label1 = document.createElement("h4");
-          label1.textContent = "Rank 1";
-          wrap1.appendChild(label1);
-          wrap1.appendChild(slot1);
-
-          const wrap2 = document.createElement("div");
-          wrap2.className = "slot-wrapper";
-          const label2 = document.createElement("h4");
-          label2.textContent = "Rank 2";
-          wrap2.appendChild(label2);
-          wrap2.appendChild(slot2);
-
-          banner.appendChild(wrap1);
-          banner.appendChild(wrap2);
+          banner.appendChild(createSlotWrapper(1, slot1));
+          banner.appendChild(createSlotWrapper(2, slot2));
           previewArea.appendChild(banner);
 
           snippetCode.textContent = buildSnippetContext(fields);
@@ -553,6 +596,28 @@
 
           previewArea.appendChild(banner);
           snippetCode.textContent = buildSnippetPredefined(fields);
+        } else if (fields.mode === "predefined-context") {
+          fields.templateHtml1 = (data.get("template-html-1") || "").trim();
+          fields.templateHtml2 = (data.get("template-html-2") || "").trim();
+
+          const banner = createBannerEl(fields);
+          banner.setAttribute("context", "");
+
+          const slot1 = document.createElement("topsort-banner-slot");
+          slot1.setAttribute("rank", "1");
+          slot1.setAttribute("predefined", "");
+          slot1.innerHTML = fields.templateHtml1;
+
+          const slot2 = document.createElement("topsort-banner-slot");
+          slot2.setAttribute("rank", "2");
+          slot2.setAttribute("predefined", "");
+          slot2.innerHTML = fields.templateHtml2;
+
+          banner.appendChild(createSlotWrapper(1, slot1));
+          banner.appendChild(createSlotWrapper(2, slot2));
+          previewArea.appendChild(banner);
+
+          snippetCode.textContent = buildSnippetPredefinedContext(fields);
         } else {
           const banner = createBannerEl(fields);
 
