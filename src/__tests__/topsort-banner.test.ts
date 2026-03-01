@@ -180,6 +180,7 @@ describe("TopsortBanner", () => {
     vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
       throw new Error("DOM error");
     });
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const el = mount({ id: "slot-1", predefined: "" });
     el.innerHTML = '<span data-ts-field="label">old</span>';
     const events: CustomEvent[] = [];
@@ -187,6 +188,7 @@ describe("TopsortBanner", () => {
     await taskSettled(el);
     const readyEvents = events.filter((e) => e.detail.status === "ready");
     expect(readyEvents.length).toBe(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.any(Error));
     vi.restoreAllMocks();
   });
 
