@@ -138,6 +138,31 @@
         background: #fff;
       }
 
+      textarea {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #d4d4d4;
+        border-radius: 6px;
+        font-size: 12px;
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        color: #1a1a1a;
+        background: #fafafa;
+        transition: border-color 0.15s, background 0.15s;
+        outline: none;
+        resize: vertical;
+      }
+
+      textarea:focus {
+        border-color: #0066cc;
+        background: #fff;
+      }
+
+      .hint code {
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-size: 11px;
+        color: #555;
+      }
+
       .field-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -329,10 +354,30 @@
                   <input type="radio" name="mode" value="context" />
                   Context (rank 1 + 2)
                 </label>
+                <label>
+                  <input type="radio" name="mode" value="predefined" />
+                  Predefined
+                </label>
               </div>
-              <p class="hint">Context mode renders two banner slots under a shared auction.</p>
+              <p class="hint">Context mode renders two banner slots under a shared auction. Predefined mode fills in your existing HTML template using <code>data-ts-field</code> attributes.</p>
             </div>
           </fieldset>
+
+          <div class="field" id="template-field" style="display:none">
+            <label for="template-html">Template HTML</label>
+            <textarea id="template-html" name="template-html" rows="8"><div data-ts-clickable>
+  <a data-ts-field="target">
+    <img data-ts-field="imageUrl" src="" alt="" />
+  </a>
+  <p data-ts-field="headline">Headline</p>
+</div></textarea>
+            <p class="hint">
+              Mark elements with <code>data-ts-field="key"</code> — values come from the auction
+              response. Template fields are only populated when the auction response includes
+              <code>content</code> data; otherwise the component logs a warning and leaves the
+              template unchanged.
+            </p>
+          </div>
 
           <button type="submit">Render Banner</button>
         </form>
@@ -366,6 +411,14 @@
       const previewArea = document.getElementById("preview-area");
       const snippetArea = document.getElementById("snippet-area");
       const snippetCode = document.getElementById("snippet-code");
+      const templateField = document.getElementById("template-field");
+
+      document.querySelectorAll('[name="mode"]').forEach((r) =>
+        r.addEventListener("change", () => {
+          const mode = document.querySelector('[name="mode"]:checked').value;
+          templateField.style.display = mode === "predefined" ? "" : "none";
+        }),
+      );
 
       function escapeHtml(str) {
         return str
@@ -390,6 +443,17 @@
       const SO = "<" + "script";
       const SC = "</" + "script" + ">";
 
+      function createBannerEl(fields) {
+        const el = document.createElement("topsort-banner");
+        el.setAttribute("id", fields.slotId);
+        el.setAttribute("width", fields.width);
+        el.setAttribute("height", fields.height);
+        if (fields.categoryId) el.setAttribute("category-id", fields.categoryId);
+        if (fields.searchQuery) el.setAttribute("search-query", fields.searchQuery);
+        if (fields.newTab) el.setAttribute("new-tab", "");
+        return el;
+      }
+
       function buildSnippetSingle(fields) {
         const attrs = buildAttrs(fields);
         return [
@@ -397,6 +461,19 @@
           `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}></topsort-banner>`,
+        ].join("\n");
+      }
+
+      function buildSnippetPredefined(fields) {
+        const attrs = buildAttrs(fields);
+        const indented = fields.templateHtml.split("\n").map((l) => "  " + l).join("\n");
+        return [
+          `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
+          ``,
+          `<topsort-banner ${attrs} predefined>`,
+          indented,
+          `</topsort-banner>`,
         ].join("\n");
       }
 
@@ -440,13 +517,7 @@
         previewArea.innerHTML = "";
 
         if (fields.mode === "context") {
-          const banner = document.createElement("topsort-banner");
-          banner.setAttribute("id", fields.slotId);
-          banner.setAttribute("width", fields.width);
-          banner.setAttribute("height", fields.height);
-          if (fields.categoryId) banner.setAttribute("category-id", fields.categoryId);
-          if (fields.searchQuery) banner.setAttribute("search-query", fields.searchQuery);
-          if (fields.newTab) banner.setAttribute("new-tab", "");
+          const banner = createBannerEl(fields);
           banner.setAttribute("context", "");
 
           const slot1 = document.createElement("topsort-banner-slot");
@@ -473,14 +544,17 @@
           previewArea.appendChild(banner);
 
           snippetCode.textContent = buildSnippetContext(fields);
+        } else if (fields.mode === "predefined") {
+          fields.templateHtml = (data.get("template-html") || "").trim();
+
+          const banner = createBannerEl(fields);
+          banner.setAttribute("predefined", "");
+          banner.innerHTML = fields.templateHtml;
+
+          previewArea.appendChild(banner);
+          snippetCode.textContent = buildSnippetPredefined(fields);
         } else {
-          const banner = document.createElement("topsort-banner");
-          banner.setAttribute("id", fields.slotId);
-          banner.setAttribute("width", fields.width);
-          banner.setAttribute("height", fields.height);
-          if (fields.categoryId) banner.setAttribute("category-id", fields.categoryId);
-          if (fields.searchQuery) banner.setAttribute("search-query", fields.searchQuery);
-          if (fields.newTab) banner.setAttribute("new-tab", "");
+          const banner = createBannerEl(fields);
 
           previewArea.appendChild(banner);
 
