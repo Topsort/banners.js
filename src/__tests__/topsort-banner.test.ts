@@ -180,6 +180,7 @@ describe("TopsortBanner", () => {
     vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
       throw new Error("DOM error");
     });
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const el = mount({ id: "slot-1", predefined: "" });
     el.innerHTML = '<span data-ts-field="label">old</span>';
     const events: CustomEvent[] = [];
@@ -187,6 +188,7 @@ describe("TopsortBanner", () => {
     await taskSettled(el);
     const readyEvents = events.filter((e) => e.detail.status === "ready");
     expect(readyEvents.length).toBe(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.any(Error));
     vi.restoreAllMocks();
   });
 
@@ -221,5 +223,59 @@ describe("TopsortBanner", () => {
     el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
     await taskSettled(el);
     expect(events.some((e) => e.detail.status === "error")).toBe(true);
+  });
+
+  describe("context mode", () => {
+    function mountContext(parentAttrs: Record<string, string>): {
+      banner: Element;
+      slot1: Element;
+      slot2: Element;
+    } {
+      const banner = document.createElement("topsort-banner");
+      for (const [k, v] of Object.entries(parentAttrs)) banner.setAttribute(k, v);
+      banner.setAttribute("context", "");
+      const slot1 = document.createElement("topsort-banner-slot");
+      slot1.setAttribute("rank", "1");
+      const slot2 = document.createElement("topsort-banner-slot");
+      slot2.setAttribute("rank", "2");
+      banner.appendChild(slot1);
+      banner.appendChild(slot2);
+      document.body.appendChild(banner);
+      return { banner, slot1, slot2 };
+    }
+
+    async function contextSettled(banner: Element, slot1: Element, slot2: Element): Promise<void> {
+      await taskSettled(banner);
+      await (slot1 as LitElement).updateComplete;
+      await (slot2 as LitElement).updateComplete;
+    }
+
+    it("propagates width and height from parent to slot-rendered banner images", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
+      await contextSettled(banner, slot1, slot2);
+      const img1 = slot1.querySelector("img");
+      const img2 = slot2.querySelector("img");
+      expect(img1?.getAttribute("style")).toContain("width:300px");
+      expect(img1?.getAttribute("style")).toContain("height:90px");
+      expect(img2?.getAttribute("style")).toContain("width:300px");
+      expect(img2?.getAttribute("style")).toContain("height:90px");
+    });
+
+    it("preserves banner content in slots when parent width/height attribute changes after auction", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
+      await contextSettled(banner, slot1, slot2);
+      // Banners rendered before the attribute change
+      expect(slot1.querySelector("img")).not.toBeNull();
+      expect(slot2.querySelector("img")).not.toBeNull();
+      // Change width after the auction has already returned banners
+      banner.setAttribute("width", "400");
+      await contextSettled(banner, slot1, slot2);
+      // Banners must still be visible — the context update must not wipe banners
+      expect(slot1.querySelector("img")).not.toBeNull();
+      expect(slot2.querySelector("img")).not.toBeNull();
+      expect(slot1.querySelector("img")?.getAttribute("style")).toContain("width:400px");
+    });
   });
 });

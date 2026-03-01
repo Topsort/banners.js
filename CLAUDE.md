@@ -42,6 +42,10 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 4. **`window.TS.token`** must be set before the component renders — it is checked synchronously in `render()`.
 5. **External CDN dependencies**: `analytics.js` and `hls.js` are loaded at runtime from CDNs, not bundled.
 
+## Testing
+
+Every bug fix must be accompanied by a regression test that would have caught the bug. Add it to the relevant file in `src/__tests__/`. The test must fail on the unfixed code and pass after the fix.
+
 ## Dependency Policy
 
 New runtime dependencies require strong justification — every byte matters in a library loaded on e-commerce pages. Prefer native browser APIs and existing Lit utilities. Nothing goes into `dependencies` without discussion.
