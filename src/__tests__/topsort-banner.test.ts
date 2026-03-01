@@ -190,13 +190,15 @@ describe("TopsortBanner", () => {
     vi.restoreAllMocks();
   });
 
-  it("predefined mode: winner with no content map falls back to getBannerElement", async () => {
+  it("predefined mode: winner with no content map leaves template unchanged and warns", async () => {
     const winner = makeBanner(); // asset has no content field
     vi.mocked(runAuction).mockResolvedValue([winner]);
+    const warnSpy = vi.spyOn(console, "warn");
     const el = mount({ id: "slot-1", predefined: "" });
     await taskSettled(el);
-    // Fallback renders the standard <img> element
-    expect(el.querySelector("img")).not.toBeNull();
+    // No image banner rendered — template stays unchanged
+    expect(el.querySelector("img")).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("no content map"));
   });
 
   it("standard mode: transition detection prevents double-emission of ready", async () => {
