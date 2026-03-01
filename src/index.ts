@@ -206,14 +206,6 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       return html``;
     }
     if (this.predefined) {
-      if (
-        this.task.status === TaskStatus.COMPLETE &&
-        this.task.value?.length &&
-        !this.task.value[0].asset?.[0]?.content
-      ) {
-        // Winner has no content map — fall back to replacement rendering
-        return getBannerElement(this.task.value[0], this.width, this.height, this.newTab);
-      }
       return nothing;
     }
     return this.task.render({
@@ -255,6 +247,10 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         } catch (e) {
           logError(e);
         }
+      } else if (banners.length) {
+        console.warn(
+          `[topsort-banner] Predefined mode is set but the auction response for slot "${this.slotId}" contains no content map. Template was not mutated.`,
+        );
       }
     }
 
@@ -324,16 +320,6 @@ export class TopsortBannerSlot extends LitElement {
 
   protected render() {
     if (this.predefined) {
-      const banner = this._bannerForRank();
-      if (banner && !banner.asset?.[0]?.content && this.context) {
-        // Winner has no content map — fall back to replacement rendering
-        return getBannerElement(
-          banner,
-          this.context.width,
-          this.context.height,
-          this.context.newTab,
-        );
-      }
       return nothing;
     }
     if (!this.context) {
@@ -373,9 +359,12 @@ export class TopsortBannerSlot extends LitElement {
           } catch (e) {
             logError(e);
           }
+        } else if (banner) {
+          console.warn(
+            `[topsort-banner-slot] Predefined mode is set but the auction response for rank ${this.rank} contains no content map. Template was not mutated.`,
+          );
         }
-        // No-winners or fallback: predefined content stays as-is
-        // (fallback case is handled by render() returning getBannerElement)
+        // No banner (no-winners): predefined content stays as-is, no warning needed
       }
     }
   }

@@ -111,13 +111,15 @@ describe("TopsortBannerSlot", () => {
     expect(el.querySelector("span")?.textContent).toBe("World");
   });
 
-  it("predefined mode: winner with no content map falls back to getBannerElement", async () => {
+  it("predefined mode: winner with no content map leaves template unchanged and warns", async () => {
     const winner = makeBanner(); // asset has no content field
+    const warnSpy = vi.spyOn(console, "warn");
     const el = mountSlot({ rank: "1", predefined: "" });
     await (el as LitElement).updateComplete;
     await setContext(el, { ...baseCtx, banners: [winner] });
-    // Fallback renders the standard <img>
-    expect(el.querySelector("img")).not.toBeNull();
+    // No image banner rendered — template stays unchanged
+    expect(el.querySelector("img")).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("no content map"));
   });
 
   it("predefined mode: slot survives applyTemplate throw", async () => {
