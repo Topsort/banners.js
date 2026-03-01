@@ -281,6 +281,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     ) {
       Promise.resolve().then(() => {
         this.context = {
+          ...this.context,
           width: this.width,
           height: this.height,
           newTab: this.newTab,
