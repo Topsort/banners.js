@@ -95,9 +95,9 @@ Use `data-ts-field` to bind content keys from the auction response to element at
 Use `key:target` syntax to specify exactly which content key maps to which attribute:
 
 ```html
-<img data-ts-field="mainImage:src" />
-<a data-ts-field="target:href">Click</a>
-<span data-ts-field="headline:textContent">Default</span>
+<img data-ts-field="mainImage:src" src="/fallback.jpg" />
+<a data-ts-field="target:href" href="/fallback">Click</a>
+<span data-ts-field="headline:textContent">Default headline</span>
 ```
 
 Use `textContent` as the target to set the element's text content.
