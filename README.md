@@ -102,6 +102,8 @@ Use `key:target` syntax to specify exactly which content key maps to which attri
 
 Use `textContent` as the target to set the element's text content.
 
+Bindings create or overwrite the target attribute — it does not need to exist in the HTML beforehand. However, you should always provide a fallback value in the markup so the template degrades gracefully if the auction fails or returns no winners.
+
 #### Multiple bindings
 
 Comma-separate multiple `key:target` pairs to set several attributes on one element:
