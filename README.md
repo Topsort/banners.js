@@ -95,12 +95,14 @@ Use `data-ts-field` to bind content keys from the auction response to element at
 Use `key:target` syntax to specify exactly which content key maps to which attribute:
 
 ```html
-<img data-ts-field="mainImage:src" />
-<a data-ts-field="target:href">Click</a>
-<span data-ts-field="headline:textContent">Default</span>
+<img data-ts-field="mainImage:src" src="/fallback.jpg" />
+<a data-ts-field="target:href" href="/fallback">Click</a>
+<span data-ts-field="headline:textContent">Default headline</span>
 ```
 
 Use `textContent` as the target to set the element's text content.
+
+The target attribute **must already exist** on the element — banners.js only overwrites existing attributes, never creates them. If a binding targets an attribute that doesn't exist, it is skipped and a warning is logged. This catches typos and ensures your template always has fallback values for graceful degradation when the auction fails or returns no winners.
 
 #### Multiple bindings
 

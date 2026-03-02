@@ -26,7 +26,7 @@ describe("applyTemplate", () => {
 
   describe("legacy implicit binding (bare key)", () => {
     it("sets href on <a> element", () => {
-      const container = makeContainer('<a data-ts-field="url">click</a>');
+      const container = makeContainer('<a data-ts-field="url" href="/fallback">click</a>');
       const banner = makeBanner({
         asset: [{ url: "x", content: { url: "https://example.com" } }],
       });
@@ -35,7 +35,7 @@ describe("applyTemplate", () => {
     });
 
     it("sets src on <img> element", () => {
-      const container = makeContainer('<img data-ts-field="image" />');
+      const container = makeContainer('<img data-ts-field="image" src="/fallback.jpg" />');
       const banner = makeBanner({
         asset: [{ url: "x", content: { image: "https://img.example.com/photo.jpg" } }],
       });
@@ -46,7 +46,7 @@ describe("applyTemplate", () => {
     });
 
     it("sets src on <video> element", () => {
-      const container = makeContainer('<video data-ts-field="video"></video>');
+      const container = makeContainer('<video data-ts-field="video" src="/fallback.mp4"></video>');
       const banner = makeBanner({
         asset: [{ url: "x", content: { video: "https://cdn.example.com/ad.mp4" } }],
       });
@@ -57,7 +57,7 @@ describe("applyTemplate", () => {
     });
 
     it("sets src on <source> element", () => {
-      const container = makeContainer('<source data-ts-field="src" />');
+      const container = makeContainer('<source data-ts-field="src" src="/fallback.mp4" />');
       const banner = makeBanner({
         asset: [{ url: "x", content: { src: "https://cdn.example.com/ad.mp4" } }],
       });
@@ -76,7 +76,7 @@ describe("applyTemplate", () => {
 
     it("data-ts-attr override sets named attribute instead of default", () => {
       const container = makeContainer(
-        '<span data-ts-field="label" data-ts-attr="title">old</span>',
+        '<span data-ts-field="label" data-ts-attr="title" title="old title">old</span>',
       );
       const banner = makeBanner({ asset: [{ url: "x", content: { label: "Overridden" } }] });
       applyTemplate(container, banner);
@@ -109,7 +109,7 @@ describe("applyTemplate", () => {
 
   describe("explicit binding (key:target)", () => {
     it("sets src on <img> via explicit binding", () => {
-      const container = makeContainer('<img data-ts-field="mainImage:src" />');
+      const container = makeContainer('<img data-ts-field="mainImage:src" src="/fallback.jpg" />');
       const banner = makeBanner({
         asset: [{ url: "x", content: { mainImage: "https://img.example.com/photo.jpg" } }],
       });
@@ -120,7 +120,7 @@ describe("applyTemplate", () => {
     });
 
     it("sets href on <a> via explicit binding", () => {
-      const container = makeContainer('<a data-ts-field="target:href">click</a>');
+      const container = makeContainer('<a data-ts-field="target:href" href="/fallback">click</a>');
       const banner = makeBanner({
         asset: [{ url: "x", content: { target: "https://example.com" } }],
       });
@@ -138,7 +138,7 @@ describe("applyTemplate", () => {
     });
 
     it("sets arbitrary attribute via explicit binding", () => {
-      const container = makeContainer('<span data-ts-field="label:title">text</span>');
+      const container = makeContainer('<span data-ts-field="label:title" title="old">text</span>');
       const banner = makeBanner({ asset: [{ url: "x", content: { label: "Tooltip" } }] });
       applyTemplate(container, banner);
       const el = container.querySelector("span");
@@ -148,7 +148,7 @@ describe("applyTemplate", () => {
 
     it("does not log deprecation warning for explicit bindings", () => {
       const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-      const container = makeContainer('<img data-ts-field="mainImage:src" />');
+      const container = makeContainer('<img data-ts-field="mainImage:src" src="/fallback.jpg" />');
       const banner = makeBanner({
         asset: [{ url: "x", content: { mainImage: "https://example.com/img.png" } }],
       });
@@ -192,7 +192,7 @@ describe("applyTemplate", () => {
 
     it("mixed bare + explicit: bare key uses tag inference, data-ts-attr ignored", () => {
       const container = makeContainer(
-        '<img data-ts-field="imageUrl, altText:alt" data-ts-attr="data-custom" src="" alt="" />',
+        '<img data-ts-field="imageUrl, altText:alt" data-ts-attr="data-custom" src="/fb.jpg" alt="fb" />',
       );
       const banner = makeBanner({
         asset: [
@@ -214,7 +214,7 @@ describe("applyTemplate", () => {
 
     it("ignores data-ts-attr when explicit bindings are used", () => {
       const container = makeContainer(
-        '<img data-ts-field="mainImage:src" data-ts-attr="data-custom" />',
+        '<img data-ts-field="mainImage:src" data-ts-attr="data-custom" src="/fallback.jpg" />',
       );
       const banner = makeBanner({
         asset: [{ url: "x", content: { mainImage: "https://example.com/img.png" } }],
@@ -254,6 +254,30 @@ describe("applyTemplate", () => {
       expect(container.querySelector("img")?.getAttribute("src")).toBe(
         "https://example.com/img.png",
       );
+    });
+
+    it("skips binding and warns when target attribute does not exist on element", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const container = makeContainer('<img data-ts-field="mainImage:src" />');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { mainImage: "https://example.com/img.png" } }],
+      });
+      applyTemplate(container, banner);
+      expect(container.querySelector("img")?.hasAttribute("src")).toBe(false);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('has no "src" attribute'));
+      warnSpy.mockRestore();
+    });
+
+    it("skips bare-key binding and warns when inferred attribute does not exist", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const container = makeContainer('<a data-ts-field="url">click</a>');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { url: "https://example.com" } }],
+      });
+      applyTemplate(container, banner);
+      expect(container.querySelector("a")?.hasAttribute("href")).toBe(false);
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('has no "href" attribute'));
+      warnSpy.mockRestore();
     });
 
     it("unknown field key leaves element untouched", () => {
@@ -304,7 +328,7 @@ describe("applyTemplate", () => {
 
   it("does not apply any sizing or layout styles — merchant controls template appearance", () => {
     const container = makeContainer(
-      '<div data-ts-clickable><img data-ts-field="imageUrl:src" src="" style="width:300px;height:250px;" /></div>',
+      '<div data-ts-clickable><img data-ts-field="imageUrl:src" src="/fallback.jpg" style="width:300px;height:250px;" /></div>',
     );
     const banner = makeBanner({
       asset: [
