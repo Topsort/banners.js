@@ -88,7 +88,33 @@ Opt in by adding the `predefined` attribute to `<topsort-banner>` (standalone) o
 
 ### Binding convention
 
-Add `data-ts-field="<contentKey>"` to any element whose value should be updated from the auction response. The property that gets set is inferred from the element type:
+Use `data-ts-field` to bind content keys from the auction response to element attributes or text.
+
+#### Explicit binding (recommended)
+
+Use `key:target` syntax to specify exactly which content key maps to which attribute:
+
+```html
+<img data-ts-field="mainImage:src" />
+<a data-ts-field="target:href">Click</a>
+<span data-ts-field="headline:textContent">Default</span>
+```
+
+Use `textContent` as the target to set the element's text content.
+
+#### Multiple bindings
+
+Comma-separate multiple `key:target` pairs to set several attributes on one element:
+
+```html
+<img data-ts-field="mainImage:src, altText:alt" src="/fallback.jpg" alt="Fallback" />
+```
+
+If the auction response only includes some keys, only matching bindings are applied — unmatched attributes keep their original values.
+
+#### Implicit binding (legacy)
+
+A bare key (without `:target`) infers the target from the element type:
 
 | Element | Property set |
 |---|---|
@@ -96,7 +122,11 @@ Add `data-ts-field="<contentKey>"` to any element whose value should be updated 
 | `<img>`, `<video>`, `<source>` | `src` |
 | All others | `textContent` |
 
-Use `data-ts-attr="<attributeName>"` to override the default and target a specific attribute (e.g. `alt` on an `<img>`).
+`data-ts-attr="<attributeName>"` can override the default target for bare keys.
+
+> Implicit binding still works but is deprecated. Prefer explicit `key:target` syntax for clarity and to avoid tag-based inference surprises.
+
+#### Click tracking
 
 Add `data-ts-clickable` to the element that should be the click-tracking surface for analytics.js. If omitted, the first child element is used.
 
@@ -105,11 +135,11 @@ Add `data-ts-clickable` to the element that should be the click-tracking surface
 ```html
 <topsort-banner predefined width="600" height="400" id="slot-1">
   <div class="brand-banner" data-ts-clickable>
-    <a data-ts-field="target" href="/brands/featured" aria-label="Featured Brand">
-      <img data-ts-field="mainImage" src="/fallbacks/featured.jpg"
+    <a data-ts-field="target:href" href="/brands/featured" aria-label="Featured Brand">
+      <img data-ts-field="mainImage:src, altText:alt" src="/fallbacks/featured.jpg"
            alt="Explore our featured brands" width="600" height="400" loading="lazy" />
     </a>
-    <h2 data-ts-field="default-Headline">Featured Brand</h2>
+    <h2 data-ts-field="default-Headline:textContent">Featured Brand</h2>
   </div>
 </topsort-banner>
 ```
@@ -120,18 +150,18 @@ Add `data-ts-clickable` to the element that should be the click-tracking surface
 <topsort-banner context width="600" height="400" id="slot-1">
   <topsort-banner-slot predefined rank="1">
     <div class="product-card" data-ts-clickable>
-      <a data-ts-field="target" href="/default-1">
-        <img data-ts-field="mainImage" src="/default-1.jpg" width="600" height="400" />
+      <a data-ts-field="target:href" href="/default-1">
+        <img data-ts-field="mainImage:src" src="/default-1.jpg" width="600" height="400" />
       </a>
-      <h3 data-ts-field="default-Headline">Default Product 1</h3>
+      <h3 data-ts-field="default-Headline:textContent">Default Product 1</h3>
     </div>
   </topsort-banner-slot>
   <topsort-banner-slot predefined rank="2">
     <div class="product-card" data-ts-clickable>
-      <a data-ts-field="target" href="/default-2">
-        <img data-ts-field="mainImage" src="/default-2.jpg" width="600" height="400" />
+      <a data-ts-field="target:href" href="/default-2">
+        <img data-ts-field="mainImage:src" src="/default-2.jpg" width="600" height="400" />
       </a>
-      <h3 data-ts-field="default-Headline">Default Product 2</h3>
+      <h3 data-ts-field="default-Headline:textContent">Default Product 2</h3>
     </div>
   </topsort-banner-slot>
 </topsort-banner>

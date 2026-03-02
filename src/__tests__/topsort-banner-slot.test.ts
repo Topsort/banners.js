@@ -104,7 +104,7 @@ describe("TopsortBannerSlot", () => {
   it("predefined mode: applies template when banners arrive via context", async () => {
     const winner = makeBanner({ asset: [{ url: "x", content: { label: "World" } }] });
     const el = mountSlot({ rank: "1", predefined: "" });
-    el.innerHTML = '<span data-ts-field="label">old</span>';
+    el.innerHTML = '<span data-ts-field="label:textContent">old</span>';
     await (el as LitElement).updateComplete;
     // Simulate banners arriving (transition from undefined → defined)
     await setContext(el, { ...baseCtx, banners: [winner] });
@@ -128,7 +128,7 @@ describe("TopsortBannerSlot", () => {
       throw new Error("DOM error");
     });
     const el = mountSlot({ rank: "1", predefined: "" });
-    el.innerHTML = '<span data-ts-field="label">old</span>';
+    el.innerHTML = '<span data-ts-field="label:textContent">old</span>';
     await (el as LitElement).updateComplete;
     await setContext(el, { ...baseCtx, banners: [winner] });
     // Slot remains connected and no exception propagates
