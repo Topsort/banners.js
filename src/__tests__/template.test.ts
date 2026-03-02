@@ -287,6 +287,13 @@ describe("applyTemplate", () => {
       expect(container.querySelector("span")?.textContent).toBe("original");
     });
 
+    it("skips element with empty data-ts-field attribute", () => {
+      const container = makeContainer('<span data-ts-field="">original</span>');
+      const banner = makeBanner({ asset: [{ url: "x", content: { label: "text" } }] });
+      applyTemplate(container, banner);
+      expect(container.querySelector("span")?.textContent).toBe("original");
+    });
+
     it("no content in banner leaves fields untouched", () => {
       const container = makeContainer('<span data-ts-field="label">original</span><div></div>');
       const banner = makeBanner({ asset: [{ url: "x" }] });
@@ -316,6 +323,14 @@ describe("applyTemplate", () => {
       const banner = makeBanner({ isFallback: false });
       applyTemplate(container, banner);
       expect(container.querySelector("a")?.getAttribute("data-ts-resolved-bid")).toBe("bid-123");
+    });
+
+    it("does not throw when container has no children or [data-ts-clickable]", () => {
+      const container = document.createElement("div");
+      const banner = makeBanner();
+      expect(() => applyTemplate(container, banner)).not.toThrow();
+      expect(container.querySelector("[data-ts-clickable]")).toBeNull();
+      expect(container.hasAttribute("data-ts-resolved-bid")).toBe(false);
     });
 
     it("does not set data-ts-resolved-bid when banner is a fallback", () => {

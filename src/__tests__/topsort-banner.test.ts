@@ -225,6 +225,53 @@ describe("TopsortBanner", () => {
     expect(events.some((e) => e.detail.status === "error")).toBe(true);
   });
 
+  describe("buildAuction branches", () => {
+    it("passes category.id when category-id attribute is set", async () => {
+      vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
+      const el = mount({ id: "slot-1", width: "300", height: "250", "category-id": "cat1" });
+      await (el as LitElement).updateComplete;
+      const auction = vi.mocked(runAuction).mock.calls[0][0];
+      expect(auction.category).toEqual({ id: "cat1" });
+    });
+
+    it("passes category.ids when category-ids attribute is set", async () => {
+      vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
+      const el = mount({ id: "slot-1", width: "300", height: "250", "category-ids": "cat1, cat2" });
+      await (el as LitElement).updateComplete;
+      const auction = vi.mocked(runAuction).mock.calls[0][0];
+      expect(auction.category).toEqual({ ids: ["cat1", "cat2"] });
+    });
+
+    it("passes category.disjunctions when category-disjunctions attribute is set", async () => {
+      vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
+      const el = mount({
+        id: "slot-1",
+        width: "300",
+        height: "250",
+        "category-disjunctions": "cat1, cat2",
+      });
+      await (el as LitElement).updateComplete;
+      const auction = vi.mocked(runAuction).mock.calls[0][0];
+      expect(auction.category).toEqual({ disjunctions: [["cat1", "cat2"]] });
+    });
+
+    it("passes searchQuery when search-query attribute is set", async () => {
+      vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
+      const el = mount({ id: "slot-1", width: "300", height: "250", "search-query": "shoes" });
+      await (el as LitElement).updateComplete;
+      const auction = vi.mocked(runAuction).mock.calls[0][0];
+      expect(auction.searchQuery).toBe("shoes");
+    });
+
+    it("passes geoTargeting.location when location attribute is set", async () => {
+      vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
+      const el = mount({ id: "slot-1", width: "300", height: "250", location: "US" });
+      await (el as LitElement).updateComplete;
+      const auction = vi.mocked(runAuction).mock.calls[0][0];
+      expect(auction.geoTargeting).toEqual({ location: "US" });
+    });
+  });
+
   describe("context mode", () => {
     function mountContext(parentAttrs: Record<string, string>): {
       banner: Element;
