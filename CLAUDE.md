@@ -46,6 +46,8 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 
 Every bug fix must be accompanied by a regression test that would have caught the bug. Add it to the relevant file in `src/__tests__/`. The test must fail on the unfixed code and pass after the fix.
 
+Always run `pnpm lint` before committing. Biome enforces both formatting and lint rules — CI will fail if either is violated.
+
 ## Dependency Policy
 
 New runtime dependencies require strong justification — every byte matters in a library loaded on e-commerce pages. Prefer native browser APIs and existing Lit utilities. Nothing goes into `dependencies` without discussion.
