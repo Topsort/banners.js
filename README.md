@@ -102,7 +102,7 @@ Use `key:target` syntax to specify exactly which content key maps to which attri
 
 Use `textContent` as the target to set the element's text content.
 
-Bindings create or overwrite the target attribute — it does not need to exist in the HTML beforehand. However, you should always provide a fallback value in the markup so the template degrades gracefully if the auction fails or returns no winners.
+The target attribute **must already exist** on the element — banners.js only overwrites existing attributes, never creates them. If a binding targets an attribute that doesn't exist, it is skipped and a warning is logged. This catches typos and ensures your template always has fallback values for graceful degradation when the auction fails or returns no winners.
 
 #### Multiple bindings
 

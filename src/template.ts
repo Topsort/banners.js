@@ -22,23 +22,28 @@ function parseBindings(raw: string): Binding[] {
   return bindings;
 }
 
-function setFieldValue(el: Element, value: string, target: string | null) {
+function resolveTarget(el: Element, target: string | null): string {
+  if (target) return target;
+  const tag = el.tagName.toLowerCase();
+  if (tag === "a") return "href";
+  if (tag === "img" || tag === "video" || tag === "source") return "src";
+  return "textContent";
+}
+
+/**
+ * Sets a value on `el`. Returns `false` when the resolved target is an
+ * attribute that does not already exist on the element (binding skipped).
+ */
+function setFieldValue(el: Element, value: string, target: string): boolean {
   if (target === "textContent") {
     el.textContent = value;
-    return;
+    return true;
   }
-  if (target) {
-    el.setAttribute(target, value);
-    return;
+  if (!el.hasAttribute(target)) {
+    return false;
   }
-  const tag = el.tagName.toLowerCase();
-  if (tag === "a") {
-    el.setAttribute("href", value);
-  } else if (tag === "img" || tag === "video" || tag === "source") {
-    el.setAttribute("src", value);
-  } else {
-    el.textContent = value;
-  }
+  el.setAttribute(target, value);
+  return true;
 }
 
 /**
@@ -63,6 +68,7 @@ export function applyTemplate(container: Element, banner: Banner) {
       for (const { key, target } of bindings) {
         if (!(key in content)) continue;
 
+        let resolved: string;
         if (!isExplicit && target === null) {
           // Bare key — check data-ts-attr override for backwards compat
           const attrOverride = el.dataset.tsAttr;
@@ -72,9 +78,16 @@ export function applyTemplate(container: Element, banner: Banner) {
               '[banners.js] Implicit data-ts-field binding is deprecated. Use explicit "key:target" syntax instead (e.g. data-ts-field="image:src").',
             );
           }
-          setFieldValue(el, content[key], attrOverride ?? null);
+          resolved = resolveTarget(el, attrOverride ?? null);
         } else {
-          setFieldValue(el, content[key], target);
+          resolved = resolveTarget(el, target);
+        }
+
+        if (!setFieldValue(el, content[key], resolved)) {
+          const tag = el.tagName.toLowerCase();
+          console.warn(
+            `[banners.js] Binding "${key}" → "${resolved}" skipped: <${tag}> has no "${resolved}" attribute. Add a fallback value (e.g. ${resolved}="...") to your template.`,
+          );
         }
       }
     }
