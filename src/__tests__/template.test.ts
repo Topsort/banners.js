@@ -118,4 +118,20 @@ describe("applyTemplate", () => {
     applyTemplate(container, banner);
     expect(container.querySelector("a")?.hasAttribute("data-ts-resolved-bid")).toBe(false);
   });
+
+  it("does not apply any sizing or layout styles — merchant controls template appearance", () => {
+    const container = makeContainer(
+      '<div data-ts-clickable><img data-ts-field="imageUrl" src="" style="width:300px;height:250px;" /></div>',
+    );
+    const banner = makeBanner({
+      asset: [{ url: "https://example.com/img.png", content: { imageUrl: "https://example.com/img.png" } }],
+    });
+    const imgBefore = container.querySelector("img")!;
+    const styleBefore = imgBefore.getAttribute("style");
+
+    applyTemplate(container, banner);
+
+    const imgAfter = container.querySelector("img")!;
+    expect(imgAfter.getAttribute("style")).toBe(styleBefore);
+  });
 });
