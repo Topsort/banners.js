@@ -20,6 +20,7 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 - Admin override (`gh pr merge --admin`) is only appropriate to bypass the **review requirement** when all CI checks pass. Never use it to force-merge a PR with failing CI — fix the failures first.
 - Keep branches up to date with `main` before merging — rebase or merge `main` into your branch to resolve conflicts locally, not in the merge commit.
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages (e.g., `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
+- Never approve or merge a PR that has unresolved review comments — address or explicitly dismiss each one first.
 
 ## Code Conventions
 
