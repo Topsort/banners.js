@@ -43,6 +43,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-24.04
+    outputs:
+      size-exceeded: ${{ steps.size-check.outputs.exceeded }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -64,12 +66,23 @@ jobs:
         run: pnpm run build
 
       - name: Check bundle size
-        run: pnpm size
+        id: size-check
+        run: |
+          if pnpm size; then
+            echo "exceeded=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "exceeded=true" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
 
   size-report:
     name: Bundle Size Report
+    needs: build
     runs-on: ubuntu-24.04
-    if: github.event_name == 'pull_request'
+    if: >-
+      github.event_name == 'pull_request' &&
+      always() &&
+      needs.build.outputs.size-exceeded == 'true'
     permissions:
       pull-requests: write
     steps:
