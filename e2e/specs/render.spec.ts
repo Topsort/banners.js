@@ -31,4 +31,11 @@ test.describe("render", () => {
     const link = page.locator(".ts-banner a");
     await expect(link).toHaveAttribute("href", "https://example.com/product");
   });
+
+  test("img is rendered at the dimensions specified on the banner element", async ({ page }) => {
+    const img = page.locator(".ts-banner img");
+    await expect(img).toBeVisible();
+    await expect(img).toHaveCSS("width", "600px");
+    await expect(img).toHaveCSS("height", "400px");
+  });
 });

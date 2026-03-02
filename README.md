@@ -82,6 +82,8 @@ use `topsort-banner-slot` as children elements.
 
 Instead of replacing a placeholder with Topsort-generated DOM, you can annotate your own markup with `data-ts-field` attributes and have banners.js mutate only the targeted fields in place. All other markup — classes, ARIA attributes, styles, event listeners — is left untouched. If the auction returns no winners or fails, the predefined content is shown as-is with no changes.
 
+> **Sizing is your responsibility.** banners.js only fills in content fields and telemetry attributes — it never writes `width`, `height`, or any other style to your template elements. Set dimensions with your own CSS or HTML attributes (see examples below).
+
 Opt in by adding the `predefined` attribute to `<topsort-banner>` (standalone) or to each `<topsort-banner-slot>` (context mode).
 
 ### Binding convention
@@ -115,11 +117,11 @@ Add `data-ts-clickable` to the element that should be the click-tracking surface
 ### Multiple winners (context mode)
 
 ```html
-<topsort-banner context="true" width="600" height="400" id="slot-1">
+<topsort-banner context width="600" height="400" id="slot-1">
   <topsort-banner-slot predefined rank="1">
     <div class="product-card" data-ts-clickable>
       <a data-ts-field="target" href="/default-1">
-        <img data-ts-field="mainImage" src="/default-1.jpg" />
+        <img data-ts-field="mainImage" src="/default-1.jpg" width="600" height="400" />
       </a>
       <h3 data-ts-field="default-Headline">Default Product 1</h3>
     </div>
@@ -127,7 +129,7 @@ Add `data-ts-clickable` to the element that should be the click-tracking surface
   <topsort-banner-slot predefined rank="2">
     <div class="product-card" data-ts-clickable>
       <a data-ts-field="target" href="/default-2">
-        <img data-ts-field="mainImage" src="/default-2.jpg" />
+        <img data-ts-field="mainImage" src="/default-2.jpg" width="600" height="400" />
       </a>
       <h3 data-ts-field="default-Headline">Default Product 2</h3>
     </div>

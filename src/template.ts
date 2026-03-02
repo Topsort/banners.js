@@ -15,6 +15,13 @@ function setFieldValue(el: Element, value: string, attrOverride?: string) {
   }
 }
 
+/**
+ * Mutates `container` in place with auction data from `banner`.
+ *
+ * Intentionally does not apply any sizing or layout styles — predefined mode
+ * gives the merchant full control over the template's appearance. Only content
+ * fields (`data-ts-field`) and telemetry attributes are written.
+ */
 export function applyTemplate(container: Element, banner: Banner) {
   const content = banner.asset?.[0]?.content;
 
