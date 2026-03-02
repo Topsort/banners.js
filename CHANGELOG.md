@@ -1,3 +1,11 @@
+### 0.8.1
+
+- Support explicit `key:target` syntax in `data-ts-field` (e.g. `data-ts-field="mainImage:src"`) for deterministic bindings without tag-based inference
+- Support comma-separated multiple bindings on a single element (e.g. `data-ts-field="mainImage:src, altText:alt"`)
+- Bare-key `data-ts-field` usage (implicit tag-based inference) now logs a one-time deprecation warning
+- Bindings to attributes that don't exist on the element are skipped with a warning, enforcing fallback values in templates
+- Update Lit to v3.3.2
+
 ### 0.8.0
 
 - Add support for fallback banners (`isFallback`) returned by the auction API
