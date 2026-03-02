@@ -1,4 +1,7 @@
+import path from "node:path";
 import { defineConfig } from "@playwright/test";
+
+const root = path.resolve(import.meta.dirname, "..");
 
 export default defineConfig({
   testDir: "specs",
@@ -11,6 +14,7 @@ export default defineConfig({
   },
   webServer: {
     command: "node node_modules/vite/bin/vite.js --port 4173 --logLevel error",
+    cwd: root,
     url: "http://localhost:4173",
     reuseExistingServer: !process.env.CI,
   },
