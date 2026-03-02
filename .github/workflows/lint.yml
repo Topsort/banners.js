@@ -5,7 +5,7 @@ on:
 
 env:
   lockfile: pnpm-lock.yaml
-  node_version: "20"
+  node_version: "24"
 
 jobs:
   actionlint:
