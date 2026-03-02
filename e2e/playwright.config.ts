@@ -10,7 +10,7 @@ export default defineConfig({
     browserName: "chromium",
   },
   webServer: {
-    command: "pnpm exec vite --port 4173 --logLevel error",
+    command: "node node_modules/vite/bin/vite.js --port 4173 --logLevel error",
     url: "http://localhost:4173",
     reuseExistingServer: !process.env.CI,
   },
