@@ -20,7 +20,8 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 - Admin override (`gh pr merge --admin`) is only appropriate to bypass the **review requirement** when all CI checks pass. Never use it to force-merge a PR with failing CI — fix the failures first.
 - Keep branches up to date with `main` before merging — rebase or merge `main` into your branch to resolve conflicts locally, not in the merge commit.
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages (e.g., `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
-- Never approve or merge a PR that has unresolved review comments — address or explicitly dismiss each one first.
+- Never approve or merge a PR that has unresolved review comments — address or explicitly dismiss each one first. Always check nested/threaded comments (e.g. replies under bot comments) as they may contain substantive issues not visible at the top level.
+- When waiting for CI, always wait for Cursor Bugbot to complete even if it is non-blocking. Check its comments (including nested replies) before approving or merging.
 
 ## Code Conventions
 
