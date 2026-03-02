@@ -151,7 +151,7 @@ describe("TopsortBanner", () => {
     const winner = makeBanner({ asset: [{ url: "x", content: { label: "Hello" } }] });
     vi.mocked(runAuction).mockResolvedValue([winner]);
     const el = mount({ id: "slot-1", predefined: "" });
-    el.innerHTML = '<span data-ts-field="label">old</span>';
+    el.innerHTML = '<span data-ts-field="label:textContent">old</span>';
     const events: CustomEvent[] = [];
     el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
     await taskSettled(el);
@@ -163,7 +163,7 @@ describe("TopsortBanner", () => {
     const winner = makeBanner({ asset: [{ url: "x", content: { label: "Hello" } }] });
     vi.mocked(runAuction).mockResolvedValue([winner]);
     const el = mount({ id: "slot-1", predefined: "" });
-    el.innerHTML = '<span data-ts-field="label">old</span>';
+    el.innerHTML = '<span data-ts-field="label:textContent">old</span>';
     const events: CustomEvent[] = [];
     el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
     await taskSettled(el);
@@ -182,7 +182,7 @@ describe("TopsortBanner", () => {
     });
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const el = mount({ id: "slot-1", predefined: "" });
-    el.innerHTML = '<span data-ts-field="label">old</span>';
+    el.innerHTML = '<span data-ts-field="label:textContent">old</span>';
     const events: CustomEvent[] = [];
     el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
     await taskSettled(el);

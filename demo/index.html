@@ -371,10 +371,10 @@
           <div class="field" id="template-field" style="display:none">
             <label for="template-html">Template HTML</label>
             <textarea id="template-html" name="template-html" rows="8"><div data-ts-clickable>
-  <a data-ts-field="target">
-    <img data-ts-field="imageUrl" src="" alt="" />
+  <a data-ts-field="target:href">
+    <img data-ts-field="imageUrl:src, altText:alt" src="" alt="" />
   </a>
-  <p data-ts-field="headline">Headline</p>
+  <p data-ts-field="headline:textContent">Headline</p>
 </div></textarea>
             <p class="hint">
               Mark elements with <code>data-ts-field="key"</code> — values come from the auction
@@ -388,17 +388,17 @@
           <div class="field" id="template-context-field" style="display:none">
             <label for="template-html-1">Rank 1 Template HTML</label>
             <textarea id="template-html-1" name="template-html-1" rows="6"><div data-ts-clickable>
-  <a data-ts-field="target">
-    <img data-ts-field="imageUrl" src="" alt="" />
+  <a data-ts-field="target:href">
+    <img data-ts-field="imageUrl:src, altText:alt" src="" alt="" />
   </a>
-  <p data-ts-field="headline">Headline</p>
+  <p data-ts-field="headline:textContent">Headline</p>
 </div></textarea>
             <label for="template-html-2" style="margin-top:10px">Rank 2 Template HTML</label>
             <textarea id="template-html-2" name="template-html-2" rows="6"><div data-ts-clickable>
-  <a data-ts-field="target">
-    <img data-ts-field="imageUrl" src="" alt="" />
+  <a data-ts-field="target:href">
+    <img data-ts-field="imageUrl:src, altText:alt" src="" alt="" />
   </a>
-  <p data-ts-field="headline">Headline</p>
+  <p data-ts-field="headline:textContent">Headline</p>
 </div></textarea>
             <p class="hint">
               Each slot mutates its own template independently. Sizing and layout are entirely
