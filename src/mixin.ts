@@ -70,7 +70,8 @@ export const BannerComponent = <T extends Constructor<LitElement>>(Base: T) => {
         auction.category = {
           disjunctions: [this.categoryDisjunctions.split(",").map((item) => item.trim())],
         };
-      } else if (this.searchQuery) {
+      }
+      if (this.searchQuery) {
         auction.searchQuery = this.searchQuery;
       }
       if (this.location) {

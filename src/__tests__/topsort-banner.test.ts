@@ -263,6 +263,21 @@ describe("TopsortBanner", () => {
       expect(auction.searchQuery).toBe("shoes");
     });
 
+    it("includes both category and searchQuery when both attributes are set", async () => {
+      vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
+      const el = mount({
+        id: "slot-1",
+        width: "300",
+        height: "250",
+        "category-id": "electronics",
+        "search-query": "laptop",
+      });
+      await (el as LitElement).updateComplete;
+      const auction = vi.mocked(runAuction).mock.calls[0][0];
+      expect(auction.category).toEqual({ id: "electronics" });
+      expect(auction.searchQuery).toBe("laptop");
+    });
+
     it("passes geoTargeting.location when location attribute is set", async () => {
       vi.mocked(runAuction).mockReturnValue(new Promise(() => {}));
       const el = mount({ id: "slot-1", width: "300", height: "250", location: "US" });
