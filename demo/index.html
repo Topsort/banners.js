@@ -287,6 +287,50 @@
         margin-bottom: 6px;
         font-weight: 500;
       }
+
+      /* Predefined template card styles */
+      .ts-card {
+        display: inline-block;
+        width: 300px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        overflow: hidden;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #fff;
+      }
+
+      .ts-card a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .ts-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+      }
+
+      .ts-card p {
+        margin: 0;
+        padding: 12px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+      }
+
+      .ts-card--sm {
+        width: 260px;
+      }
+
+      .ts-card--sm img {
+        height: 180px;
+      }
+
+      .ts-card--sm p {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
     </style>
   </head>
   <body>
@@ -370,7 +414,7 @@
 
           <div class="field" id="template-field" style="display:none">
             <label for="template-html">Template HTML</label>
-            <textarea id="template-html" name="template-html" rows="8"><div data-ts-clickable>
+            <textarea id="template-html" name="template-html" rows="8"><div class="ts-card" data-ts-clickable>
   <a data-ts-field="target:href" href="/fallback">
     <img data-ts-field="imageUrl:src, altText:alt" src="/fallback.jpg" alt="Sponsored" />
   </a>
@@ -387,14 +431,14 @@
 
           <div class="field" id="template-context-field" style="display:none">
             <label for="template-html-1">Rank 1 Template HTML</label>
-            <textarea id="template-html-1" name="template-html-1" rows="6"><div data-ts-clickable>
+            <textarea id="template-html-1" name="template-html-1" rows="6"><div class="ts-card ts-card--sm" data-ts-clickable>
   <a data-ts-field="target:href" href="/fallback-1">
     <img data-ts-field="imageUrl:src, altText:alt" src="/fallback-1.jpg" alt="Sponsored" />
   </a>
   <p data-ts-field="headline:textContent">Sponsored Product 1</p>
 </div></textarea>
             <label for="template-html-2" style="margin-top:10px">Rank 2 Template HTML</label>
-            <textarea id="template-html-2" name="template-html-2" rows="6"><div data-ts-clickable>
+            <textarea id="template-html-2" name="template-html-2" rows="6"><div class="ts-card ts-card--sm" data-ts-clickable>
   <a data-ts-field="target:href" href="/fallback-2">
     <img data-ts-field="imageUrl:src, altText:alt" src="/fallback-2.jpg" alt="Sponsored" />
   </a>
