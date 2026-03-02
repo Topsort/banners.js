@@ -124,14 +124,17 @@ describe("applyTemplate", () => {
       '<div data-ts-clickable><img data-ts-field="imageUrl" src="" style="width:300px;height:250px;" /></div>',
     );
     const banner = makeBanner({
-      asset: [{ url: "https://example.com/img.png", content: { imageUrl: "https://example.com/img.png" } }],
+      asset: [
+        {
+          url: "https://example.com/img.png",
+          content: { imageUrl: "https://example.com/img.png" },
+        },
+      ],
     });
-    const imgBefore = container.querySelector("img")!;
-    const styleBefore = imgBefore.getAttribute("style");
+    const styleBefore = container.querySelector("img")?.getAttribute("style");
 
     applyTemplate(container, banner);
 
-    const imgAfter = container.querySelector("img")!;
-    expect(imgAfter.getAttribute("style")).toBe(styleBefore);
+    expect(container.querySelector("img")?.getAttribute("style")).toBe(styleBefore);
   });
 });
