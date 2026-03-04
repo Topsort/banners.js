@@ -41,6 +41,7 @@ jobs:
           mkdir -p _site
           cp demo/index.html _site/index.html
           cp -r dist _site/dist
+          cp -r public/* _site/
 
       - uses: actions/configure-pages@v5
 
