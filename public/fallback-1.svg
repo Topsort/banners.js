@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e2e2" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="300" fill="#f5f5f5"/>
+  <rect width="400" height="300" fill="url(#grid)"/>
+  <rect x="1" y="1" width="398" height="298" fill="none" stroke="#ccc" stroke-width="2" stroke-dasharray="8 4" rx="8"/>
+  <text x="200" y="125" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" font-weight="600" fill="#888">Fallback · Rank 1</text>
+  <text x="200" y="160" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#aaa">No auction winner for this slot.</text>
+  <text x="200" y="185" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#bbb">Your default content stays visible.</text>
+</svg>
