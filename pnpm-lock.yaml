@@ -29,7 +29,7 @@ importers:
         version: 1.58.2
       '@size-limit/file':
         specifier: ^12.0.0
-        version: 12.0.0(size-limit@12.0.0(jiti@2.6.1))
+        version: 12.0.0(size-limit@12.0.1(jiti@2.6.1))
       '@types/node':
         specifier: 24.11.0
         version: 24.11.0
@@ -41,7 +41,7 @@ importers:
         version: 28.1.0
       size-limit:
         specifier: ^12.0.0
-        version: 12.0.0(jiti@2.6.1)
+        version: 12.0.1(jiti@2.6.1)
       skeleton-webcomponent-loader:
         specifier: 2.1.4
         version: 2.1.4
@@ -1059,8 +1059,8 @@ packages:
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
-  size-limit@12.0.0:
-    resolution: {integrity: sha512-JBG8dioIs0m2kHOhs9jD6E/tZKD08vmbf2bfqj/rJyNWqJxk/ZcakixjhYtsqdbi+AKVbfPkt3g2RRZiKaizYA==}
+  size-limit@12.0.1:
+    resolution: {integrity: sha512-vuFj+6lDOoBJQu6OLhcMQv7jnbXjuoEn4WsQHlSLOV/8EFfOka/tfjtLQ/rZig5Gagi3R0GnU/0kd4EY/y2etg==}
     engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
@@ -1661,9 +1661,9 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@size-limit/file@12.0.0(size-limit@12.0.0(jiti@2.6.1))':
+  '@size-limit/file@12.0.0(size-limit@12.0.1(jiti@2.6.1))':
     dependencies:
-      size-limit: 12.0.0(jiti@2.6.1)
+      size-limit: 12.0.1(jiti@2.6.1)
 
   '@standard-schema/spec@1.1.0': {}
 
@@ -2204,7 +2204,7 @@ snapshots:
 
   siginfo@2.0.0: {}
 
-  size-limit@12.0.0(jiti@2.6.1):
+  size-limit@12.0.1(jiti@2.6.1):
     dependencies:
       bytes-iec: 3.1.1
       lilconfig: 3.1.3
