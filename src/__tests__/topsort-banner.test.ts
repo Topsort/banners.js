@@ -324,6 +324,38 @@ describe("TopsortBanner", () => {
       expect(img2?.getAttribute("style")).toContain("height:90px");
     });
 
+    it("slots emit statechange with status 'ready' when banners arrive", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
+      const slot1Events: CustomEvent[] = [];
+      const slot2Events: CustomEvent[] = [];
+      slot1.addEventListener("statechange", (e) => slot1Events.push(e as CustomEvent));
+      slot2.addEventListener("statechange", (e) => slot2Events.push(e as CustomEvent));
+      await contextSettled(banner, slot1, slot2);
+      expect(slot1Events.some((e) => e.detail.status === "ready")).toBe(true);
+      expect(slot1Events.find((e) => e.detail.status === "ready")?.detail.rank).toBe(1);
+      expect(slot2Events.some((e) => e.detail.status === "ready")).toBe(true);
+      expect(slot2Events.find((e) => e.detail.status === "ready")?.detail.rank).toBe(2);
+    });
+
+    it("slots emit statechange with status 'nowinners' when auction returns empty", async () => {
+      vi.mocked(runAuction).mockResolvedValue([]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
+      const slot1Events: CustomEvent[] = [];
+      slot1.addEventListener("statechange", (e) => slot1Events.push(e as CustomEvent));
+      await contextSettled(banner, slot1, slot2);
+      expect(slot1Events.some((e) => e.detail.status === "nowinners")).toBe(true);
+    });
+
+    it("slots emit statechange with status 'error' when auction fails", async () => {
+      vi.mocked(runAuction).mockRejectedValue(new Error("network error"));
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
+      const slot1Events: CustomEvent[] = [];
+      slot1.addEventListener("statechange", (e) => slot1Events.push(e as CustomEvent));
+      await contextSettled(banner, slot1, slot2);
+      expect(slot1Events.some((e) => e.detail.status === "error")).toBe(true);
+    });
+
     it("preserves banner content in slots when parent width/height attribute changes after auction", async () => {
       vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
       const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });

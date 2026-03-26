@@ -378,6 +378,10 @@
               <label for="search-query">Search Query</label>
               <input type="text" id="search-query" name="search-query" placeholder="running shoes" />
             </div>
+            <div class="field">
+              <label for="location">Location</label>
+              <input type="text" id="location" name="location" placeholder="US" />
+            </div>
           </fieldset>
 
           <fieldset>
@@ -509,6 +513,7 @@
         if (fields.height) parts.push(`height="${escapeHtml(fields.height)}"`);
         if (fields.categoryId) parts.push(`category-id="${escapeHtml(fields.categoryId)}"`);
         if (fields.searchQuery) parts.push(`search-query="${escapeHtml(fields.searchQuery)}"`);
+        if (fields.location) parts.push(`location="${escapeHtml(fields.location)}"`);
         if (fields.newTab) parts.push(`new-tab`);
         return parts.join(" ");
       }
@@ -524,6 +529,7 @@
         el.setAttribute("height", fields.height);
         if (fields.categoryId) el.setAttribute("category-id", fields.categoryId);
         if (fields.searchQuery) el.setAttribute("search-query", fields.searchQuery);
+        if (fields.location) el.setAttribute("location", fields.location);
         if (fields.newTab) el.setAttribute("new-tab", "");
         return el;
       }
@@ -604,6 +610,7 @@
           height: data.get("height") || "90",
           categoryId: data.get("category-id") || "",
           searchQuery: data.get("search-query") || "",
+          location: data.get("location") || "",
           newTab: data.get("new-tab") === "on",
           mode: data.get("mode") || "single",
         };

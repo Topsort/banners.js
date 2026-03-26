@@ -275,14 +275,41 @@ window.TS = {
 This configuration needs to be set before analytics.js is loaded or imported.
 
 # Listening to events
-The banner component emits an event when the state changes. You can listen to this event to write custom logic.
-The various states are `loading`, `ready`, `error`, and `nowinners`.
+The banner component emits a `statechange` event when the auction resolves. You can listen to this event to write custom logic.
+The possible statuses are `ready`, `error`, and `nowinners`.
 
+### Single and predefined mode
 
 ```javascript
 document.querySelector('#my-slot-id').addEventListener('statechange', (event) => {
-  console.log(event.detail); // { status: 'ready', banner: { ... } }
+  console.log(event.detail); // { slotId: 'my-slot-id', status: 'ready' }
 });
+```
+
+### Context mode
+
+In context mode, each `<topsort-banner-slot>` emits its own `statechange` event with the slot's `rank` in the detail:
+
+```javascript
+document.addEventListener('statechange', (event) => {
+  console.log(event.detail); // { rank: 1, status: 'ready' }
+}, true);
+```
+
+### Customizing links in predefined mode
+
+In predefined mode, `data-ts-field="target:href"` sets the link directly from the auction response. If you need to transform the URL (similar to `window.TS_BANNERS.getLink` in standard mode), use the `statechange` event to post-process the link after the template has been applied:
+
+```javascript
+document.addEventListener('statechange', (event) => {
+  if (event.detail.status !== 'ready') return;
+  const banner = event.target;
+  const link = banner.querySelector('a');
+  if (link) {
+    const original = link.getAttribute('href');
+    link.href = `https://example.com/${original}`;
+  }
+}, true);
 ```
 
 # Playground
