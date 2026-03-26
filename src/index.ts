@@ -349,25 +349,45 @@ export class TopsortBannerSlot extends LitElement {
   updated(changedProperties: Map<string | number | symbol, unknown>) {
     super.updated(changedProperties);
 
-    if (this.predefined && changedProperties.has("context")) {
+    if (changedProperties.has("context")) {
       const oldContext = changedProperties.get("context") as BannerContext | undefined;
       const bannersJustArrived = !oldContext?.banners && !!this.context?.banners;
+
       if (bannersJustArrived) {
-        const banner = this._bannerForRank();
-        if (banner?.asset?.[0]?.content) {
-          try {
-            applyTemplate(this, banner);
-          } catch (e) {
-            logError(e);
+        if (this.predefined) {
+          const banner = this._bannerForRank();
+          if (banner?.asset?.[0]?.content) {
+            try {
+              applyTemplate(this, banner);
+            } catch (e) {
+              logError(e);
+            }
+          } else if (banner) {
+            console.warn(
+              `[topsort-banner-slot] Predefined mode is set but the auction response for rank ${this.rank} contains no content map. Template was not mutated.`,
+            );
           }
-        } else if (banner) {
-          console.warn(
-            `[topsort-banner-slot] Predefined mode is set but the auction response for rank ${this.rank} contains no content map. Template was not mutated.`,
-          );
+          // No banner (no-winners): predefined content stays as-is, no warning needed
         }
-        // No banner (no-winners): predefined content stays as-is, no warning needed
+
+        const banner = this._bannerForRank();
+        this._emitStateChange(banner ? "ready" : "nowinners");
+      }
+
+      if (!oldContext?.error && this.context?.error) {
+        this._emitStateChange("error");
       }
     }
+  }
+
+  private _emitStateChange(status: string) {
+    this.dispatchEvent(
+      new CustomEvent("statechange", {
+        detail: { rank: this.rank, status },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
