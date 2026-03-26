@@ -1,3 +1,9 @@
+### 0.8.2
+
+- Emit `statechange` event from `<topsort-banner-slot>` in context mode (previously only non-context banners emitted the event)
+- Add `location` field to the interactive playground for geo-targeting support
+- Document `statechange` event usage for context mode and predefined link customization in README
+
 ### 0.8.1
 
 - Support explicit `key:target` syntax in `data-ts-field` (e.g. `data-ts-field="mainImage:src"`) for deterministic bindings without tag-based inference
