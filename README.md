@@ -44,7 +44,7 @@ Directly from unpkg.com
   type="module"
   src="https://unpkg.com/@topsort/banners/dist/banners.mjs"
 ></script>
-<script async type="module" src="https://unpkg.com/@topsort/analytics.js"></script>
+<script async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js"></script>
 <body>
   <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
 </body>
