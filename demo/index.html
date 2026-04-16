@@ -589,9 +589,9 @@
       function buildSnippetSingle(fields) {
         const attrs = buildAttrs(fields);
         return [
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
           `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
-          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}></topsort-banner>`,
         ].join("\n");
@@ -601,9 +601,9 @@
         const attrs = buildAttrs(fields);
         const indented = fields.templateHtml.split("\n").map((l) => "  " + l).join("\n");
         return [
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
           `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
-          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs} predefined>`,
           indented,
@@ -624,9 +624,9 @@
       function buildSnippetContext(fields) {
         const attrs = `${buildAttrs(fields)} context`;
         return [
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
           `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
-          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}>`,
           `  <topsort-banner-slot rank="1"></topsort-banner-slot>`,
@@ -640,9 +640,9 @@
         const indent1 = fields.templateHtml1.split("\n").map((l) => "    " + l).join("\n");
         const indent2 = fields.templateHtml2.split("\n").map((l) => "    " + l).join("\n");
         return [
+          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
           `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
-          `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}>`,
           `  <topsort-banner-slot rank="1" predefined>`,
