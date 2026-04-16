@@ -538,6 +538,7 @@
         const attrs = buildAttrs(fields);
         return [
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
           `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}></topsort-banner>`,
@@ -549,6 +550,7 @@
         const indented = fields.templateHtml.split("\n").map((l) => "  " + l).join("\n");
         return [
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
           `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs} predefined>`,
@@ -571,6 +573,7 @@
         const attrs = `${buildAttrs(fields)} context`;
         return [
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
           `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}>`,
@@ -586,6 +589,7 @@
         const indent2 = fields.templateHtml2.split("\n").map((l) => "    " + l).join("\n");
         return [
           `${SO} src="https://cdn.jsdelivr.net/npm/@topsort/banners.js/dist/banners.iife.js">${SC}`,
+          `${SO} async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js">${SC}`,
           `${SO}>window.TS = { token: "YOUR_TOKEN" };${SC}`,
           ``,
           `<topsort-banner ${attrs}>`,

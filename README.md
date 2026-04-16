@@ -15,7 +15,8 @@ Directly from unpkg.com
 
 ```html
 <script>
-  // Must come first — analytics.js reads window.TS on load
+  // Set your token before or after the scripts load — analytics.js
+  // queues events and flushes them once window.TS.token is assigned.
   window.TS = {
     token: "<your topsort api key>",
   };
@@ -272,7 +273,7 @@ window.TS = {
 };
 ```
 
-This configuration needs to be set before analytics.js is loaded or imported.
+This configuration can be set before or after analytics.js loads — events are queued until `window.TS.token` is assigned. Use property assignment (`window.TS.token = '...'`), not object replacement (`window.TS = { token: '...' }`), so the internal setter can flush queued events.
 
 # Listening to events
 The banner component emits a `statechange` event when the auction resolves. You can listen to this event to write custom logic.
