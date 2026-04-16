@@ -331,6 +331,34 @@
         padding: 10px 12px;
         font-size: 13px;
       }
+
+      #toast-container {
+        position: fixed;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 8px;
+        z-index: 9999;
+        pointer-events: none;
+      }
+
+      .toast {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font: 13px/1.4 system-ui, sans-serif;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        opacity: 0;
+        transform: translateY(8px);
+        animation: toast-in .2s ease forwards, toast-out .3s ease 2.5s forwards;
+      }
+
+      .toast--impression { background: #1a7f37; }
+      .toast--click { background: #0550ae; }
+
+      @keyframes toast-in { to { opacity: 1; transform: translateY(0); } }
+      @keyframes toast-out { to { opacity: 0; transform: translateY(-8px); } }
     </style>
   </head>
   <body>
@@ -483,6 +511,28 @@
     </div>
 
     <script>
+      // Toast notifications for analytics events
+      const toastContainer = document.createElement("div");
+      toastContainer.id = "toast-container";
+      document.body.appendChild(toastContainer);
+
+      function showToast(type, detail) {
+        const el = document.createElement("div");
+        el.className = `toast toast--${type}`;
+        const bid = detail.resolvedBidId || "";
+        el.textContent = `${type === "click" ? "Click" : "Impression"} — ${bid.slice(0, 16)}…`;
+        toastContainer.appendChild(el);
+        el.addEventListener("animationend", (e) => {
+          if (e.animationName === "toast-out") el.remove();
+        });
+      }
+
+      document.addEventListener("topsort", (e) => {
+        const d = e.detail;
+        if (d.impressions) d.impressions.forEach((i) => showToast("impression", i));
+        if (d.clicks) d.clicks.forEach((c) => showToast("click", c));
+      });
+
       const form = document.getElementById("demo-form");
       const previewArea = document.getElementById("preview-area");
       const snippetArea = document.getElementById("snippet-area");
@@ -530,7 +580,9 @@
         if (fields.categoryId) el.setAttribute("category-id", fields.categoryId);
         if (fields.searchQuery) el.setAttribute("search-query", fields.searchQuery);
         if (fields.location) el.setAttribute("location", fields.location);
-        if (fields.newTab) el.setAttribute("new-tab", "");
+        // Always open links in a new tab in the playground so the user doesn't
+        // navigate away from the demo page.
+        el.setAttribute("new-tab", "");
         return el;
       }
 
