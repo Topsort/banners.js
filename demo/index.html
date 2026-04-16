@@ -516,10 +516,9 @@
       toastContainer.id = "toast-container";
       document.body.appendChild(toastContainer);
 
-      function showToast(type, detail) {
+      function showToast(type, bid) {
         const el = document.createElement("div");
         el.className = `toast toast--${type}`;
-        const bid = detail.resolvedBidId || "";
         el.textContent = `${type === "click" ? "Click" : "Impression"} — ${bid.slice(0, 16)}…`;
         toastContainer.appendChild(el);
         el.addEventListener("animationend", (e) => {
@@ -527,10 +526,15 @@
         });
       }
 
+      // analytics.js dispatches a "topsort" CustomEvent on the tracked element
+      // (bubbles to document). detail is a single event with { type, bid, ... }.
       document.addEventListener("topsort", (e) => {
         const d = e.detail;
-        if (d.impressions) d.impressions.forEach((i) => showToast("impression", i));
-        if (d.clicks) d.clicks.forEach((c) => showToast("click", c));
+        const type = (d.type || "").toLowerCase();
+        const bid = d.bid || "";
+        if (type === "impression" || type === "click") {
+          showToast(type, bid);
+        }
       });
 
       const form = document.getElementById("demo-form");
