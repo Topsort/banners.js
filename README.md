@@ -273,7 +273,7 @@ window.TS = {
 };
 ```
 
-This configuration can be set before or after analytics.js loads — events are queued until `window.TS.token` is assigned. Use property assignment (`window.TS.token = '...'`), not object replacement (`window.TS = { token: '...' }`), so the internal setter can flush queued events.
+If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine — analytics.js will read the token on init. If you need to set or change the token **after** analytics.js has already loaded, use property assignment (`window.TS.token = '...'`) so the internal setter can flush queued events.
 
 # Listening to events
 The banner component emits a `statechange` event when the auction resolves. You can listen to this event to write custom logic.
