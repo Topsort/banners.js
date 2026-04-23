@@ -61,7 +61,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "jsdom": "^28.1.0",
     "size-limit": "^12.0.0",
-    "skeleton-webcomponent-loader": "2.1.4",
+    "skeleton-webcomponent-loader": "3.0.0",
     "typescript": "5.9.3",
     "vite": "7.3.2",
     "vite-plugin-dts": "4.5.4",
