@@ -30,10 +30,6 @@ jobs:
         with:
           cache: pnpm
           node-version-file: package.json
-          registry-url: https://registry.npmjs.org
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -47,9 +43,17 @@ jobs:
       - name: Build dist
         run: pnpm run build
 
+      - name: Configure npm registry auth
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+          registry-url: https://registry.npmjs.org
+
       - name: Update npm
         run: npm install -g npm@latest
-  
+
       - name: Publish to npm
         id: publish
         run: npm publish --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
