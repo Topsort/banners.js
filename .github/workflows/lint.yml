@@ -14,10 +14,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.25"
       - name: Install Actionlint
         env:
           version: "1.7.7"
-        run: curl -Ls "https://github.com/rhysd/actionlint/releases/download/v${{ env.version }}/actionlint_${{ env.version }}_linux_amd64.tar.gz" | sudo tar -x -z -C /usr/local/bin actionlint
+        run: |
+          go install github.com/rhysd/actionlint/cmd/actionlint@v${{ env.version }}
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
       - name: Run Actionlint
         run: |
           echo "::add-matcher::.github/matchers/actionlint.json"
