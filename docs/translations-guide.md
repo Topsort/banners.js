@@ -32,21 +32,8 @@ That's the whole integration. If the auction response for this slot returns tran
 
 ## How it works behind the scenes
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant Page as Storefront page
-  participant Banner as &lt;topsort-banner&gt;
-  participant API as /v2/auctions
+<img width="1018" height="489" alt="image" src="https://github.com/user-attachments/assets/54916803-2a81-429b-8481-2892c27a69a2" />
 
-  Page->>Banner: language="en-GB"
-  Banner->>API: POST auction request
-  API-->>Banner: winner.asset[0].content (flat map with prefixed keys)
-  Note over Banner: 1. Derive prefix "en-GB" → "enGB"
-  Note over Banner: 2. For each key starting with "enGB",<br/>copy its value over the base field
-  Note over Banner: 3. Pass the resolved content to applyTemplate()
-  Banner->>Page: DOM mutated in place — translated values visible
-```
 
 The key thing to note is **step 1**: the prefix is computed from the BCP-47 language code, not from any global table. `en-GB` always becomes `enGB`, `pt-BR` always becomes `ptBR`. There is nothing to register or configure ahead of time.
 
