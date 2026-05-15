@@ -341,6 +341,64 @@ describe("applyTemplate", () => {
     });
   });
 
+  describe("language translation", () => {
+    it("uses translated value when language matches a prefixed key", () => {
+      const container = makeContainer('<span data-ts-field="ctaText:textContent">old</span>');
+      const banner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "Translated" },
+          },
+        ],
+      });
+      applyTemplate(container, banner, "en-US");
+      expect(container.querySelector("span")?.textContent).toBe("Translated");
+    });
+
+    it("falls back to base field when translation is missing", () => {
+      const container = makeContainer('<span data-ts-field="ctaText:textContent">old</span>');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { ctaText: "Default" } }],
+      });
+      applyTemplate(container, banner, "en-US");
+      expect(container.querySelector("span")?.textContent).toBe("Default");
+    });
+
+    it("uses base field when language is not provided even if translations exist", () => {
+      const container = makeContainer('<span data-ts-field="ctaText:textContent">old</span>');
+      const banner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "Translated" },
+          },
+        ],
+      });
+      applyTemplate(container, banner);
+      expect(container.querySelector("span")?.textContent).toBe("Default");
+    });
+
+    it("picks the correct language when multiple translations are present", () => {
+      const container = makeContainer('<span data-ts-field="ctaText:textContent">old</span>');
+      const banner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: {
+              ctaText: "Default",
+              enUSctaText: "EN value",
+              frFRctaText: "FR value",
+              ptBRctaText: "PT value",
+            },
+          },
+        ],
+      });
+      applyTemplate(container, banner, "pt-BR");
+      expect(container.querySelector("span")?.textContent).toBe("PT value");
+    });
+  });
+
   it("does not apply any sizing or layout styles — merchant controls template appearance", () => {
     const container = makeContainer(
       '<div data-ts-clickable><img data-ts-field="imageUrl:src" src="/fallback.jpg" style="width:300px;height:250px;" /></div>',
