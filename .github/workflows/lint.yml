@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v6
         # No major tag unfortunately
         # https://github.com/crate-ci/typos/issues/857
-      - uses: crate-ci/typos@v1.45.2
+      - uses: crate-ci/typos@v1.46.2
 
   tsc:
     name: Type checks
