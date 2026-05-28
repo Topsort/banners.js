@@ -301,6 +301,33 @@ describe("TopsortBanner", () => {
       const readyEvents = events.filter((e) => e.detail.status === "ready");
       expect(readyEvents.length).toBe(1);
     });
+
+    it("survives applyTemplate throwing during runtime language change", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const el = mount({ id: "slot-1", predefined: "", language: "en-US" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await taskSettled(el);
+
+      // Make only the runtime re-apply throw, not the initial application
+      vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
+        throw new Error("DOM error during re-apply");
+      });
+      el.setAttribute("language", "fr-FR");
+      await (el as LitElement).updateComplete;
+
+      expect(el.isConnected).toBe(true);
+      vi.restoreAllMocks();
+      errorSpy.mockRestore();
+    });
   });
 
   it("standard mode: transition detection prevents double-emission of ready", async () => {

@@ -212,5 +212,29 @@ describe("TopsortBannerSlot", () => {
       await setContext(el, { ...baseCtx, language: "fr-FR", banners: [winner] });
       expect(events.length).toBe(countAfterReady);
     });
+
+    it("survives applyTemplate throwing during runtime language change", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      const el = mountSlot({ rank: "1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await (el as LitElement).updateComplete;
+      await setContext(el, { ...baseCtx, language: "en-US", banners: [winner] });
+
+      // Make only the runtime re-apply throw, not the initial application
+      vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
+        throw new Error("DOM error during re-apply");
+      });
+      await setContext(el, { ...baseCtx, language: "fr-FR", banners: [winner] });
+
+      expect(el.isConnected).toBe(true);
+      vi.restoreAllMocks();
+    });
   });
 });

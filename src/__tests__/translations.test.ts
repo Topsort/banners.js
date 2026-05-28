@@ -18,6 +18,11 @@ describe("languageToPrefix", () => {
     expect(languageToPrefix("")).toBe("");
   });
 
+  it("returns empty string when input starts with a separator", () => {
+    expect(languageToPrefix("_en")).toBe("");
+    expect(languageToPrefix("-en")).toBe("");
+  });
+
   it("lowercases single-part codes", () => {
     expect(languageToPrefix("EN")).toBe("en");
   });
@@ -62,6 +67,10 @@ describe("resolveTranslations", () => {
 
   it("returns content unchanged when language is empty string", () => {
     expect(resolveTranslations(base, "")).toBe(base);
+  });
+
+  it("returns content unchanged when language resolves to an empty prefix", () => {
+    expect(resolveTranslations(base, "_en")).toBe(base);
   });
 
   it("returns content unchanged when language has no matching translations", () => {
