@@ -1,3 +1,4 @@
+import { resolveTranslations } from "./translations";
 import type { Banner } from "./types";
 
 interface Binding {
@@ -53,8 +54,9 @@ function setFieldValue(el: Element, value: string, target: string): boolean {
  * gives the merchant full control over the template's appearance. Only content
  * fields (`data-ts-field`) and telemetry attributes are written.
  */
-export function applyTemplate(container: Element, banner: Banner) {
-  const content = banner.asset?.[0]?.content;
+export function applyTemplate(container: Element, banner: Banner, language?: string) {
+  const rawContent = banner.asset?.[0]?.content;
+  const content = rawContent ? resolveTranslations(rawContent, language) : rawContent;
 
   if (content) {
     const fields = container.querySelectorAll<HTMLElement>("[data-ts-field]");

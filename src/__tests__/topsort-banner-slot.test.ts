@@ -135,4 +135,106 @@ describe("TopsortBannerSlot", () => {
     expect(el.isConnected).toBe(true);
     vi.restoreAllMocks();
   });
+
+  describe("language propagation via context", () => {
+    it("uses translated value from the context language", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN value" },
+          },
+        ],
+      });
+      const el = mountSlot({ rank: "1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await (el as LitElement).updateComplete;
+      await setContext(el, { ...baseCtx, language: "en-US", banners: [winner] });
+      expect(el.querySelector("span")?.textContent).toBe("EN value");
+    });
+
+    it("falls back to base field when context has no language", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN value" },
+          },
+        ],
+      });
+      const el = mountSlot({ rank: "1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await (el as LitElement).updateComplete;
+      await setContext(el, { ...baseCtx, banners: [winner] });
+      expect(el.querySelector("span")?.textContent).toBe("Default");
+    });
+
+    it("re-applies template when context language changes after banners arrive", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: {
+              ctaText: "Default",
+              enUSctaText: "EN value",
+              frFRctaText: "FR value",
+            },
+          },
+        ],
+      });
+      const el = mountSlot({ rank: "1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await (el as LitElement).updateComplete;
+      await setContext(el, { ...baseCtx, language: "en-US", banners: [winner] });
+      expect(el.querySelector("span")?.textContent).toBe("EN value");
+
+      await setContext(el, { ...baseCtx, language: "fr-FR", banners: [winner] });
+      expect(el.querySelector("span")?.textContent).toBe("FR value");
+    });
+
+    it("does not re-emit statechange when only language changes", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      const el = mountSlot({ rank: "1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      const events: CustomEvent[] = [];
+      el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
+      await (el as LitElement).updateComplete;
+      await setContext(el, { ...baseCtx, language: "en-US", banners: [winner] });
+      const countAfterReady = events.length;
+
+      await setContext(el, { ...baseCtx, language: "fr-FR", banners: [winner] });
+      expect(events.length).toBe(countAfterReady);
+    });
+
+    it("survives applyTemplate throwing during runtime language change", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      const el = mountSlot({ rank: "1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await (el as LitElement).updateComplete;
+      await setContext(el, { ...baseCtx, language: "en-US", banners: [winner] });
+
+      // Make only the runtime re-apply throw, not the initial application
+      vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
+        throw new Error("DOM error during re-apply");
+      });
+      await setContext(el, { ...baseCtx, language: "fr-FR", banners: [winner] });
+
+      expect(el.isConnected).toBe(true);
+      vi.restoreAllMocks();
+    });
+  });
 });

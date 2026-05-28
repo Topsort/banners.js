@@ -149,6 +149,7 @@ const bannerContextHasChanged = (newVal: BannerContext, oldVal?: BannerContext) 
     newVal.width !== oldVal.width ||
     newVal.height !== oldVal.height ||
     newVal.newTab !== oldVal.newTab ||
+    newVal.language !== oldVal.language ||
     !!newVal.error !== !!oldVal.error ||
     newVal.banners?.length !== oldVal.banners?.length
   );
@@ -185,6 +186,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     width: this.width,
     height: this.height,
     newTab: this.newTab,
+    language: this.language,
   };
 
   @property({ type: Boolean, attribute: "context" })
@@ -192,6 +194,9 @@ export class TopsortBanner extends BannerComponent(LitElement) {
 
   @property({ type: Boolean })
   readonly predefined: boolean = false;
+
+  @property({ attribute: "language", type: String })
+  readonly language?: string;
 
   private _prevTaskStatus: TaskStatus = TaskStatus.INITIAL;
 
@@ -243,7 +248,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     ) {
       if (banners.length && banners[0].asset?.[0]?.content) {
         try {
-          applyTemplate(this, banners[0]);
+          applyTemplate(this, banners[0], this.language);
         } catch (e) {
           logError(e);
         }
@@ -277,7 +282,8 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     if (
       changedProperties.has("width") ||
       changedProperties.has("height") ||
-      changedProperties.has("newTab")
+      changedProperties.has("newTab") ||
+      changedProperties.has("language")
     ) {
       Promise.resolve().then(() => {
         this.context = {
@@ -285,8 +291,26 @@ export class TopsortBanner extends BannerComponent(LitElement) {
           width: this.width,
           height: this.height,
           newTab: this.newTab,
+          language: this.language,
         };
       });
+    }
+
+    // Runtime language change in predefined mode: re-apply template without
+    // re-running the auction. Skip the initial transition (handled above).
+    if (
+      this.predefined &&
+      changedProperties.has("language") &&
+      prevStatus === TaskStatus.COMPLETE &&
+      currStatus === TaskStatus.COMPLETE &&
+      banners.length &&
+      banners[0].asset?.[0]?.content
+    ) {
+      try {
+        applyTemplate(this, banners[0], this.language);
+      } catch (e) {
+        logError(e);
+      }
     }
   }
 
@@ -358,7 +382,7 @@ export class TopsortBannerSlot extends LitElement {
           const banner = this._bannerForRank();
           if (banner?.asset?.[0]?.content) {
             try {
-              applyTemplate(this, banner);
+              applyTemplate(this, banner, this.context?.language);
             } catch (e) {
               logError(e);
             }
@@ -372,6 +396,20 @@ export class TopsortBannerSlot extends LitElement {
 
         const banner = this._bannerForRank();
         this._emitStateChange(banner ? "ready" : "nowinners");
+      } else if (this.predefined && !!this.context?.banners) {
+        // Language changed after banners already arrived: re-apply template
+        // using the new language, without re-emitting state or re-running auction.
+        const languageChanged = oldContext?.language !== this.context?.language;
+        if (languageChanged) {
+          const banner = this._bannerForRank();
+          if (banner?.asset?.[0]?.content) {
+            try {
+              applyTemplate(this, banner, this.context?.language);
+            } catch (e) {
+              logError(e);
+            }
+          }
+        }
       }
 
       if (!oldContext?.error && this.context?.error) {

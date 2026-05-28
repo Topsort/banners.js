@@ -28,6 +28,7 @@ export interface BannerContext {
   width: number;
   height: number;
   newTab: boolean;
+  language?: string;
   banners?: Banner[];
   error?: unknown;
 }

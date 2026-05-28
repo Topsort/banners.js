@@ -203,6 +203,133 @@ describe("TopsortBanner", () => {
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("no content map"));
   });
 
+  describe("language attribute (predefined mode)", () => {
+    it("passes language to applyTemplate so translations override base fields", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "Translated" },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const el = mount({ id: "slot-1", predefined: "", language: "en-US" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await taskSettled(el);
+      expect(el.querySelector("span")?.textContent).toBe("Translated");
+    });
+
+    it("falls back to base field when no language attribute is set", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "Translated" },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const el = mount({ id: "slot-1", predefined: "" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await taskSettled(el);
+      expect(el.querySelector("span")?.textContent).toBe("Default");
+    });
+
+    it("re-applies template when language attribute changes at runtime", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: {
+              ctaText: "Default",
+              enUSctaText: "EN value",
+              frFRctaText: "FR value",
+            },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const el = mount({ id: "slot-1", predefined: "", language: "en-US" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await taskSettled(el);
+      expect(el.querySelector("span")?.textContent).toBe("EN value");
+
+      el.setAttribute("language", "fr-FR");
+      await (el as LitElement).updateComplete;
+      expect(el.querySelector("span")?.textContent).toBe("FR value");
+    });
+
+    it("does not re-run auction when language attribute changes", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const el = mount({ id: "slot-1", predefined: "", language: "en-US" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await taskSettled(el);
+      const callCountBefore = vi.mocked(runAuction).mock.calls.length;
+
+      el.setAttribute("language", "fr-FR");
+      await (el as LitElement).updateComplete;
+      expect(vi.mocked(runAuction).mock.calls.length).toBe(callCountBefore);
+    });
+
+    it("does not re-emit ready when language changes at runtime", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const el = mount({ id: "slot-1", predefined: "", language: "en-US" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      const events: CustomEvent[] = [];
+      el.addEventListener("statechange", (e) => events.push(e as CustomEvent));
+      await taskSettled(el);
+
+      el.setAttribute("language", "fr-FR");
+      await (el as LitElement).updateComplete;
+      const readyEvents = events.filter((e) => e.detail.status === "ready");
+      expect(readyEvents.length).toBe(1);
+    });
+
+    it("survives applyTemplate throwing during runtime language change", async () => {
+      const winner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: { ctaText: "Default", enUSctaText: "EN", frFRctaText: "FR" },
+          },
+        ],
+      });
+      vi.mocked(runAuction).mockResolvedValue([winner]);
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const el = mount({ id: "slot-1", predefined: "", language: "en-US" });
+      el.innerHTML = '<span data-ts-field="ctaText:textContent">old</span>';
+      await taskSettled(el);
+
+      // Make only the runtime re-apply throw, not the initial application
+      vi.spyOn(templateModule, "applyTemplate").mockImplementationOnce(() => {
+        throw new Error("DOM error during re-apply");
+      });
+      el.setAttribute("language", "fr-FR");
+      await (el as LitElement).updateComplete;
+
+      expect(el.isConnected).toBe(true);
+      vi.restoreAllMocks();
+      errorSpy.mockRestore();
+    });
+  });
+
   it("standard mode: transition detection prevents double-emission of ready", async () => {
     vi.mocked(runAuction).mockResolvedValue([makeBanner()]);
     const el = mount({ id: "slot-1", width: "300", height: "250" });
