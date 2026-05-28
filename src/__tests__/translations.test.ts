@@ -8,6 +8,12 @@ describe("languageToPrefix", () => {
     expect(languageToPrefix("fr-FR")).toBe("frFR");
   });
 
+  it("accepts underscore separator for POSIX/Java-style locale codes", () => {
+    expect(languageToPrefix("en_US")).toBe("enUS");
+    expect(languageToPrefix("pt_BR")).toBe("ptBR");
+    expect(languageToPrefix("zh_CN")).toBe("zhCN");
+  });
+
   it("returns empty string for empty input", () => {
     expect(languageToPrefix("")).toBe("");
   });

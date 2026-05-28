@@ -1,10 +1,11 @@
 /**
- * Derive a content-field prefix from a 2-part BCP-47 code.
- * `en-US` → `enUS`, `pt-BR` → `ptBR`. Returns `""` for empty input.
+ * Derive a content-field prefix from a 2-part locale code.
+ * Accepts both `en-US` (BCP-47) and `en_US` (POSIX/Java) separators.
+ * `en-US` → `enUS`, `pt_BR` → `ptBR`. Returns `""` for empty input.
  */
 export function languageToPrefix(language: string): string {
   if (!language) return "";
-  const [first, ...rest] = language.split("-");
+  const [first, ...rest] = language.split(/[-_]/);
   if (!first) return "";
   return first.toLowerCase() + rest.map((p) => p.toUpperCase()).join("");
 }
