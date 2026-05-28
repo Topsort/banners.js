@@ -1,3 +1,11 @@
+### 0.9.0
+
+- Add built-in translation support via new `language` attribute on `<topsort-banner>` and context-mode propagation to `<topsort-banner-slot>`
+- Translation values are sourced from prefixed keys in the auction response `content` map (e.g. `enUSctaText`, `ptBRdescription`); base fields are used as silent fallbacks when a translation is missing
+- Support both BCP-47 (`en-US`) and POSIX/Java (`en_US`) separators in the `language` attribute
+- Runtime `language` attribute changes re-apply the template without re-running the auction
+- See `docs/translations-guide.md` for the full integration guide
+
 ### 0.8.2
 
 - Emit `statechange` event from `<topsort-banner-slot>` in context mode (previously only non-context banners emitted the event)
