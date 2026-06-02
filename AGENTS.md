@@ -24,6 +24,8 @@ Three custom elements are defined in `src/index.ts`:
 
 `src/mixin.ts` exports `BannerComponent`, a Lit mixin that provides shared reactive properties (`width`, `height`, `slotId`, category filters, `newTab`, etc.) and the `buildAuction()` / `emitEvent()` methods. `TopsortBanner` applies this mixin.
 
+`width` and `height` default to `0` when their attributes are omitted. The default renderer treats `0` as a "not set" sentinel and emits `width:100%` / `height:auto` on the `<img>` (and on the `--ts-banner-width` / `--ts-banner-height` host CSS variables), so a `<topsort-banner>` with no dimensions fills its container at the asset's native aspect ratio rather than rendering 0×0. Dimensions are not part of the `/v2/auctions` request payload — the slot is identified by `slotId` alone.
+
 ### Context Provider Pattern
 
 When `context="true"` is set on `<topsort-banner>`, it uses `@lit/context` to provide a `BannerContext` (banners, dimensions, errors) to descendant `<topsort-banner-slot>` elements. The context has a custom change comparator (`bannerContextHasChanged`) that checks width, height, newTab, error presence, and banners array length.

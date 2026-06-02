@@ -91,6 +91,11 @@ function getBannerElement(
   }
   const src = banner.asset[0].url;
 
+  // width/height default to 0 when the attribute is omitted; treat 0 as "not set"
+  // and let the banner fluidly fill its container at the asset's native aspect ratio.
+  const widthStyle = width > 0 ? `${width}px` : "100%";
+  const heightStyle = height > 0 ? `${height}px` : "auto";
+
   const isVideo = (() => {
     try {
       const url = new URL(src);
@@ -110,15 +115,15 @@ function getBannerElement(
     ? html`
         <hls-video
           src="${src}"
-          width="${width}px"
-          height="${height}px"
+          width="${widthStyle}"
+          height="${heightStyle}"
         ></hls-video>
       `
     : html`
         <img
           src="${src}"
           alt="Topsort banner"
-          style="width:${width}px; height:${height}px; object-fit:cover;"
+          style="width:${widthStyle}; height:${heightStyle}; object-fit:cover;"
         />
       `;
 
@@ -274,10 +279,12 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       });
     }
 
-    if (changedProperties.has("width"))
-      this.style.setProperty("--ts-banner-width", `${this.width}px`);
-    if (changedProperties.has("height"))
-      this.style.setProperty("--ts-banner-height", `${this.height}px`);
+    if (changedProperties.has("width")) {
+      this.style.setProperty("--ts-banner-width", this.width > 0 ? `${this.width}px` : "100%");
+    }
+    if (changedProperties.has("height")) {
+      this.style.setProperty("--ts-banner-height", this.height > 0 ? `${this.height}px` : "auto");
+    }
 
     if (
       changedProperties.has("width") ||

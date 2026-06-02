@@ -147,6 +147,42 @@ describe("TopsortBanner", () => {
     expect(htmlEl.style.getPropertyValue("--ts-banner-height")).toBe("250px");
   });
 
+  describe("responsive defaults when width/height attributes omitted", () => {
+    it("renders <img> with width:100% and height:auto", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner()]);
+      const el = mount({ id: "slot-1" });
+      await taskSettled(el);
+      const img = el.querySelector("img");
+      expect(img).not.toBeNull();
+      const style = img?.getAttribute("style") ?? "";
+      expect(style).toContain("width:100%");
+      expect(style).toContain("height:auto");
+      expect(style).not.toContain("0px");
+    });
+
+    it("sets --ts-banner-width:100% and --ts-banner-height:auto host CSS vars", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner()]);
+      const el = mount({ id: "slot-1" });
+      await taskSettled(el);
+      const htmlEl = el as HTMLElement;
+      expect(htmlEl.style.getPropertyValue("--ts-banner-width")).toBe("100%");
+      expect(htmlEl.style.getPropertyValue("--ts-banner-height")).toBe("auto");
+    });
+
+    it("falls back per-axis: width set, height omitted → height:auto only", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner()]);
+      const el = mount({ id: "slot-1", width: "300" });
+      await taskSettled(el);
+      const img = el.querySelector("img");
+      const style = img?.getAttribute("style") ?? "";
+      expect(style).toContain("width:300px");
+      expect(style).toContain("height:auto");
+      const htmlEl = el as HTMLElement;
+      expect(htmlEl.style.getPropertyValue("--ts-banner-width")).toBe("300px");
+      expect(htmlEl.style.getPropertyValue("--ts-banner-height")).toBe("auto");
+    });
+  });
+
   it("predefined mode: applies template and emits 'ready'", async () => {
     const winner = makeBanner({ asset: [{ url: "x", content: { label: "Hello" } }] });
     vi.mocked(runAuction).mockResolvedValue([winner]);
@@ -481,6 +517,18 @@ describe("TopsortBanner", () => {
       slot1.addEventListener("statechange", (e) => slot1Events.push(e as CustomEvent));
       await contextSettled(banner, slot1, slot2);
       expect(slot1Events.some((e) => e.detail.status === "error")).toBe(true);
+    });
+
+    it("slots render width:100% / height:auto when parent has no width/height attrs", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1" });
+      await contextSettled(banner, slot1, slot2);
+      const style1 = slot1.querySelector("img")?.getAttribute("style") ?? "";
+      const style2 = slot2.querySelector("img")?.getAttribute("style") ?? "";
+      expect(style1).toContain("width:100%");
+      expect(style1).toContain("height:auto");
+      expect(style2).toContain("width:100%");
+      expect(style2).toContain("height:auto");
     });
 
     it("preserves banner content in slots when parent width/height attribute changes after auction", async () => {
