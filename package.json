@@ -54,17 +54,17 @@
     "e2e": "playwright test --config e2e/playwright.config.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.13",
+    "@biomejs/biome": "2.4.16",
     "@playwright/test": "^1.58.2",
     "@size-limit/file": "^12.0.0",
-    "@types/node": "24.12.2",
+    "@types/node": "24.13.0",
     "@vitest/coverage-v8": "^4.0.18",
     "jsdom": "^29.0.0",
     "size-limit": "^12.0.0",
     "skeleton-webcomponent-loader": "3.0.0",
     "typescript": "6.0.3",
-    "vite": "8.0.10",
-    "vite-plugin-dts": "5.0.0",
+    "vite": "8.0.16",
+    "vite-plugin-dts": "5.0.2",
     "vitest": "^4.0.18"
   },
   "dependencies": {
