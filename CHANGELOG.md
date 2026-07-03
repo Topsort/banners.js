@@ -1,3 +1,9 @@
+### 0.9.1
+
+- Fix ghost impressions for banners preloaded into hidden containers (e.g. mega-menus revealed on hover): `data-ts-resolved-bid` is now withheld until the banner is genuinely rendered — not `display:none`, `visibility:hidden`, `opacity:0`, or `content-visibility:hidden` — so `analytics.js` no longer counts an impression for a banner the shopper never saw. The staged bid lives in `data-ts-bid` until it is promoted on visibility.
+- Tear down visibility watchers when a banner disconnects, and stop polling once a hidden banner is removed from the DOM, preventing timer/observer leaks.
+- Render banners at 100% width (asset's native aspect ratio) when the `width`/`height` attributes are omitted.
+
 ### 0.9.0
 
 - Add built-in translation support via new `language` attribute on `<topsort-banner>` and context-mode propagation to `<topsort-banner-slot>`
