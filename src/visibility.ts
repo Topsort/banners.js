@@ -97,6 +97,14 @@ export function whenVisible(el: HTMLElement, onVisible: () => void): () => void 
         // reveal, which won't trigger another IntersectionObserver callback.
         if (timer === undefined) {
           timer = setInterval(() => {
+            // Stop if the element was removed from the DOM before it ever
+            // became visible — otherwise the poll would run forever.
+            if (!el.isConnected) {
+              done = true;
+              stopTimer();
+              io.disconnect();
+              return;
+            }
             if (isRendered(el)) finish();
           }, 200);
         }

@@ -155,19 +155,34 @@ const gated = new WeakSet<Element>();
  * Promotes staged `data-ts-bid` → `data-ts-resolved-bid` once each carrier
  * element is genuinely rendered. analytics.js observes `data-ts-resolved-bid`,
  * so this defers the impression trigger until the banner is actually visible.
+ *
+ * Each visibility watcher's cleanup is recorded on `cleanups` so the host
+ * component can tear observers/timers down in `disconnectedCallback` — without
+ * this, a watcher for a never-revealed hidden banner would run indefinitely and
+ * detached elements would leak their observers.
  */
-function promoteWhenVisible(root: Element) {
+function promoteWhenVisible(root: Element, cleanups: Array<{ el: Element; cleanup: () => void }>) {
   const pending = root.querySelectorAll<HTMLElement>("[data-ts-bid]:not([data-ts-resolved-bid])");
   for (const el of pending) {
     if (gated.has(el)) continue;
     const bid = el.getAttribute("data-ts-bid");
     if (!bid) continue;
     gated.add(el);
-    whenVisible(el, () => {
+    const cleanup = whenVisible(el, () => {
       el.setAttribute("data-ts-resolved-bid", bid);
       el.removeAttribute("data-ts-bid");
     });
+    cleanups.push({ el, cleanup });
   }
+}
+
+/** Disconnects visibility watchers and releases their elements for re-gating. */
+function teardownVisibility(cleanups: Array<{ el: Element; cleanup: () => void }>) {
+  for (const { el, cleanup } of cleanups) {
+    cleanup();
+    gated.delete(el);
+  }
+  cleanups.length = 0;
 }
 
 const bannerContext = createContext<BannerContext>(Symbol("banner-context"));
@@ -349,7 +364,14 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     }
 
     // Gate the impression trigger on real visibility (default + predefined mode).
-    promoteWhenVisible(this);
+    promoteWhenVisible(this, this._visibilityCleanups);
+  }
+
+  private readonly _visibilityCleanups: Array<{ el: Element; cleanup: () => void }> = [];
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    teardownVisibility(this._visibilityCleanups);
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
@@ -456,7 +478,14 @@ export class TopsortBannerSlot extends LitElement {
     }
 
     // Gate the impression trigger on real visibility (default + predefined mode).
-    promoteWhenVisible(this);
+    promoteWhenVisible(this, this._visibilityCleanups);
+  }
+
+  private readonly _visibilityCleanups: Array<{ el: Element; cleanup: () => void }> = [];
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    teardownVisibility(this._visibilityCleanups);
   }
 
   private _emitStateChange(status: string) {

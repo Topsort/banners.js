@@ -98,6 +98,63 @@ describe("whenVisible", () => {
     expect(onVisible).not.toHaveBeenCalled();
   });
 
+  it("stops polling once the hidden element is removed from the DOM", () => {
+    vi.useFakeTimers();
+    class FakeIO {
+      constructor(private cb: IntersectionObserverCallback) {}
+      observe(target: Element) {
+        this.cb(
+          [{ target, isIntersecting: true } as unknown as IntersectionObserverEntry],
+          this as unknown as IntersectionObserver,
+        );
+      }
+      unobserve() {}
+      disconnect() {}
+      takeRecords() {
+        return [];
+      }
+    }
+    // @ts-expect-error — install fake
+    globalThis.IntersectionObserver = FakeIO;
+
+    const el = document.createElement("div");
+    el.style.visibility = "hidden";
+    document.body.appendChild(el);
+    const onVisible = vi.fn();
+    whenVisible(el, onVisible);
+
+    // Poll is running while hidden + in-viewport.
+    const cleared = vi.spyOn(globalThis, "clearInterval");
+    el.remove(); // detached before it ever became visible
+    vi.advanceTimersByTime(250); // next poll tick observes !isConnected
+    expect(onVisible).not.toHaveBeenCalled();
+    expect(cleared).toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it("cleanup() stops the watcher and never promotes", () => {
+    class FakeIO {
+      cb: IntersectionObserverCallback;
+      constructor(cb: IntersectionObserverCallback) {
+        this.cb = cb;
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+      takeRecords() {
+        return [];
+      }
+    }
+    // @ts-expect-error — install fake
+    globalThis.IntersectionObserver = FakeIO;
+    const el = document.createElement("div");
+    document.body.appendChild(el);
+    const onVisible = vi.fn();
+    const cleanup = whenVisible(el, onVisible);
+    cleanup();
+    expect(onVisible).not.toHaveBeenCalled();
+  });
+
   it("promotes a genuinely visible element that intersects the viewport", () => {
     class FakeIO {
       constructor(private cb: IntersectionObserverCallback) {}
