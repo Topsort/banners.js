@@ -8,6 +8,7 @@ import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
 import { applyTemplate } from "./template";
 import type { Banner, BannerContext, HlsConstructor } from "./types";
+import { whenVisible } from "./visibility";
 
 /* Set up global environment for TS_BANNERS */
 
@@ -131,15 +132,42 @@ function getBannerElement(
   const wrappedMedia = newTab
     ? html`<a href="${href}" target="_blank">${media}</a>`
     : html`<a href="${href}">${media}</a>`;
+  // Stage the bid in `data-ts-bid`, not `data-ts-resolved-bid`. The observed
+  // telemetry attribute is promoted only once the element is genuinely visible
+  // (see promoteWhenVisible), so analytics.js cannot fire a phantom impression
+  // for a banner that is in the DOM but hidden (e.g. a preloaded mega-menu).
   return html`
     <div
       data-ts-clickable
-      data-ts-resolved-bid=${ifDefined(banner.isFallback ? undefined : banner.resolvedBidId)}
+      data-ts-bid=${ifDefined(banner.isFallback ? undefined : banner.resolvedBidId)}
       class="ts-banner"
     >
       ${wrappedMedia}
     </div>
   `;
+}
+
+// Tracks elements already handed to the visibility gate so repeated `updated()`
+// calls don't attach duplicate observers.
+const gated = new WeakSet<Element>();
+
+/**
+ * Promotes staged `data-ts-bid` → `data-ts-resolved-bid` once each carrier
+ * element is genuinely rendered. analytics.js observes `data-ts-resolved-bid`,
+ * so this defers the impression trigger until the banner is actually visible.
+ */
+function promoteWhenVisible(root: Element) {
+  const pending = root.querySelectorAll<HTMLElement>("[data-ts-bid]:not([data-ts-resolved-bid])");
+  for (const el of pending) {
+    if (gated.has(el)) continue;
+    const bid = el.getAttribute("data-ts-bid");
+    if (!bid) continue;
+    gated.add(el);
+    whenVisible(el, () => {
+      el.setAttribute("data-ts-resolved-bid", bid);
+      el.removeAttribute("data-ts-bid");
+    });
+  }
 }
 
 const bannerContext = createContext<BannerContext>(Symbol("banner-context"));
@@ -319,6 +347,9 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         logError(e);
       }
     }
+
+    // Gate the impression trigger on real visibility (default + predefined mode).
+    promoteWhenVisible(this);
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
@@ -423,6 +454,9 @@ export class TopsortBannerSlot extends LitElement {
         this._emitStateChange("error");
       }
     }
+
+    // Gate the impression trigger on real visibility (default + predefined mode).
+    promoteWhenVisible(this);
   }
 
   private _emitStateChange(status: string) {
