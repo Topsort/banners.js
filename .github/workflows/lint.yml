@@ -51,7 +51,7 @@ jobs:
         id: pnpm-install
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ env.node_version }}
           cache: pnpm
