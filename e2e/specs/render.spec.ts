@@ -35,6 +35,10 @@ test.describe("render", () => {
   test("img is rendered at the dimensions specified on the banner element", async ({ page }) => {
     const img = page.locator(".ts-banner img");
     await expect(img).toBeVisible();
+    // Prefer the inline style the component writes; computed CSS alone has been
+    // flaky in CI when the asset URL 404s as HTML (broken-image intrinsic size).
+    await expect(img).toHaveAttribute("style", /width:\s*600px/);
+    await expect(img).toHaveAttribute("style", /height:\s*400px/);
     await expect(img).toHaveCSS("width", "600px");
     await expect(img).toHaveCSS("height", "400px");
   });
