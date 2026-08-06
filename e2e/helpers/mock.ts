@@ -1,8 +1,25 @@
 import type { Page } from "@playwright/test";
 
+/** 1×1 PNG so banner <img> requests never hit the network or render as broken images. */
+const PIXEL_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
 export async function blockCDN(page: Page) {
   await page.route("**analytics**", (route) => route.abort());
   await page.route("**hls.js**", (route) => route.abort());
+  // Auction mocks use example.com asset URLs. Those URLs 404 with HTML, which
+  // makes Chromium treat the <img> as broken and report unstable computed sizes
+  // (e.g. height 18px) even when width/height styles are set. Serve a real PNG.
+  await page.route("**/example.com/**", async (route) => {
+    const url = route.request().url();
+    if (/\.(avif|gif|jpe?g|png|svg|webp)(\?|$)/i.test(url)) {
+      await route.fulfill({ status: 200, contentType: "image/png", body: PIXEL_PNG });
+      return;
+    }
+    await route.continue();
+  });
 }
 
 export async function mockAuctionSuccess(
