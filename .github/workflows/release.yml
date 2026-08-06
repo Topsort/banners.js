@@ -26,7 +26,7 @@ jobs:
         id: pnpm-install
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           cache: pnpm
           node-version-file: package.json
@@ -44,7 +44,7 @@ jobs:
         run: pnpm run build
 
       - name: Configure npm registry auth
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: package.json
           registry-url: https://registry.npmjs.org
