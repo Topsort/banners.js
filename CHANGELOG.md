@@ -1,3 +1,9 @@
+### 0.10.0
+
+- `data-ts-resolved-bid` is written as soon as the auction resolves again. Deciding when a banner is visible enough to count as an impression now happens in `analytics.js`, which checks both viewport intersection and whether the element is genuinely painted at the moment it would report. **Requires `@topsort/analytics.js` with visibility-gated impressions**; a warning is logged on `load` if an older version is detected.
+- Fixes banners that could never report an impression under 0.9.x: markup copied or moved out of a component (responsive duplicates, carousel clones, tag-manager rewrites) was never promoted from `data-ts-bid`, and a component hidden at the current breakpoint never promoted at all even when a visible copy of its markup was what rendered.
+- Remove `src/visibility.ts`, the staged `data-ts-bid` attribute and the per-element promotion watchers. This also removes two latent bugs in them: watchers were never re-armed when a banner was detached and re-attached (as carousel loops do), and elements added to a component's subtree after its last render were never gated.
+
 ### 0.9.1
 
 - Fix ghost impressions for banners preloaded into hidden containers (e.g. mega-menus revealed on hover): `data-ts-resolved-bid` is now withheld until the banner is genuinely rendered — not `display:none`, `visibility:hidden`, `opacity:0`, or `content-visibility:hidden` — so `analytics.js` no longer counts an impression for a banner the shopper never saw. The staged bid lives in `data-ts-bid` until it is promoted on visibility.
