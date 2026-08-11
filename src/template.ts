@@ -99,10 +99,7 @@ export function applyTemplate(container: Element, banner: Banner, language?: str
   if (wrapper) {
     wrapper.setAttribute("data-ts-clickable", "");
     if (!banner.isFallback) {
-      // Stage the bid; the component promotes it to the analytics-observed
-      // `data-ts-resolved-bid` only once the element is genuinely visible
-      // (see promoteWhenVisible in index.ts / whenVisible in visibility.ts).
-      wrapper.setAttribute("data-ts-bid", banner.resolvedBidId);
+      wrapper.setAttribute("data-ts-resolved-bid", banner.resolvedBidId);
     }
   }
 }

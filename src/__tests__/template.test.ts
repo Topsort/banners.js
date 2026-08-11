@@ -318,14 +318,11 @@ describe("applyTemplate", () => {
       expect(container.querySelector("span")?.hasAttribute("data-ts-clickable")).toBe(false);
     });
 
-    it("stages the bid in data-ts-bid (not data-ts-resolved-bid) when not a fallback", () => {
+    it("sets data-ts-resolved-bid when not a fallback", () => {
       const container = makeContainer('<a href="#">link</a>');
       const banner = makeBanner({ isFallback: false });
       applyTemplate(container, banner);
-      // applyTemplate stages the bid; the component promotes it to the
-      // analytics-observed data-ts-resolved-bid only once the element is visible.
-      expect(container.querySelector("a")?.getAttribute("data-ts-bid")).toBe("bid-123");
-      expect(container.querySelector("a")?.hasAttribute("data-ts-resolved-bid")).toBe(false);
+      expect(container.querySelector("a")?.getAttribute("data-ts-resolved-bid")).toBe("bid-123");
     });
 
     it("does not throw when container has no children or [data-ts-clickable]", () => {
@@ -333,14 +330,13 @@ describe("applyTemplate", () => {
       const banner = makeBanner();
       expect(() => applyTemplate(container, banner)).not.toThrow();
       expect(container.querySelector("[data-ts-clickable]")).toBeNull();
-      expect(container.hasAttribute("data-ts-bid")).toBe(false);
+      expect(container.hasAttribute("data-ts-resolved-bid")).toBe(false);
     });
 
-    it("does not stage a bid when banner is a fallback", () => {
+    it("does not set a bid when banner is a fallback", () => {
       const container = makeContainer('<a href="#">link</a>');
       const banner = makeBanner({ isFallback: true });
       applyTemplate(container, banner);
-      expect(container.querySelector("a")?.hasAttribute("data-ts-bid")).toBe(false);
       expect(container.querySelector("a")?.hasAttribute("data-ts-resolved-bid")).toBe(false);
     });
   });
