@@ -15,7 +15,7 @@ env:
 jobs:
   npm-publish:
     name: Publish to NPM
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
