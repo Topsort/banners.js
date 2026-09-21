@@ -1,0 +1,7 @@
+# The ubuntu-26.04 runner image is generally available, but actionlint's
+# built-in runner label list has not been updated for it yet (latest release
+# v1.7.12 still stops at ubuntu-24.04). Declaring it here silences the false
+# "label is unknown" error. Remove this file once actionlint ships the label.
+self-hosted-runner:
+  labels:
+    - ubuntu-26.04
