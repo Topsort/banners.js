@@ -53,8 +53,18 @@ function setFieldValue(el: Element, value: string, target: string): boolean {
  * Intentionally does not apply any sizing or layout styles — predefined mode
  * gives the merchant full control over the template's appearance. Only content
  * fields (`data-ts-field`) and telemetry attributes are written.
+ *
+ * `resolveHref` is applied to every binding that writes an `href`, letting the
+ * caller transform campaign URLs (see `resolveLink`). It runs before the
+ * URL reaches the DOM, so the shopper never sees — or can click — the
+ * unresolved link. Omitted, URLs are written exactly as the auction sent them.
  */
-export function applyTemplate(container: Element, banner: Banner, language?: string) {
+export function applyTemplate(
+  container: Element,
+  banner: Banner,
+  language?: string,
+  resolveHref?: (href: string) => string,
+) {
   const rawContent = banner.asset?.[0]?.content;
   const content = rawContent ? resolveTranslations(rawContent, language) : rawContent;
 
@@ -85,7 +95,20 @@ export function applyTemplate(container: Element, banner: Banner, language?: str
           resolved = resolveTarget(el, target);
         }
 
-        if (!setFieldValue(el, content[key], resolved)) {
+        let value = content[key];
+        if (resolved === "href" && resolveHref) {
+          // Merchant-supplied hook: never let it break the rest of the template.
+          try {
+            value = resolveHref(value);
+          } catch (e) {
+            console.warn(
+              `[banners.js] resolveLink threw for "${value}"; using the original URL.`,
+              e,
+            );
+          }
+        }
+
+        if (!setFieldValue(el, value, resolved)) {
           const tag = el.tagName.toLowerCase();
           console.warn(
             `[banners.js] Binding "${key}" → "${resolved}" skipped: <${tag}> has no "${resolved}" attribute. Add a fallback value (e.g. ${resolved}="...") to your template.`,

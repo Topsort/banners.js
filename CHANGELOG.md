@@ -1,3 +1,11 @@
+### 0.11.0
+
+- Add `resolveLink` to `window.TS_BANNERS`: a hook that receives the destination URL a predefined-mode template binding is about to write and returns the URL to use. It runs for every binding that resolves to an `href`, before the value reaches the DOM, so a shopper can never see or click the unresolved link. Until now predefined mode wrote the auction's URL verbatim and offered no interception point — `getLink` is only called by standard rendering — so the only workaround was post-processing the anchor in a `statechange` handler, which fires after the href is already live.
+- `resolveLink` is deliberately separate from `getLink` rather than an extension of it. `getLink` *generates* one link per banner from the winner; `resolveLink` *transforms* a URL the auction already supplied and runs once per `href` binding, of which a template may have several. Routing predefined mode through `getLink` would also have applied a merchant's existing standard-mode implementation to their campaign URLs, silently replacing them.
+- `getLink` now receives a second argument, `LinkContext` (`location`, `slotId`, `language`), describing where the banner is rendering, so a destination can depend on page context and not only on which entity won. `resolveLink` receives the same context as its third argument. Existing one-argument `getLink` implementations are unaffected.
+- Context mode propagates `location` and `slotId` to `<topsort-banner-slot>`, so slots resolve links with the same context as their parent, and a runtime `location` change now reaches slots.
+- No behaviour changes without an explicit override: with `resolveLink` undefined, a template's URL is written exactly as the auction returned it. A `resolveLink` that throws falls back to the original URL, logs a warning, and leaves the remaining bindings intact.
+
 ### 0.10.0
 
 - `data-ts-resolved-bid` is written as soon as the auction resolves again. Deciding when a banner is visible enough to count as an impression now happens in `analytics.js`, which checks both viewport intersection and whether the element is genuinely painted at the moment it would report. **Requires `@topsort/analytics.js` with visibility-gated impressions**; a warning is logged on `load` if an older version is detected.

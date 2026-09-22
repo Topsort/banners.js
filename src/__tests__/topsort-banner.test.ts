@@ -450,6 +450,85 @@ describe("TopsortBanner", () => {
     });
   });
 
+  describe("getLink context", () => {
+    // Regression: a banner's destination URL has to be able to depend on the
+    // location the banner rendered in. Without it, a store-scoped site sends
+    // every shopper to the default store no matter which one they were in.
+    let original: typeof window.TS_BANNERS;
+
+    beforeEach(() => {
+      original = window.TS_BANNERS;
+    });
+
+    afterEach(() => {
+      window.TS_BANNERS = original;
+    });
+
+    it("passes location, slotId and language to getLink in standard mode", async () => {
+      const getLink = vi.fn().mockReturnValue("/102/en/brands/opotne");
+      window.TS_BANNERS = { ...original, getLink } as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([makeBanner()]);
+      const el = mount({ id: "slot-1", location: "US", language: "en-GB" });
+      await taskSettled(el);
+
+      expect(getLink).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "b1" }),
+        expect.objectContaining({ location: "US", slotId: "slot-1", language: "en-GB" }),
+      );
+      expect(el.querySelector("a")?.getAttribute("href")).toBe("/102/en/brands/opotne");
+    });
+
+    it("routes predefined-mode hrefs through resolveLink with the template URL", async () => {
+      const resolveLink = vi.fn((href: string) => `/102${href}`);
+      window.TS_BANNERS = { ...original, resolveLink } as unknown as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([
+        makeBanner({ asset: [{ url: "x", content: { target: "/en/brands/opotne" } }] }),
+      ]);
+      const el = mount({ id: "slot-1", predefined: "", location: "US" });
+      el.innerHTML = '<a data-ts-field="target:href" href="/fallback">go</a>';
+      await taskSettled(el);
+
+      expect(resolveLink).toHaveBeenCalledWith(
+        "/en/brands/opotne",
+        expect.objectContaining({ id: "b1" }),
+        expect.objectContaining({ location: "US", slotId: "slot-1" }),
+      );
+      expect(el.querySelector("a")?.getAttribute("href")).toBe("/102/en/brands/opotne");
+    });
+
+    it("leaves predefined-mode hrefs untouched when no hook is overridden", async () => {
+      window.TS_BANNERS = {
+        ...original,
+        getLink: undefined,
+        resolveLink: undefined,
+      } as unknown as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([
+        makeBanner({ asset: [{ url: "x", content: { target: "/en/brands/opotne" } }] }),
+      ]);
+      const el = mount({ id: "slot-1", predefined: "" });
+      el.innerHTML = '<a data-ts-field="target:href" href="/fallback">go</a>';
+      await taskSettled(el);
+      expect(el.querySelector("a")?.getAttribute("href")).toBe("/en/brands/opotne");
+    });
+
+    // Back-compat: merchants who wrote getLink for standard mode and ALSO use
+    // predefined mode must not have it applied to their campaign URLs. This is
+    // exactly why predefined mode gets its own hook instead of reusing getLink.
+    it("does not apply a standard-mode getLink to predefined-mode template URLs", async () => {
+      const getLink = vi.fn((banner: Banner) => `https://legacy.example.com/${banner.id}`);
+      window.TS_BANNERS = { ...original, getLink } as unknown as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([
+        makeBanner({ asset: [{ url: "x", content: { target: "/campaign/url" } }] }),
+      ]);
+      const el = mount({ id: "slot-1", predefined: "", location: "US" });
+      el.innerHTML = '<a data-ts-field="target:href" href="/fallback">go</a>';
+      await taskSettled(el);
+
+      expect(el.querySelector("a")?.getAttribute("href")).toBe("/campaign/url");
+      expect(getLink).not.toHaveBeenCalled();
+    });
+  });
+
   describe("context mode", () => {
     function mountContext(parentAttrs: Record<string, string>): {
       banner: Element;

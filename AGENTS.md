@@ -50,6 +50,10 @@ Telemetry is handled externally by `@topsort/analytics.js`, not by this library.
 
 `window.TS_BANNERS` allows consumers to override rendering functions: `getLink`, `getLoadingElement`, `getErrorElement`, `getNoWinnersElement`, `getBannerElement`. Each function in `src/index.ts` checks the global hook first and falls back to defaults.
 
+Links go through two separate hooks, both receiving a `LinkContext` (`location`, `slotId`, `language`) so they can depend on where the banner renders. `getLink(banner, context)` *generates* a URL and is called only from `getBannerElement` (standard mode). `resolveLink(href, banner, context)` *transforms* a URL the auction supplied and is called only from predefined mode, via the `resolveHref` callback passed into `applyTemplate`, for every binding that resolves to `href`. The callback is injected rather than imported to keep `template.ts` free of a circular dependency on `index.ts`.
+
+Keeping them separate is a back-compat requirement, not a style choice: merchants already using `getLink` in standard mode must not have it silently applied to predefined-mode campaign URLs. `resolveLink` is undefined by default, so predefined mode behaves exactly as before unless a merchant opts in.
+
 ### Error Handling
 
 `src/errors.ts` defines two custom error classes with static type-guard methods:

@@ -38,7 +38,7 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 - **Predefined content mode**: When `predefined` is set on `<topsort-banner>`, `render()` returns `nothing`. `updated()` calls `applyTemplate()` to mutate the customer's existing markup in place, then emits the event. Fallback: winners with no `content` map fall through to `getBannerElement`.
 - **Template bindings**: `data-ts-field` supports explicit `key:target` pairs (e.g. `data-ts-field="mainImage:src"`) and comma-separated multiple bindings (e.g. `data-ts-field="mainImage:src, altText:alt"`). Use `textContent` as the target to set text. A bare key (no colon) falls back to tag-based inference (deprecated) and respects `data-ts-attr`. Attribute targets must already exist on the element — bindings to missing attributes are skipped with a warning.
 - **Context mode**: A single `<topsort-banner context>` runs **one** auction and distributes the resulting winners to child `<topsort-banner-slot>` elements via Lit context. Each slot picks its banner by `rank` (1-indexed, always ≥ 1). There is no "second auction" within a context — different placements (separate `<topsort-banner>` elements) each run their own auction independently.
-- **Context mode comparator**: `bannerContextHasChanged` checks width, height, newTab, error presence, and banners array length — not deep equality. Changes to these fields trigger re-renders in slots.
+- **Context mode comparator**: `bannerContextHasChanged` checks width, height, newTab, language, location, error presence, and banners array length — not deep equality. Changes to these fields trigger re-renders in slots. `slotId` rides along on the context for `getLink` but is not compared (it never changes after mount).
 
 ## Key Constraints
 
