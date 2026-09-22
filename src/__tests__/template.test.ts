@@ -24,6 +24,80 @@ describe("applyTemplate", () => {
     _resetDeprecationWarning();
   });
 
+  describe("resolveHref hook", () => {
+    it("rewrites an explicitly bound href before it reaches the DOM", () => {
+      const container = makeContainer('<a data-ts-field="target:href" href="/fallback">go</a>');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { target: "/en/brands/opotne" } }],
+      });
+      applyTemplate(container, banner, undefined, (href) => `/102${href}`);
+      expect(container.querySelector("a")?.getAttribute("href")).toBe("/102/en/brands/opotne");
+    });
+
+    it("rewrites a legacy bare-key href binding", () => {
+      const container = makeContainer('<a data-ts-field="url" href="/fallback">go</a>');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { url: "/en/brands/opotne" } }],
+      });
+      applyTemplate(container, banner, undefined, (href) => `/102${href}`);
+      expect(container.querySelector("a")?.getAttribute("href")).toBe("/102/en/brands/opotne");
+    });
+
+    it("receives the translated URL, not the raw translation map value", () => {
+      const container = makeContainer('<a data-ts-field="target:href" href="/fallback">go</a>');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { ptBRTarget: "/pt/marcas/opotne", target: "/en/x" } }],
+      });
+      const seen: string[] = [];
+      applyTemplate(container, banner, "pt-BR", (href) => {
+        seen.push(href);
+        return href;
+      });
+      expect(seen).toEqual(["/pt/marcas/opotne"]);
+    });
+
+    it("leaves non-href targets untouched", () => {
+      const container = makeContainer(
+        '<img data-ts-field="image:src" src="/f.jpg" /><span data-ts-field="title:textContent"></span>',
+      );
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { image: "/photo.jpg", title: "Hello" } }],
+      });
+      const resolveHref = vi.fn((href: string) => `/102${href}`);
+      applyTemplate(container, banner, undefined, resolveHref);
+      expect(resolveHref).not.toHaveBeenCalled();
+      expect(container.querySelector("img")?.getAttribute("src")).toBe("/photo.jpg");
+      expect(container.querySelector("span")?.textContent).toBe("Hello");
+    });
+
+    it("falls back to the original URL and keeps going when the hook throws", () => {
+      const container = makeContainer(
+        '<a data-ts-field="target:href" href="/fallback">go</a><span data-ts-field="title:textContent"></span>',
+      );
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { target: "/en/brands/opotne", title: "Hello" } }],
+      });
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      applyTemplate(container, banner, undefined, () => {
+        throw new Error("boom");
+      });
+      expect(container.querySelector("a")?.getAttribute("href")).toBe("/en/brands/opotne");
+      // A throwing hook must not abort the remaining bindings.
+      expect(container.querySelector("span")?.textContent).toBe("Hello");
+      expect(warn).toHaveBeenCalled();
+      warn.mockRestore();
+    });
+
+    it("writes the URL unchanged when no hook is supplied", () => {
+      const container = makeContainer('<a data-ts-field="target:href" href="/fallback">go</a>');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { target: "/en/brands/opotne" } }],
+      });
+      applyTemplate(container, banner);
+      expect(container.querySelector("a")?.getAttribute("href")).toBe("/en/brands/opotne");
+    });
+  });
+
   describe("legacy implicit binding (bare key)", () => {
     it("sets href on <a> element", () => {
       const container = makeContainer('<a data-ts-field="url" href="/fallback">click</a>');

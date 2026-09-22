@@ -7,14 +7,15 @@ import { runAuction } from "./auction";
 import { TopsortConfigurationError } from "./errors";
 import { BannerComponent } from "./mixin";
 import { applyTemplate } from "./template";
-import type { Banner, BannerContext, HlsConstructor } from "./types";
+import type { Banner, BannerContext, HlsConstructor, LinkContext } from "./types";
 
 /* Set up global environment for TS_BANNERS */
 
 declare global {
   interface Window {
     TS_BANNERS: {
-      getLink(banner: Banner): string;
+      getLink(banner: Banner, context: LinkContext): string;
+      resolveLink(href: string, banner: Banner, context: LinkContext): string;
       getLoadingElement(): HTMLElement;
       getErrorElement(error: unknown): HTMLElement;
       getNoWinnersElement(): HTMLElement;
@@ -67,14 +68,35 @@ function logError(error: unknown) {
 }
 
 // The following methods are used to customize the appearance of the banner component.
-function getLink(banner: Banner): string {
+function getLink(banner: Banner, context: LinkContext): string {
   if (window.TS_BANNERS.getLink) {
-    return window.TS_BANNERS.getLink(banner);
+    return window.TS_BANNERS.getLink(banner, context);
   }
   if (banner.type === "url") {
     return banner.id;
   }
   return `${banner.type}/${banner.id}`;
+}
+
+/**
+ * Predefined mode only. Takes the URL a template binding is about to write and
+ * returns the one to use, so an incomplete destination can be completed from
+ * the context it is rendering in.
+ *
+ * Deliberately not part of `getLink`: that hook *generates* a link from a
+ * winner and returns one link per banner, while this one *transforms* a URL the
+ * auction already supplied and runs per `href` binding — a template may have
+ * several. Merging them would also apply a merchant's existing standard-mode
+ * `getLink` to their campaign URLs here, silently replacing them.
+ *
+ * Undefined by default, so a template's URL is written exactly as the auction
+ * returned it.
+ */
+function resolveLink(href: string, banner: Banner, context: LinkContext): string {
+  if (window.TS_BANNERS.resolveLink) {
+    return window.TS_BANNERS.resolveLink(href, banner, context);
+  }
+  return href;
 }
 
 function getLoadingElement(): TemplateResult {
@@ -109,6 +131,7 @@ function getBannerElement(
   width: number,
   height: number,
   newTab: boolean,
+  context: LinkContext,
 ): TemplateResult {
   if (window.TS_BANNERS.getBannerElement) {
     const element = window.TS_BANNERS.getBannerElement(banner);
@@ -157,7 +180,7 @@ function getBannerElement(
         />
       `;
 
-  const href = getLink(banner);
+  const href = getLink(banner, context);
   const wrappedMedia = newTab
     ? html`<a href="${href}" target="_blank">${media}</a>`
     : html`<a href="${href}">${media}</a>`;
@@ -185,6 +208,7 @@ const bannerContextHasChanged = (newVal: BannerContext, oldVal?: BannerContext) 
     newVal.height !== oldVal.height ||
     newVal.newTab !== oldVal.newTab ||
     newVal.language !== oldVal.language ||
+    newVal.location !== oldVal.location ||
     !!newVal.error !== !!oldVal.error ||
     newVal.banners?.length !== oldVal.banners?.length
   );
@@ -222,6 +246,8 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     height: this.height,
     newTab: this.newTab,
     language: this.language,
+    location: this.location,
+    slotId: this.slotId,
   };
 
   @property({ type: Boolean, attribute: "context" })
@@ -261,7 +287,13 @@ export class TopsortBanner extends BannerComponent(LitElement) {
           logError(err);
           return getErrorElement(err);
         }
-        return getBannerElement(banners[0], this.width, this.height, this.newTab);
+        return getBannerElement(
+          banners[0],
+          this.width,
+          this.height,
+          this.newTab,
+          this.linkContext(),
+        );
       },
       error: (error) => getErrorElement(error),
     });
@@ -283,7 +315,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
     ) {
       if (banners.length && banners[0].asset?.[0]?.content) {
         try {
-          applyTemplate(this, banners[0], this.language);
+          this.applyBannerTemplate(banners[0]);
         } catch (e) {
           logError(e);
         }
@@ -320,7 +352,8 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       changedProperties.has("width") ||
       changedProperties.has("height") ||
       changedProperties.has("newTab") ||
-      changedProperties.has("language")
+      changedProperties.has("language") ||
+      changedProperties.has("location")
     ) {
       Promise.resolve().then(() => {
         this.context = {
@@ -329,6 +362,8 @@ export class TopsortBanner extends BannerComponent(LitElement) {
           height: this.height,
           newTab: this.newTab,
           language: this.language,
+          location: this.location,
+          slotId: this.slotId,
         };
       });
     }
@@ -344,11 +379,26 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       banners[0].asset?.[0]?.content
     ) {
       try {
-        applyTemplate(this, banners[0], this.language);
+        this.applyBannerTemplate(banners[0]);
       } catch (e) {
         logError(e);
       }
     }
+  }
+
+  /** Everything the link hooks need to know about *where* this banner is rendering. */
+  private linkContext(): LinkContext {
+    return {
+      location: this.location,
+      slotId: this.slotId,
+      language: this.language,
+    };
+  }
+
+  private applyBannerTemplate(banner: Banner) {
+    applyTemplate(this, banner, this.language, (href) =>
+      resolveLink(href, banner, this.linkContext()),
+    );
   }
 
   // avoid shadow dom since we cannot attach to events via analytics.js
@@ -404,7 +454,13 @@ export class TopsortBannerSlot extends LitElement {
       logError(err);
       return getErrorElement(err);
     }
-    return getBannerElement(banner, this.context.width, this.context.height, this.context.newTab);
+    return getBannerElement(
+      banner,
+      this.context.width,
+      this.context.height,
+      this.context.newTab,
+      this.linkContext(),
+    );
   }
 
   updated(changedProperties: Map<string | number | symbol, unknown>) {
@@ -419,7 +475,7 @@ export class TopsortBannerSlot extends LitElement {
           const banner = this._bannerForRank();
           if (banner?.asset?.[0]?.content) {
             try {
-              applyTemplate(this, banner, this.context?.language);
+              this.applyBannerTemplate(banner);
             } catch (e) {
               logError(e);
             }
@@ -441,7 +497,7 @@ export class TopsortBannerSlot extends LitElement {
           const banner = this._bannerForRank();
           if (banner?.asset?.[0]?.content) {
             try {
-              applyTemplate(this, banner, this.context?.language);
+              this.applyBannerTemplate(banner);
             } catch (e) {
               logError(e);
             }
@@ -453,6 +509,21 @@ export class TopsortBannerSlot extends LitElement {
         this._emitStateChange("error");
       }
     }
+  }
+
+  /** Slots inherit location/slotId from the context-mode parent's auction. */
+  private linkContext(): LinkContext {
+    return {
+      location: this.context?.location,
+      slotId: this.context?.slotId,
+      language: this.context?.language,
+    };
+  }
+
+  private applyBannerTemplate(banner: Banner) {
+    applyTemplate(this, banner, this.context?.language, (href) =>
+      resolveLink(href, banner, this.linkContext()),
+    );
   }
 
   private _emitStateChange(status: string) {

@@ -240,7 +240,8 @@ topsort-banner {
 
 | Function Name         | Arg type                                                                                        | Return Type   | Description                                                      |
 | -------------------   | ---------------------------                                                                     | ------------- | --------------------------------------------------------         |
-| `getLink`             | [Banner](#banner-interface)                                                                     | `string`      | Generates a URL from a banner response                           |
+| `getLink`             | [Banner](#banner-interface), [LinkContext](#linkcontext-interface)                              | `string`      | Generates a URL from a banner response. **Standard mode only.**   |
+| `resolveLink`     | `href: string`, [Banner](#banner-interface), [LinkContext](#linkcontext-interface)              | `string`      | Transforms a URL coming from the auction response. **Predefined mode only.** |
 | `getLoadingElement`   |                                                                                                 | `HTMLElement` | A custom element to be shown when the banner is loading.         |
 | `getErrorElement`     | [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `HTMLElement` | A custom element to be shown when the banner errors.             |
 | `getNoWinnersElement` |                                                                                                 | `HTMLElement` | A custom element to be shown when the auction returns no banner. |
@@ -254,6 +255,57 @@ topsort-banner {
 | `slotId`        | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
 | `asset`         | `[{ url: string; content?: Record<string, string> }]` | An array of assets. `content` is a key-value map used in predefined content mode. |
+
+# LinkContext Interface
+
+Passed to both link hooks. It describes **where** the banner is rendering, so
+the destination URL can depend on the page context and not only on the winner.
+
+| Name       | Type                  | Description                                                                                                                                         |
+| ---------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location` | `string \| undefined` | The component's `location` attribute — the same value sent to the auction as `geoTargeting.location`.                                                |
+| `slotId`   | `string \| undefined` | The component's `id` attribute (the auction slot id).                                                                                                |
+| `language` | `string \| undefined` | The component's `language` attribute, when set.                                                                                                      |
+
+### Making links location-aware
+
+On a site where the same catalogue is served under several store or region
+paths, the URL an advertiser enters in a campaign cannot carry the store — one
+campaign covers every store. Use `location` to put it back before the link is
+written:
+
+```javascript
+// Each banner tag already carries the location it renders in:
+//   <topsort-banner id="whats-trending" location="store-north" predefined>
+const STORE_BY_LOCATION = { "store-north": "102", "store-south": "64" };
+
+function withStore(url, location) {
+  const store = STORE_BY_LOCATION[location ?? ""];
+  return !store || !url.startsWith("/") ? url : `/${store}${url}`;
+}
+
+window.TS_BANNERS = {
+  // Predefined mode: transform the URL the campaign supplied.
+  resolveLink(href, banner, context) {
+    return withStore(href, context.location);
+  },
+  // Standard mode: generate the URL yourself.
+  getLink(banner, context) {
+    const url = banner.type === "url" ? banner.id : `${banner.type}/${banner.id}`;
+    return withStore(url, context.location);
+  },
+};
+```
+
+The two hooks are deliberately separate. `getLink` *generates* a link from a
+winner; `resolveLink` *transforms* one the campaign already supplied. If
+predefined mode reused `getLink`, every merchant who had written one for
+standard mode would suddenly see it override their campaign URLs.
+
+Both run **before** the URL reaches the DOM, so the shopper never sees or clicks
+the unresolved link. If `resolveLink` throws, the original URL is written and
+a warning is logged — a broken hook degrades to the previous behaviour rather
+than breaking the banner.
 
 ## Custom User ID (Optional)
 
@@ -298,19 +350,16 @@ document.addEventListener('statechange', (event) => {
 
 ### Customizing links in predefined mode
 
-In predefined mode, `data-ts-field="target:href"` sets the link directly from the auction response. If you need to transform the URL (similar to `window.TS_BANNERS.getLink` in standard mode), use the `statechange` event to post-process the link after the template has been applied:
+In predefined mode, `data-ts-field="target:href"` sets the link from the auction
+response. To transform that URL, override
+[`window.TS_BANNERS.resolveLink`](#making-links-location-aware) — it is
+called for every binding that writes an `href`, with the incoming URL as its
+first argument.
 
-```javascript
-document.addEventListener('statechange', (event) => {
-  if (event.detail.status !== 'ready') return;
-  const banner = event.target;
-  const link = banner.querySelector('a');
-  if (link) {
-    const original = link.getAttribute('href');
-    link.href = `https://example.com/${original}`;
-  }
-}, true);
-```
+Post-processing links with the `statechange` event still works, but prefer
+`resolveLink`: `statechange` fires *after* the href is already in the DOM, so
+the shopper can click the unresolved link in the window before your handler
+runs.
 
 # Playground
 
