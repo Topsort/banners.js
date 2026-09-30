@@ -61,6 +61,54 @@ if (document.readyState === "complete") {
   window.addEventListener("load", warnIfImpressionsUngated, { once: true });
 }
 
+/**
+ * Content field carrying a third-party impression tracker (e.g. a Google
+ * Campaign Manager pixel) set on the campaign. It is not template content, so
+ * it neither triggers predefined mode nor needs a `data-ts-field` binding.
+ */
+const IMPRESSION_PIXEL_FIELD = "impressionPixelUrl";
+
+// resolvedBidId -> tracker URL, for winners whose impression has not fired yet.
+const pendingPixels = new Map<string, string>();
+
+/** True when the winner carries content for a predefined template. */
+function hasTemplateContent(banner?: Banner): banner is Banner {
+  const content = banner?.asset?.[0]?.content;
+  return !!content && Object.keys(content).some((key) => key !== IMPRESSION_PIXEL_FIELD);
+}
+
+function registerImpressionPixels(banners: Banner[]): void {
+  for (const banner of banners) {
+    const url = banner.asset?.[0]?.content?.[IMPRESSION_PIXEL_FIELD];
+    // Fallbacks carry no bid, so analytics.js never reports an impression for them.
+    if (url && !banner.isFallback) {
+      pendingPixels.set(banner.resolvedBidId, url);
+    }
+  }
+}
+
+/**
+ * Fires the tracker when analytics.js reports the Topsort impression, so both
+ * sides count the same viewable impression (50% in view, painted, for 1s).
+ * Without gating, analytics.js would report hidden or off-screen banners too.
+ */
+function fireImpressionPixel(event: Event): void {
+  const detail = (event as CustomEvent<{ type?: string; bid?: string }>).detail;
+  if (detail?.type !== "Impression" || !detail.bid || !window.TS?.gatedImpressions) {
+    return;
+  }
+  const url = pendingPixels.get(detail.bid);
+  if (!url) {
+    return;
+  }
+  pendingPixels.delete(detail.bid);
+  const cacheBuster = `${Date.now()}${Math.floor(Math.random() * 1e6)}`;
+  // Never attached to the DOM, so it cannot affect the ad's layout.
+  new Image().src = url.replace(/\[timestamp\]|%%CACHEBUSTER%%/gi, cacheBuster);
+}
+
+document.addEventListener("topsort", fireImpressionPixel);
+
 function logError(error: unknown) {
   if (import.meta.env.DEV) {
     console.error(error);
@@ -224,6 +272,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       runAuction(this.buildAuction(slots), { ...options, logError })
         .then((winners) => {
           options.signal.throwIfAborted();
+          registerImpressionPixels(winners);
           if (this.isContext) {
             this.context = { ...this.context, banners: winners };
           }
@@ -280,7 +329,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
         if (!banners.length) {
           return getNoWinnersElement();
         }
-        if (banners[0].asset?.[0]?.content) {
+        if (hasTemplateContent(banners[0])) {
           const err = new Error(
             "Banner has predefined content but component is not in predefined mode",
           );
@@ -313,7 +362,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       prevStatus !== TaskStatus.COMPLETE &&
       currStatus === TaskStatus.COMPLETE
     ) {
-      if (banners.length && banners[0].asset?.[0]?.content) {
+      if (banners.length && hasTemplateContent(banners[0])) {
         try {
           this.applyBannerTemplate(banners[0]);
         } catch (e) {
@@ -376,7 +425,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       prevStatus === TaskStatus.COMPLETE &&
       currStatus === TaskStatus.COMPLETE &&
       banners.length &&
-      banners[0].asset?.[0]?.content
+      hasTemplateContent(banners[0])
     ) {
       try {
         this.applyBannerTemplate(banners[0]);
@@ -447,7 +496,7 @@ export class TopsortBannerSlot extends LitElement {
       return getNoWinnersElement();
     }
     const banner = this.context.banners[this.rank - 1];
-    if (banner.asset?.[0]?.content) {
+    if (hasTemplateContent(banner)) {
       const err = new Error(
         "Banner has predefined content but component is not in predefined mode",
       );
@@ -473,7 +522,7 @@ export class TopsortBannerSlot extends LitElement {
       if (bannersJustArrived) {
         if (this.predefined) {
           const banner = this._bannerForRank();
-          if (banner?.asset?.[0]?.content) {
+          if (hasTemplateContent(banner)) {
             try {
               this.applyBannerTemplate(banner);
             } catch (e) {
@@ -495,7 +544,7 @@ export class TopsortBannerSlot extends LitElement {
         const languageChanged = oldContext?.language !== this.context?.language;
         if (languageChanged) {
           const banner = this._bannerForRank();
-          if (banner?.asset?.[0]?.content) {
+          if (hasTemplateContent(banner)) {
             try {
               this.applyBannerTemplate(banner);
             } catch (e) {

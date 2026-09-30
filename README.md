@@ -307,6 +307,23 @@ the unresolved link. If `resolveLink` throws, the original URL is written and
 a warning is logged — a broken hook degrades to the previous behaviour rather
 than breaking the banner.
 
+## Third-party impression tracking
+
+A campaign can carry an impression tracker from another ad server, such as a
+Google Campaign Manager pixel, by setting `impressionPixelUrl` in the
+creative's template content. No change is needed on the page.
+
+banners.js requests the URL once, when `@topsort/analytics.js` reports the
+Topsort impression for that banner (at least 50% in view, painted, for one
+second). It does not fire when the auction resolves, so a banner that is never
+seen is never counted. `[timestamp]` and `%%CACHEBUSTER%%` in the URL are
+replaced with a random value so the browser does not serve it from cache.
+
+The request is made with `new Image()` and is never inserted into the page: it
+shows up in the Network panel but not in the DOM, and cannot affect layout.
+Fallback banners never fire it, and neither does an `analytics.js` without
+visibility-gated impressions.
+
 ## Custom User ID (Optional)
 
 If you want to use your own user identification system instead of the automatic opaque user ID, you can override the `getUserId` function in the `window.TS` configuration.

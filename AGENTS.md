@@ -45,6 +45,7 @@ Telemetry is handled externally by `@topsort/analytics.js`, not by this library.
 - Disabling shadow DOM so analytics.js can observe DOM events.
 - Adding `data-ts-clickable` and `data-ts-resolved-bid` attributes to rendered banners.
 - Omitting `data-ts-resolved-bid` on fallback banners (`isFallback`) to prevent false attribution.
+- Firing a winner's `impressionPixelUrl` (a third-party tracker in the template content) when analytics.js dispatches its `topsort` event with `type: "Impression"` for that bid. The field is excluded from the predefined-content checks via `hasTemplateContent()`.
 
 ### Customization Hooks
 
