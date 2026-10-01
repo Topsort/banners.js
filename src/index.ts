@@ -63,17 +63,22 @@ if (document.readyState === "complete") {
 
 /**
  * Content field carrying a third-party impression tracker (e.g. a Google
- * Campaign Manager pixel) set on the campaign. It is not template content, so
- * it neither triggers predefined mode nor needs a `data-ts-field` binding.
+ * Campaign Manager pixel) set on the campaign. It needs no `data-ts-field`
+ * binding, and a standard-mode banner carrying it still renders.
  */
 const IMPRESSION_PIXEL_FIELD = "impressionPixelUrl";
 
 // resolvedBidId -> tracker URL, for winners whose impression has not fired yet.
 const pendingPixels = new Map<string, string>();
 
-/** True when the winner carries content for a predefined template. */
-function hasTemplateContent(banner?: Banner): banner is Banner {
-  const content = banner?.asset?.[0]?.content;
+/**
+ * Standard mode only: true when the winner carries content meant for a
+ * predefined template, which standard rendering cannot show. Predefined mode
+ * applies any content map, because `applyTemplate` is also what writes
+ * `data-ts-resolved-bid` — skipping it would lose the impression.
+ */
+function hasTemplateContent(banner: Banner): boolean {
+  const content = banner.asset?.[0]?.content;
   return !!content && Object.keys(content).some((key) => key !== IMPRESSION_PIXEL_FIELD);
 }
 
@@ -362,7 +367,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       prevStatus !== TaskStatus.COMPLETE &&
       currStatus === TaskStatus.COMPLETE
     ) {
-      if (banners.length && hasTemplateContent(banners[0])) {
+      if (banners.length && banners[0].asset?.[0]?.content) {
         try {
           this.applyBannerTemplate(banners[0]);
         } catch (e) {
@@ -425,7 +430,7 @@ export class TopsortBanner extends BannerComponent(LitElement) {
       prevStatus === TaskStatus.COMPLETE &&
       currStatus === TaskStatus.COMPLETE &&
       banners.length &&
-      hasTemplateContent(banners[0])
+      banners[0].asset?.[0]?.content
     ) {
       try {
         this.applyBannerTemplate(banners[0]);
@@ -522,7 +527,7 @@ export class TopsortBannerSlot extends LitElement {
       if (bannersJustArrived) {
         if (this.predefined) {
           const banner = this._bannerForRank();
-          if (hasTemplateContent(banner)) {
+          if (banner?.asset?.[0]?.content) {
             try {
               this.applyBannerTemplate(banner);
             } catch (e) {
@@ -544,7 +549,7 @@ export class TopsortBannerSlot extends LitElement {
         const languageChanged = oldContext?.language !== this.context?.language;
         if (languageChanged) {
           const banner = this._bannerForRank();
-          if (hasTemplateContent(banner)) {
+          if (banner?.asset?.[0]?.content) {
             try {
               this.applyBannerTemplate(banner);
             } catch (e) {

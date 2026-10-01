@@ -25,10 +25,14 @@ function makeBanner(overrides: Partial<Banner> = {}): Banner {
   };
 }
 
-async function mount(banner: Banner): Promise<Element> {
+async function mount(banner: Banner, predefinedMarkup?: string): Promise<Element> {
   vi.mocked(runAuction).mockResolvedValue([banner]);
   const el = document.createElement("topsort-banner");
   el.setAttribute("id", "slot-1");
+  if (predefinedMarkup !== undefined) {
+    el.setAttribute("predefined", "");
+    el.innerHTML = predefinedMarkup;
+  }
   document.body.appendChild(el);
   await (el as LitElement).updateComplete;
   await new Promise<void>((r) => setTimeout(r, 0));
@@ -36,10 +40,14 @@ async function mount(banner: Banner): Promise<Element> {
   return el;
 }
 
-/** What analytics.js dispatches on the bid element once it logs an event. */
+/**
+ * What analytics.js dispatches once it logs an event. It only watches elements
+ * carrying `data-ts-resolved-bid`, so without one nothing is reported.
+ */
 function report(el: Element, type: string, bid = "bid-1") {
-  const node = el.querySelector("[data-ts-resolved-bid]") ?? el;
-  node.dispatchEvent(new CustomEvent("topsort", { bubbles: true, detail: { type, bid } }));
+  el.querySelector("[data-ts-resolved-bid]")?.dispatchEvent(
+    new CustomEvent("topsort", { bubbles: true, detail: { type, bid } }),
+  );
 }
 
 beforeEach(() => {
@@ -115,5 +123,22 @@ describe("impression pixel", () => {
     report(el, "Impression", "bid-ungated");
 
     expect(pixels).toEqual([]);
+  });
+
+  it("fires in predefined mode when the content holds only the pixel", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const el = await mount(
+      makeBanner({ resolvedBidId: "bid-predefined" }),
+      '<div data-ts-clickable><img data-ts-field="mainImage:src" src="default.jpg" /></div>',
+    );
+
+    const wrapper = el.querySelector("[data-ts-clickable]");
+    expect(wrapper?.getAttribute("data-ts-resolved-bid")).toBe("bid-predefined");
+    expect(el.querySelector("img")?.getAttribute("src")).toBe("default.jpg");
+
+    report(el, "Impression", "bid-predefined");
+
+    expect(pixels).toHaveLength(1);
+    warn.mockRestore();
   });
 });
