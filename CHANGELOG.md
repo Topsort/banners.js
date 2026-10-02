@@ -1,3 +1,8 @@
+### 0.12.0
+
+- Fire a third-party impression tracker (e.g. a Google Campaign Manager pixel) set on the campaign. When a winner's template `content` carries `impressionPixelUrl`, banners.js requests that URL once, at the moment `analytics.js` reports the Topsort impression, so both sides count the same viewable impression. It never fires when the auction resolves, on the `Render` event, for fallback banners, or when the loaded `analytics.js` does not gate impressions on visibility. `[timestamp]` and `%%CACHEBUSTER%%` in the URL are replaced with a random value. The request is made with `new Image()` and is never attached to the DOM, so it cannot affect the banner's layout. Merchants change nothing.
+- `impressionPixelUrl` is not treated as template content: a standard-mode winner whose `content` holds only that field renders as a normal image banner instead of the "predefined content but component is not in predefined mode" error.
+
 ### 0.11.0
 
 - Add `resolveLink` to `window.TS_BANNERS`: a hook that receives the destination URL a predefined-mode template binding is about to write and returns the URL to use. It runs for every binding that resolves to an `href`, before the value reaches the DOM, so a shopper can never see or click the unresolved link. Until now predefined mode wrote the auction's URL verbatim and offered no interception point — `getLink` is only called by standard rendering — so the only workaround was post-processing the anchor in a `statechange` handler, which fires after the href is already live.
