@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":disableRateLimiting"],
+  "timezone": "Europe/Lisbon",
+  "schedule": ["before 9pm on sunday"],
+  "labels": ["dependencies"],
+  "automerge": false,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 9pm on sunday"],
+    "automerge": true
+  },
+  "packageRules": [
+    {
+      "description": "Automerge patch, minor, pin and digest updates once CI passes",
+      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "description": "Group all Lit packages together",
+      "matchPackageNames": ["lit", "@lit/**"],
+      "groupName": "lit"
+    },
+    {
+      "description": "Group dev tooling together and keep it reviewed",
+      "matchPackageNames": ["vite", "vite-plugin-dts", "@biomejs/biome", "typescript", "@types/**"],
+      "groupName": "dev tooling",
+      "automerge": false
+    }
+  ]
+}
