@@ -5,6 +5,7 @@
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": true,
+  "lockFileMaintenance": { "enabled": true },
   "packageRules": [
     {
       "description": "Group all Lit packages together",
