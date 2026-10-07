@@ -7,7 +7,7 @@
   "automerge": false,
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 9pm on sunday"],
+    "schedule": ["before 5am"],
     "automerge": true
   },
   "packageRules": [
@@ -22,10 +22,10 @@
       "groupName": "lit"
     },
     {
-      "description": "Group dev tooling together and keep it reviewed",
+      "description": "Group dev tooling together",
       "matchPackageNames": ["vite", "vite-plugin-dts", "@biomejs/biome", "typescript", "@types/**"],
-      "groupName": "dev tooling",
-      "automerge": false
+      "groupName": "dev tooling"
     }
-  ]
+  ],
+  "platformAutomerge": false
 }
