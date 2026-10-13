@@ -2,6 +2,7 @@
 
 - Fire a third-party impression tracker (e.g. a Google Campaign Manager pixel) set on the campaign. When a winner's template `content` carries `impressionPixelUrl`, banners.js requests that URL once, at the moment `analytics.js` reports the Topsort impression, so both sides count the same viewable impression. It never fires when the auction resolves, on the `Render` event, for fallback banners, or when the loaded `analytics.js` does not gate impressions on visibility. `[timestamp]` and `%%CACHEBUSTER%%` in the URL are replaced with a random value. The request is made with `new Image()` and is never attached to the DOM, so it cannot affect the banner's layout. Merchants change nothing.
 - `impressionPixelUrl` is not treated as template content: a standard-mode winner whose `content` holds only that field renders as a normal image banner instead of the "predefined content but component is not in predefined mode" error.
+- `lit`, `@lit/context` and `@lit/task` are declared with caret ranges instead of exact versions, so installing `@topsort/banners` from npm can share your app's copy of Lit instead of adding a second one to `node_modules`. Both builds still bundle Lit, at the same versions as before, so runtime behaviour is unchanged.
 
 ### 0.11.0
 
