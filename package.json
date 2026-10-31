@@ -54,7 +54,7 @@
     "e2e": "playwright test --config e2e/playwright.config.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
+    "@biomejs/biome": "2.6.4",
     "@playwright/test": "^1.58.2",
     "@size-limit/file": "^13.0.0",
     "@types/node": "24.19.2",
@@ -64,7 +64,7 @@
     "size-limit": "^13.0.0",
     "skeleton-webcomponent-loader": "3.0.0",
     "typescript": "7.0.2",
-    "vite": "8.3.4",
+    "vite": "8.3.5",
     "vite-plugin-dts": "5.1.2",
     "vitest": "^5.0.0"
   },
