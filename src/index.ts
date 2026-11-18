@@ -319,8 +319,9 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   private slots?: NodeListOf<Element>;
 
   connectedCallback() {
-    if (this.isContext) {
-      this.slots = this.querySelectorAll("topsort-banner-slot");
+    const slots = this.isContext ? this.querySelectorAll("topsort-banner-slot") : undefined;
+    if (slots?.length) {
+      this.slots = slots;
     }
     super.connectedCallback();
   }
