@@ -318,6 +318,14 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   @property({ attribute: false, state: true })
   private slots?: NodeListOf<Element>;
 
+  connectedCallback() {
+    const slots = this.isContext ? this.querySelectorAll("topsort-banner-slot") : undefined;
+    if (slots?.length) {
+      this.slots = slots;
+    }
+    super.connectedCallback();
+  }
+
   protected render() {
     if (!window.TS.token || !this.slotId) {
       return getErrorElement(new TopsortConfigurationError(window.TS.token, this.slotId));
