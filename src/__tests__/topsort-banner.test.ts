@@ -566,6 +566,14 @@ describe("TopsortBanner", () => {
       expect(img2?.getAttribute("style")).toContain("height:90px");
     });
 
+    it("runs a single auction sized to the number of slot children", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1" });
+      await contextSettled(banner, slot1, slot2);
+      expect(runAuction).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(runAuction).mock.calls[0][0].slots).toBe(2);
+    });
+
     it("slots emit statechange with status 'ready' when banners arrive", async () => {
       vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
       const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
