@@ -566,6 +566,32 @@ describe("TopsortBanner", () => {
       expect(img2?.getAttribute("style")).toContain("height:90px");
     });
 
+    it("runs a single auction sized to the number of slot children", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const { banner, slot1, slot2 } = mountContext({ id: "slot-1" });
+      await contextSettled(banner, slot1, slot2);
+      expect(runAuction).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(runAuction).mock.calls[0][0].slots).toBe(2);
+    });
+
+    it("aborts the provisional auction when slot children are appended after connect", async () => {
+      vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
+      const banner = document.createElement("topsort-banner");
+      banner.setAttribute("id", "slot-1");
+      banner.setAttribute("context", "");
+      document.body.appendChild(banner);
+      const slot1 = document.createElement("topsort-banner-slot");
+      slot1.setAttribute("rank", "1");
+      const slot2 = document.createElement("topsort-banner-slot");
+      slot2.setAttribute("rank", "2");
+      banner.appendChild(slot1);
+      banner.appendChild(slot2);
+      await contextSettled(banner, slot1, slot2);
+      const calls = vi.mocked(runAuction).mock.calls;
+      expect(calls[calls.length - 1][0].slots).toBe(2);
+      expect(calls.slice(0, -1).every((c) => c[1]?.signal?.aborted)).toBe(true);
+    });
+
     it("slots emit statechange with status 'ready' when banners arrive", async () => {
       vi.mocked(runAuction).mockResolvedValue([makeBanner(), makeBanner({ id: "b2" })]);
       const { banner, slot1, slot2 } = mountContext({ id: "slot-1", width: "300", height: "90" });
