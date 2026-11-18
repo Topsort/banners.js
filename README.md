@@ -42,10 +42,10 @@ Directly from unpkg.com
     },
   };
 </script>
-<script src="https://unpkg.com/@topsort/analytics.js@2.12.1/dist/ts.iife.js"></script>
+<script src="https://unpkg.com/@topsort/analytics.js@2/dist/ts.iife.js"></script>
 <script
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.12.0/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.12/dist/banners.mjs"
 ></script>
 <body>
   <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
@@ -54,10 +54,12 @@ Directly from unpkg.com
 
 ## Legacy Systems (IIFE Bundle)
 
-For environments that don't support ES modules (e.g., Magento), use the IIFE bundle:
+For environments that don't support ES modules (e.g., Magento), use the IIFE bundle. Keep the
+same order: set `window.TS`, then load analytics.js, then banners.js, all without `async`:
 
 ```html
-<script src="https://unpkg.com/@topsort/banners@0.12.0/dist/banners.iife.js"></script>
+<script src="https://unpkg.com/@topsort/analytics.js@2/dist/ts.iife.js"></script>
+<script src="https://unpkg.com/@topsort/banners@0.12/dist/banners.iife.js"></script>
 ```
 
 ## Rendering multiple banners with one slot ID
@@ -243,7 +245,7 @@ topsort-banner {
 | `getLoadingElement`   |                                                                                                 | `HTMLElement` | A custom element to be shown when the banner is loading.         |
 | `getErrorElement`     | [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `HTMLElement` | A custom element to be shown when the banner errors.             |
 | `getNoWinnersElement` |                                                                                                 | `HTMLElement` | A custom element to be shown when the auction returns no banner. |
-| `getBannerElement`    | [Banner](#banner-interface)                                                                     | `HTMLElement` | A custom element to be shown when a banner is loaded. It must carry `data-ts-clickable` on the clickable wrapper and `data-ts-resolved-bid="<banner.resolvedBidId>"` (omit it when `isFallback` is true), otherwise impressions and clicks are not tracked. |
+| `getBannerElement`    | [Banner](#banner-interface)                                                                     | `HTMLElement` | A custom element to be shown when a banner is loaded. It must carry `data-ts-resolved-bid="<banner.resolvedBidId>"` (omit it when `isFallback` is true), otherwise impressions and clicks are not tracked. Add `data-ts-clickable` to a descendant to narrow the click surface; without it, the whole element is clickable. |
 
 # Banner Interface
 
@@ -340,13 +342,13 @@ window.TS = {
 };
 ```
 
-If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine, and it is the recommended order: set `window.TS`, then load analytics.js, then banners.js. `getUserId` must be defined before banners.js runs its first auction.
+If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine, and it is the recommended order: set `window.TS`, then load analytics.js, then banners.js. `getUserId` must be defined before banners.js runs its first auction. If you need to set or change the token **after** analytics.js has already loaded, use property assignment (`window.TS.token = '...'`) so the internal setter can flush queued events.
 
 # Listening to events
 The banner component emits a `statechange` event when the auction resolves. You can listen to this event to write custom logic.
 The possible statuses are `ready`, `error`, and `nowinners`.
 
-`ready` means the auction returned at least one winner. It does not mean the banner was shown or that an impression was counted: analytics.js reports the impression once the banner is at least 50% in view, painted, for one second.
+`ready` means the auction returned at least one winner (in context mode, a winner for that slot's `rank`). It does not mean the banner was shown or that an impression was counted: analytics.js reports the impression once the banner is at least 50% in view, painted, for one second.
 
 ### Single and predefined mode
 
