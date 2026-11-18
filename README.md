@@ -14,8 +14,11 @@ Directly from unpkg.com
 
 ```html
 <script>
-  // Set your token before or after the scripts load — analytics.js
-  // queues events and flushes them once window.TS.token is assigned.
+  // Set window.TS before either script loads. Load analytics.js synchronously
+  // (no async) before banners.js: banners.js reads window.TS.token and
+  // window.TS.getUserId when it runs the auction, and a late analytics.js
+  // means the auction is sent without an opaqueUserId.
+  // Requires @topsort/analytics.js 2.9.0 or later.
   window.TS = {
     token: "<your topsort api key>",
   };
@@ -39,12 +42,11 @@ Directly from unpkg.com
     },
   };
 </script>
+<script src="https://unpkg.com/@topsort/analytics.js@2.12.1/dist/ts.iife.js"></script>
 <script
-  async
   type="module"
-  src="https://unpkg.com/@topsort/banners/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.12.0/dist/banners.mjs"
 ></script>
-<script async src="https://unpkg.com/@topsort/analytics.js/dist/ts.iife.js"></script>
 <body>
   <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
 </body>
@@ -55,13 +57,8 @@ Directly from unpkg.com
 For environments that don't support ES modules (e.g., Magento), use the IIFE bundle:
 
 ```html
-<script src="https://unpkg.com/@topsort/banners/dist/banners.iife.js"></script>
+<script src="https://unpkg.com/@topsort/banners@0.12.0/dist/banners.iife.js"></script>
 ```
-
-| Bundle | Size (gzip) | Size (brotli) |
-|--------|-------------|---------------|
-| `banners.mjs` (ES module) | 12.40 kB | 11.01 kB |
-| `banners.iife.js` (IIFE) | 11.18 kB | 10.08 kB |
 
 ## Rendering multiple banners with one slot ID
 
@@ -176,6 +173,7 @@ Add `data-ts-clickable` to the element that should be the click-tracking surface
 | width                  | Number           | Banner width                                                                |
 | height                 | Number           | Banner height                                                               |
 | id                     | String           | The slot ID for this banner                                                 |
+| language               | Optional String  | Locale (e.g. `en-GB`, `pt_BR`) used to pick translated content fields in predefined mode. See [the translations guide](docs/translations-guide.md) |
 | category-id*           | Optional String  | The category ID of the current page                                         |
 | category-ids*          | Optional String  | Comma (,) separated list of category IDs, the item must match all           |
 | category-disjunctions* | Optional String  | Comma (,) separated list of category IDs, the item must match any           |
@@ -245,14 +243,15 @@ topsort-banner {
 | `getLoadingElement`   |                                                                                                 | `HTMLElement` | A custom element to be shown when the banner is loading.         |
 | `getErrorElement`     | [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `HTMLElement` | A custom element to be shown when the banner errors.             |
 | `getNoWinnersElement` |                                                                                                 | `HTMLElement` | A custom element to be shown when the auction returns no banner. |
-| `getBannerElement`    | [Banner](#banner-interface)                                                                     | `HTMLElement` | A custom clement to be shown when a banner is loaded.            |
+| `getBannerElement`    | [Banner](#banner-interface)                                                                     | `HTMLElement` | A custom element to be shown when a banner is loaded. It must carry `data-ts-clickable` on the clickable wrapper and `data-ts-resolved-bid="<banner.resolvedBidId>"` (omit it when `isFallback` is true), otherwise impressions and clicks are not tracked. |
 
 # Banner Interface
 
 | Name            | Type                                        | Description                                                                  |
 | --------------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
 | `type`          | `"product" \| "vendor" \| "brand" \| "url"` | The type of the winning entity, represented by the banner.                   |
-| `slotId`        | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
+| `id`            | `string`                                    | The ID of the winning entity. If the entity is of type URL, this is the URL. |
+| `isFallback`    | `boolean` (optional)                        | `true` for a fallback banner. Fallback banners are not tracked.              |
 | `resolvedBidId` | `string`                                    | The corresponding auction ID of the winning entity.                          |
 | `asset`         | `[{ url: string; content?: Record<string, string> }]` | An array of assets. `content` is a key-value map used in predefined content mode. |
 
@@ -341,11 +340,13 @@ window.TS = {
 };
 ```
 
-If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine — analytics.js will read the token on init. If you need to set or change the token **after** analytics.js has already loaded, use property assignment (`window.TS.token = '...'`) so the internal setter can flush queued events.
+If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine, and it is the recommended order: set `window.TS`, then load analytics.js, then banners.js. `getUserId` must be defined before banners.js runs its first auction.
 
 # Listening to events
 The banner component emits a `statechange` event when the auction resolves. You can listen to this event to write custom logic.
 The possible statuses are `ready`, `error`, and `nowinners`.
+
+`ready` means the auction returned at least one winner. It does not mean the banner was shown or that an impression was counted: analytics.js reports the impression once the banner is at least 50% in view, painted, for one second.
 
 ### Single and predefined mode
 
@@ -357,7 +358,7 @@ document.querySelector('#my-slot-id').addEventListener('statechange', (event) =>
 
 ### Context mode
 
-In context mode, each `<topsort-banner-slot>` emits its own `statechange` event with the slot's `rank` in the detail:
+In context mode, the parent `<topsort-banner context>` emits no `statechange`; each `<topsort-banner-slot>` emits its own `statechange` event with the slot's `rank` in the detail:
 
 ```javascript
 document.addEventListener('statechange', (event) => {
