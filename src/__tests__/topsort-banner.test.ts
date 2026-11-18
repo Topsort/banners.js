@@ -588,7 +588,7 @@ describe("TopsortBanner", () => {
       banner.appendChild(slot2);
       await contextSettled(banner, slot1, slot2);
       const calls = vi.mocked(runAuction).mock.calls;
-      expect(calls.at(-1)?.[0].slots).toBe(2);
+      expect(calls[calls.length - 1][0].slots).toBe(2);
       expect(calls.slice(0, -1).every((c) => c[1]?.signal?.aborted)).toBe(true);
     });
 
