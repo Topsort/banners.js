@@ -4,7 +4,7 @@ Thanks for your interest. Before investing significant effort, open an issue fir
 
 ## Philosophy
 
-**Lightweight first. Ease of use second.** Every new dependency, abstraction, or file must justify its cost against bundle weight and maintenance burden. See [CLAUDE.md](./CLAUDE.md) for the full set of conventions.
+**Lightweight first. Ease of use second.** Every new dependency, abstraction, or file must justify its cost against bundle weight and maintenance burden. See [AGENTS.md](./AGENTS.md) for the full set of conventions.
 
 ## Prerequisites
 
@@ -40,4 +40,4 @@ pnpm install
 - If you add or move a package between `dependencies` and `devDependencies`, run `pnpm install` and commit the updated `pnpm-lock.yaml` in the same PR.
 - CI runs Biome, TypeScript, Vitest, and a bundle-size guard. All checks must pass before merge.
 
-See [CLAUDE.md](./CLAUDE.md) for naming conventions, key patterns, and constraints.
+See [AGENTS.md](./AGENTS.md) for naming conventions, key patterns, and constraints.
