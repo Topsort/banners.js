@@ -1,12 +1,30 @@
 # GitHub requests a review from these owners automatically. The list mirrors the
-# paths where .claude/approvals.yml always asks for a second person, so a routine
-# pull request, which Claude can approve, requests nobody.
+# paths where .claude/approvals.yml asks for a second person, so a routine pull
+# request, which Claude can approve, requests nobody.
+# One exception CODEOWNERS cannot express: a Renovate-only workflow update needs
+# nobody when Claude's review passes, but still requests the team here.
 # Keep this file and the two-person rules in .claude/approvals.yml in step.
 # "Require review from Code Owners" stays off: Claude cannot be a code owner.
 
+# Review rules and agent instructions
 .claude/ @Topsort/integrations
+/.agents/ @Topsort/integrations
+/.cursor/ @Topsort/integrations
+/docs/agents/ @Topsort/integrations
 AGENTS.md @Topsort/integrations
 CLAUDE.md @Topsort/integrations
+CLAUDE.local.md @Topsort/integrations
+.claudeignore @Topsort/integrations
+.cursorignore @Topsort/integrations
+.mcp.json @Topsort/integrations
+
+# Who reviews, CI and dependency automation
 /.github/CODEOWNERS @Topsort/integrations
 /.github/workflows/ @Topsort/integrations
-/.github/renovate.json @Topsort/integrations
+/.github/renovate.json* @Topsort/integrations
+/renovate.json* @Topsort/integrations
+/.renovaterc* @Topsort/integrations
+
+# Build pipeline
+buildspec.yml @Topsort/integrations
+build.sh @Topsort/integrations
