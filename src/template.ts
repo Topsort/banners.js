@@ -8,6 +8,8 @@ interface Binding {
 
 let deprecationWarned = false;
 
+const ASSET_TARGETS = new Set(["src", "srcset", "poster"]);
+
 function parseBindings(raw: string): Binding[] {
   const bindings: Binding[] = [];
   for (const part of raw.split(",")) {
@@ -64,6 +66,7 @@ export function applyTemplate(
   banner: Banner,
   language?: string,
   resolveHref?: (href: string) => string,
+  resolveSrc?: (src: string) => string,
 ) {
   const rawContent = banner.asset?.[0]?.content;
   const content = rawContent ? resolveTranslations(rawContent, language) : rawContent;
@@ -106,6 +109,10 @@ export function applyTemplate(
               e,
             );
           }
+        }
+
+        if (resolveSrc && ASSET_TARGETS.has(resolved)) {
+          value = resolveSrc(value);
         }
 
         if (!setFieldValue(el, value, resolved)) {
