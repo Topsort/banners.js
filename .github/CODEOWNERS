@@ -8,6 +8,7 @@
 
 # Review rules and agent instructions
 .claude/ @Topsort/integrations
+REVIEW.md @Topsort/integrations
 /.agents/ @Topsort/integrations
 /.cursor/ @Topsort/integrations
 /docs/agents/ @Topsort/integrations
@@ -24,6 +25,10 @@ CLAUDE.local.md @Topsort/integrations
 /.github/renovate.json* @Topsort/integrations
 /renovate.json* @Topsort/integrations
 /.renovaterc* @Topsort/integrations
+
+# Git attribute files
+.gitattributes @Topsort/integrations
+.gitmodules @Topsort/integrations
 
 # Build pipeline
 buildspec.yml @Topsort/integrations

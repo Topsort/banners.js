@@ -45,7 +45,7 @@ Directly from unpkg.com
 <script src="https://unpkg.com/@topsort/analytics.js@2/dist/ts.iife.js"></script>
 <script
   type="module"
-  src="https://unpkg.com/@topsort/banners@0.12/dist/banners.mjs"
+  src="https://unpkg.com/@topsort/banners@0.13/dist/banners.mjs"
 ></script>
 <body>
   <topsort-banner width="600" height="400" id="<your slot id>"></topsort-banner>
@@ -59,7 +59,7 @@ same order: set `window.TS`, then load analytics.js, then banners.js, all withou
 
 ```html
 <script src="https://unpkg.com/@topsort/analytics.js@2/dist/ts.iife.js"></script>
-<script src="https://unpkg.com/@topsort/banners@0.12/dist/banners.iife.js"></script>
+<script src="https://unpkg.com/@topsort/banners@0.13/dist/banners.iife.js"></script>
 ```
 
 ## Rendering multiple banners with one slot ID
