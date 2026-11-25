@@ -187,6 +187,24 @@ describe("runAuction", () => {
     expect(body.auctions[0].opaqueUserId).toBe("user-abc");
   });
 
+  it("includes the analytics.js cookie as opaqueUserId before getUserId is defined", async () => {
+    // biome-ignore lint/suspicious/noDocumentCookie: simulates the cookie analytics.js writes.
+    document.cookie = "tsuid=cookie-abc";
+    setWindowTS({ token: "test-token" });
+    const fetchMock = mockFetch({ ok: true, data: { results: [{ winners: [] }] } });
+
+    await runAuction(
+      { ...baseAuction },
+      { signal: new AbortController().signal, logError: vi.fn() },
+    );
+    // biome-ignore lint/suspicious/noDocumentCookie: removes the cookie set above.
+    document.cookie = "tsuid=;max-age=0";
+
+    const [, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
+    const body = JSON.parse(init.body as string) as { auctions: Auction[] };
+    expect(body.auctions[0].opaqueUserId).toBe("cookie-abc");
+  });
+
   it("uses window.TS.url when set", async () => {
     setWindowTS({ token: "test-token", url: "https://custom.api.com" });
     const fetchMock = mockFetch({ ok: true, data: { results: [{ winners: [] }] } });

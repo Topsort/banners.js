@@ -1,3 +1,7 @@
+### 0.13.1
+
+- Auctions carry an `opaqueUserId` even when analytics.js has not run yet. Before, banners.js only sent one if `window.TS.getUserId` already existed when the auction fired, so pages that load analytics.js with `async`, through a tag manager or after banners.js sent auctions that could not be linked to the user's events. banners.js now falls back to the analytics.js user ID cookie (`tsuid`, or `window.TS.cookieName`), creating it in the same format when missing; analytics.js adopts it when it loads. `window.TS.getUserId` still takes precedence when defined, so custom user IDs are unaffected.
+
 ### 0.13.0
 
 - Add `resolveAssetUrl` to `window.TS_BANNERS`: a hook that receives a creative URL and returns the one to load, so a merchant can serve creatives through their own CDN or proxy (for example a domain licensed for a specific country). It runs for the default image or video in standard mode and, in predefined mode, for every binding that resolves to `src`, `srcset` or `poster`, before the value reaches the DOM. It receives the banner and the same `LinkContext` as the link hooks. With the hook undefined, creative URLs are written exactly as the auction returned them. A hook that throws falls back to the original URL and logs a warning.
