@@ -1,0 +1,33 @@
+version: 1
+mode: enforce
+rules:
+  - purpose: "A change takes two people. When Claude's review passes, one is enough and Claude approves."
+    paths: ["**"]
+    verdict: { claude: comments, seats: 2 }
+    override:
+      - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
+  - purpose: "Changes to the review rules, agent instructions, code owners or CI take two people."
+    paths:
+      # Review policy and agent config
+      - "**/.claude/**"
+      - ".agents/**"
+      - ".cursor/agents/**"
+      # Agent instructions Claude reads before reviewing
+      - "**/AGENTS.md"
+      - "**/CLAUDE.md"
+      - "**/CLAUDE.local.md"
+      - ".cursor/rules/**"
+      - ".cursor/skills/**"
+      - "docs/agents/**"
+      # Which files agents read and which tools they run
+      - "**/.claudeignore"
+      - "**/.cursorignore"
+      - "**/.mcp.json"
+      # Who reviews and which checks run
+      - ".github/CODEOWNERS"
+      - ".github/workflows/**"
+      # CodeBuild pipeline
+      - "**/buildspec.yml"
+      - "**/build.sh"
+    nested: inherit
+    verdict: { claude: comments, seats: 2 }
