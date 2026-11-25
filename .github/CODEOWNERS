@@ -1,9 +1,12 @@
-# Source code
-**/*.ts @Topsort/integrations
-**/*.js @Topsort/integrations
+# GitHub requests a review from these owners automatically. The list mirrors the
+# paths where .claude/approvals.yml always asks for a second person, so a routine
+# pull request, which Claude can approve, requests nobody.
+# Keep this file and the two-person rules in .claude/approvals.yml in step.
+# "Require review from Code Owners" stays off: Claude cannot be a code owner.
 
-# Config
-**/*.json @Topsort/integrations
-
-# CI
-.github/ @Topsort/integrations
+.claude/ @Topsort/integrations
+AGENTS.md @Topsort/integrations
+CLAUDE.md @Topsort/integrations
+/.github/CODEOWNERS @Topsort/integrations
+/.github/workflows/ @Topsort/integrations
+/.github/renovate.json @Topsort/integrations
