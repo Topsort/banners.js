@@ -4,7 +4,9 @@
  * analytics.js keeps the ID in a cookie (`tsuid`, or `window.TS.cookieName`) and only generates
  * one when that cookie is missing. When analytics.js has not run yet, reading or creating the same
  * cookie here keeps the auction and the user's later events under one ID: analytics.js adopts the
- * cookie when it loads. The cookie format below mirrors analytics.js and must stay in sync with it.
+ * cookie when it loads. The cookie name and value format mirror analytics.js and must stay in sync
+ * with it. The cookie is written with path=/ so every page on the site reads the same ID; without
+ * it, the browser scopes the cookie to the current directory.
  */
 
 const COOKIE_MAX_AGE_SECONDS = 31536000;
@@ -39,6 +41,6 @@ export function getOpaqueUserId(): string | undefined {
 
   const id = generateId();
   // biome-ignore lint/suspicious/noDocumentCookie: must match analytics.js synchronously; the Cookie Store API is async and not universally supported.
-  document.cookie = `${cookieName}=${id};max-age=${COOKIE_MAX_AGE_SECONDS}`;
+  document.cookie = `${cookieName}=${id};max-age=${COOKIE_MAX_AGE_SECONDS};path=/`;
   return id;
 }

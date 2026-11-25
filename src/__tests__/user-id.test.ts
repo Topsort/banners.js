@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getOpaqueUserId } from "../user-id";
 
 type TSGlobal = { token: string; url?: string; getUserId?: () => string; cookieName?: string };
@@ -80,5 +80,15 @@ describe("getOpaqueUserId", () => {
     expect(id).toBeTruthy();
     expect(readCookie("custom_uid")).toBe(id);
     expect(readCookie("tsuid")).toBeUndefined();
+  });
+
+  // Regression: without path=/ the browser scopes the cookie to the current directory, so pages
+  // under other paths cannot read it and mint a new ID, splitting one user across several IDs.
+  it("creates the cookie with path=/ so it is shared across the whole site", () => {
+    const setter = vi.spyOn(Document.prototype, "cookie", "set");
+    setWindowTS({ token: "tok" });
+    getOpaqueUserId();
+    expect(setter).toHaveBeenCalledWith(expect.stringMatching(/;\s*path=\/(;|$)/));
+    setter.mockRestore();
   });
 });
