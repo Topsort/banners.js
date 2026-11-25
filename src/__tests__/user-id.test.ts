@@ -66,29 +66,25 @@ describe("getOpaqueUserId", () => {
     expect(getOpaqueUserId()).toBe("custom-id");
   });
 
-  it("creates the cookie when neither getUserId nor the cookie exist, and reuses it", () => {
-    setWindowTS({ token: "tok" });
-    const id = getOpaqueUserId();
-    expect(id).toBeTruthy();
-    expect(readCookie("tsuid")).toBe(id);
-    expect(getOpaqueUserId()).toBe(id);
-  });
-
-  it("creates the cookie under window.TS.cookieName", () => {
-    setWindowTS({ token: "tok", cookieName: "custom_uid" });
-    const id = getOpaqueUserId();
-    expect(id).toBeTruthy();
-    expect(readCookie("custom_uid")).toBe(id);
-    expect(readCookie("tsuid")).toBeUndefined();
-  });
-
-  // Regression: without path=/ the browser scopes the cookie to the current directory, so pages
-  // under other paths cannot read it and mint a new ID, splitting one user across several IDs.
-  it("creates the cookie with path=/ so it is shared across the whole site", () => {
+  // Regression: banners.js must not write an identifier cookie. analytics.js owns it, and a
+  // merchant may delay analytics.js until the user consents.
+  it("returns undefined and writes no cookie when neither getUserId nor the cookie exist", () => {
     const setter = vi.spyOn(Document.prototype, "cookie", "set");
     setWindowTS({ token: "tok" });
-    getOpaqueUserId();
-    expect(setter).toHaveBeenCalledWith(expect.stringMatching(/;\s*path=\/(;|$)/));
+    expect(getOpaqueUserId()).toBeUndefined();
+    expect(setter).not.toHaveBeenCalled();
+    expect(readCookie("tsuid")).toBeUndefined();
     setter.mockRestore();
+  });
+
+  // Regression: reading document.cookie throws in opaque-origin documents (sandboxed iframes).
+  // The auction must still run without an ID instead of failing.
+  it("returns undefined when reading document.cookie throws", () => {
+    const getter = vi.spyOn(Document.prototype, "cookie", "get").mockImplementation(() => {
+      throw new DOMException("The operation is insecure.", "SecurityError");
+    });
+    setWindowTS({ token: "tok" });
+    expect(getOpaqueUserId()).toBeUndefined();
+    getter.mockRestore();
   });
 });

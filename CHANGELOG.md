@@ -1,6 +1,6 @@
 ### 0.13.1
 
-- Auctions carry an `opaqueUserId` even when analytics.js has not run yet. Before, banners.js only sent one if `window.TS.getUserId` already existed when the auction fired, so pages that load analytics.js with `async`, through a tag manager or after banners.js sent auctions that could not be linked to the user's events. banners.js now falls back to the analytics.js user ID cookie (`tsuid`, or `window.TS.cookieName`), creating it in the same format when missing; analytics.js adopts it when it loads. `window.TS.getUserId` still takes precedence when defined, so custom user IDs are unaffected.
+- Auctions carry an `opaqueUserId` even when analytics.js has not run yet. Before, banners.js only sent one if `window.TS.getUserId` already existed when the auction fired, so pages that load analytics.js with `async`, through a tag manager or after banners.js sent auctions that could not be linked to the user's events. banners.js now falls back to reading the analytics.js user ID cookie (`tsuid`, or `window.TS.cookieName`). It never creates the cookie, so a visitor's first auction before analytics.js has run still goes out without an ID. `window.TS.getUserId` still takes precedence when defined, so custom user IDs are unaffected.
 
 ### 0.13.0
 
