@@ -1,12 +1,13 @@
 version: 1
 mode: enforce
 rules:
-  - purpose: "A change takes two people. When Claude's review passes, one is enough and Claude approves."
+  - purpose: "A change takes two people. When Claude's review passes, one is enough and Claude approves. Renovate-only updates: Claude alone, if its review passes."
     paths: ["**"]
     verdict: { claude: comments, seats: 2 }
     override:
+      - { if: "claude/code_review = pass AND ALL pr/authors = bot:renovate", verdict: { claude: approves, seats: 0 } }
       - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
-  - purpose: "Changes to the review rules, agent instructions, code owners or CI take two people."
+  - purpose: "Changes to the review rules, agent instructions, code owners or the CodeBuild pipeline take two people."
     paths:
       # Review policy and agent config
       - "**/.claude/**"
@@ -23,11 +24,21 @@ rules:
       - "**/.claudeignore"
       - "**/.cursorignore"
       - "**/.mcp.json"
-      # Who reviews and which checks run
+      # Who reviews
       - ".github/CODEOWNERS"
-      - ".github/workflows/**"
       # CodeBuild pipeline
       - "**/buildspec.yml"
       - "**/build.sh"
     nested: inherit
     verdict: { claude: comments, seats: 2 }
+  - purpose: "CI workflows take two people. Renovate-only updates: Claude alone, if its review passes."
+    paths: [".github/workflows/**"]
+    nested: inherit
+    verdict: { claude: comments, seats: 2 }
+    override:
+      - { if: "claude/code_review = pass AND ALL pr/authors = bot:renovate", verdict: { claude: approves, seats: 0 } }
+  - purpose: "Review instructions and Git attribute files keep the two-person default, with no Renovate shortcut."
+    paths: ["**/REVIEW.md", "**/.gitattributes", "**/.gitmodules"]
+    verdict: { claude: comments, seats: 2 }
+    override:
+      - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
