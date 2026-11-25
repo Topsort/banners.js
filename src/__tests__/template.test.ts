@@ -98,6 +98,64 @@ describe("applyTemplate", () => {
     });
   });
 
+  describe("resolveSrc hook", () => {
+    const CN = (src: string) =>
+      src.replace("https://topsortassets.com/", "https://cn.example.com/");
+
+    it("rewrites src, srcset and poster bindings", () => {
+      const container = makeContainer(
+        '<picture><source data-ts-field="mobileImage:srcset" srcset="/m.jpg" /><img data-ts-field="mainImage:src" src="/f.jpg" /></picture><video data-ts-field="cover:poster" poster="/p.jpg"></video>',
+      );
+      const banner = makeBanner({
+        asset: [
+          {
+            url: "x",
+            content: {
+              mainImage: "https://topsortassets.com/asset_main.jpg?c=K3pQ",
+              mobileImage: "https://topsortassets.com/asset_mobile.jpg",
+              cover: "https://topsortassets.com/asset_cover.jpg",
+            },
+          },
+        ],
+      });
+      applyTemplate(container, banner, undefined, undefined, CN);
+      expect(container.querySelector("img")?.getAttribute("src")).toBe(
+        "https://cn.example.com/asset_main.jpg?c=K3pQ",
+      );
+      expect(container.querySelector("source")?.getAttribute("srcset")).toBe(
+        "https://cn.example.com/asset_mobile.jpg",
+      );
+      expect(container.querySelector("video")?.getAttribute("poster")).toBe(
+        "https://cn.example.com/asset_cover.jpg",
+      );
+    });
+
+    it("rewrites a legacy bare-key img binding", () => {
+      const container = makeContainer('<img data-ts-field="image" src="/f.jpg" />');
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { image: "https://topsortassets.com/asset_a.jpg" } }],
+      });
+      applyTemplate(container, banner, undefined, undefined, CN);
+      expect(container.querySelector("img")?.getAttribute("src")).toBe(
+        "https://cn.example.com/asset_a.jpg",
+      );
+    });
+
+    it("applies only to asset targets", () => {
+      const container = makeContainer(
+        '<a data-ts-field="target:href" href="/fallback">go</a><img data-ts-field="image:alt" alt="" src="/f.jpg" />',
+      );
+      const banner = makeBanner({
+        asset: [{ url: "x", content: { target: "/en/brands/opotne", image: "Alt text" } }],
+      });
+      const resolveSrc = vi.fn(CN);
+      applyTemplate(container, banner, undefined, undefined, resolveSrc);
+      expect(resolveSrc).not.toHaveBeenCalled();
+      expect(container.querySelector("a")?.getAttribute("href")).toBe("/en/brands/opotne");
+      expect(container.querySelector("img")?.getAttribute("alt")).toBe("Alt text");
+    });
+  });
+
   describe("legacy implicit binding (bare key)", () => {
     it("sets href on <a> element", () => {
       const container = makeContainer('<a data-ts-field="url" href="/fallback">click</a>');

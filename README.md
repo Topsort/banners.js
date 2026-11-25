@@ -242,6 +242,7 @@ topsort-banner {
 | -------------------   | ---------------------------                                                                     | ------------- | --------------------------------------------------------         |
 | `getLink`             | [Banner](#banner-interface), [LinkContext](#linkcontext-interface)                              | `string`      | Generates a URL from a banner response. **Standard mode only.**   |
 | `resolveLink`     | `href: string`, [Banner](#banner-interface), [LinkContext](#linkcontext-interface)              | `string`      | Transforms a URL coming from the auction response. **Predefined mode only.** |
+| `resolveAssetUrl` | `src: string`, [Banner](#banner-interface), [LinkContext](#linkcontext-interface)               | `string`      | Transforms a creative URL (image, video, poster) before it is written. Standard and predefined mode. |
 | `getLoadingElement`   |                                                                                                 | `HTMLElement` | A custom element to be shown when the banner is loading.         |
 | `getErrorElement`     | [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `HTMLElement` | A custom element to be shown when the banner errors.             |
 | `getNoWinnersElement` |                                                                                                 | `HTMLElement` | A custom element to be shown when the auction returns no banner. |
@@ -307,6 +308,31 @@ Both run **before** the URL reaches the DOM, so the shopper never sees or clicks
 the unresolved link. If `resolveLink` throws, the original URL is written and
 a warning is logged — a broken hook degrades to the previous behaviour rather
 than breaking the banner.
+
+### Serving creatives from your own domain
+
+Creative URLs in the auction response point to Topsort's asset host
+(`https://topsortassets.com/...`). To load them through your own CDN or proxy,
+for example on a domain licensed for a specific country, rewrite the host with
+`resolveAssetUrl`:
+
+```javascript
+window.TS_BANNERS = {
+  resolveAssetUrl(src, banner, context) {
+    return src.replace("https://topsortassets.com/", "https://assets.example.cn/");
+  },
+};
+```
+
+It runs for the default banner image or video in standard mode, and in
+predefined mode for every binding that resolves to `src`, `srcset` or `poster`.
+It receives the same `LinkContext` as the link hooks. Keep the path and query
+string unchanged: the query string selects the image crop. Your CDN should pull
+from `https://topsortassets.com` with that `Host` header, include the query
+string in its cache key, and either include `Accept` in its cache key or not
+forward it, since the image format (AVIF, WebP or original) is chosen from
+`Accept`. If `resolveAssetUrl` throws, the original URL is written and a
+warning is logged.
 
 ## Third-party impression tracking
 

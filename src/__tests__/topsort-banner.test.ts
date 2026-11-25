@@ -529,6 +529,95 @@ describe("TopsortBanner", () => {
     });
   });
 
+  describe("resolveAssetUrl", () => {
+    let original: typeof window.TS_BANNERS;
+    const ASSET = "https://topsortassets.com/asset_main.jpg?c=K3pQ";
+    const CN_ASSET = "https://cn.example.com/asset_main.jpg?c=K3pQ";
+    const toCn = (src: string) =>
+      src.replace("https://topsortassets.com/", "https://cn.example.com/");
+
+    beforeEach(() => {
+      original = window.TS_BANNERS;
+    });
+
+    afterEach(() => {
+      window.TS_BANNERS = original;
+    });
+
+    it("rewrites the image src in standard mode with the banner and its context", async () => {
+      const resolveAssetUrl = vi.fn(toCn);
+      window.TS_BANNERS = { ...original, resolveAssetUrl } as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([makeBanner({ asset: [{ url: ASSET }] })]);
+      const el = mount({ id: "slot-1", location: "PVG" });
+      await taskSettled(el);
+
+      expect(resolveAssetUrl).toHaveBeenCalledWith(
+        ASSET,
+        expect.objectContaining({ id: "b1" }),
+        expect.objectContaining({ location: "PVG", slotId: "slot-1" }),
+      );
+      expect(el.querySelector("img")?.getAttribute("src")).toBe(CN_ASSET);
+    });
+
+    it("rewrites template image bindings in predefined mode", async () => {
+      window.TS_BANNERS = {
+        ...original,
+        resolveAssetUrl: toCn,
+      } as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([
+        makeBanner({ asset: [{ url: "x", content: { mainImage: ASSET } }] }),
+      ]);
+      const el = mount({ id: "slot-1", predefined: "" });
+      el.innerHTML = '<img data-ts-field="mainImage:src" src="/fallback.jpg" />';
+      await taskSettled(el);
+
+      expect(el.querySelector("img")?.getAttribute("src")).toBe(CN_ASSET);
+    });
+
+    it("rewrites template image bindings in context-mode slots", async () => {
+      window.TS_BANNERS = {
+        ...original,
+        resolveAssetUrl: toCn,
+      } as typeof window.TS_BANNERS;
+      vi.mocked(runAuction).mockResolvedValue([
+        makeBanner({ asset: [{ url: "x", content: { mainImage: ASSET } }] }),
+      ]);
+      const banner = document.createElement("topsort-banner");
+      banner.setAttribute("id", "slot-1");
+      banner.setAttribute("context", "");
+      const slot = document.createElement("topsort-banner-slot");
+      slot.setAttribute("rank", "1");
+      slot.setAttribute("predefined", "");
+      slot.innerHTML = '<img data-ts-field="mainImage:src" src="/fallback.jpg" />';
+      banner.appendChild(slot);
+      document.body.appendChild(banner);
+      await taskSettled(banner);
+      await (slot as LitElement).updateComplete;
+
+      expect(slot.querySelector("img")?.getAttribute("src")).toBe(CN_ASSET);
+    });
+
+    it("writes the original URL and warns when the hook throws", async () => {
+      window.TS_BANNERS = {
+        ...original,
+        resolveAssetUrl: () => {
+          throw new Error("boom");
+        },
+      } as unknown as typeof window.TS_BANNERS;
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      vi.mocked(runAuction).mockResolvedValue([makeBanner({ asset: [{ url: ASSET }] })]);
+      const el = mount({ id: "slot-1" });
+      await taskSettled(el);
+
+      expect(el.querySelector("img")?.getAttribute("src")).toBe(ASSET);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining("resolveAssetUrl threw"),
+        expect.any(Error),
+      );
+      warn.mockRestore();
+    });
+  });
+
   describe("context mode", () => {
     function mountContext(parentAttrs: Record<string, string>): {
       banner: Element;

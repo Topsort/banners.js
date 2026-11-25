@@ -1,3 +1,7 @@
+### 0.13.0
+
+- Add `resolveAssetUrl` to `window.TS_BANNERS`: a hook that receives a creative URL and returns the one to load, so a merchant can serve creatives through their own CDN or proxy (for example a domain licensed for a specific country). It runs for the default image or video in standard mode and, in predefined mode, for every binding that resolves to `src`, `srcset` or `poster`, before the value reaches the DOM. It receives the banner and the same `LinkContext` as the link hooks. With the hook undefined, creative URLs are written exactly as the auction returned them. A hook that throws falls back to the original URL and logs a warning.
+
 ### 0.12.0
 
 - Fire a third-party impression tracker (e.g. a Google Campaign Manager pixel) set on the campaign. When a winner's template `content` carries `impressionPixelUrl`, banners.js requests that URL once, at the moment `analytics.js` reports the Topsort impression, so both sides count the same viewable impression. It never fires when the auction resolves, on the `Render` event, for fallback banners, or when the loaded `analytics.js` does not gate impressions on visibility. `[timestamp]` and `%%CACHEBUSTER%%` in the URL are replaced with a random value. The request is made with `new Image()` and is never attached to the DOM, so it cannot affect the banner's layout. Merchants change nothing.

@@ -16,6 +16,7 @@ declare global {
     TS_BANNERS: {
       getLink(banner: Banner, context: LinkContext): string;
       resolveLink(href: string, banner: Banner, context: LinkContext): string;
+      resolveAssetUrl(src: string, banner: Banner, context: LinkContext): string;
       getLoadingElement(): HTMLElement;
       getErrorElement(error: unknown): HTMLElement;
       getNoWinnersElement(): HTMLElement;
@@ -152,6 +153,18 @@ function resolveLink(href: string, banner: Banner, context: LinkContext): string
   return href;
 }
 
+function resolveAssetUrl(src: string, banner: Banner, context: LinkContext): string {
+  if (!window.TS_BANNERS.resolveAssetUrl) {
+    return src;
+  }
+  try {
+    return window.TS_BANNERS.resolveAssetUrl(src, banner, context);
+  } catch (e) {
+    console.warn(`[banners.js] resolveAssetUrl threw for "${src}"; using the original URL.`, e);
+    return src;
+  }
+}
+
 function getLoadingElement(): TemplateResult {
   if (window.TS_BANNERS.getLoadingElement) {
     const element = window.TS_BANNERS.getLoadingElement();
@@ -195,7 +208,7 @@ function getBannerElement(
     logError(new Error("Invalid banner asset: missing URL"));
     return html``;
   }
-  const src = banner.asset[0].url;
+  const src = resolveAssetUrl(banner.asset[0].url, banner, context);
 
   // width/height default to 0 when the attribute is omitted; treat 0 as "not set"
   // and let the banner fluidly fill its container at the asset's native aspect ratio.
@@ -458,8 +471,12 @@ export class TopsortBanner extends BannerComponent(LitElement) {
   }
 
   private applyBannerTemplate(banner: Banner) {
-    applyTemplate(this, banner, this.language, (href) =>
-      resolveLink(href, banner, this.linkContext()),
+    applyTemplate(
+      this,
+      banner,
+      this.language,
+      (href) => resolveLink(href, banner, this.linkContext()),
+      (src) => resolveAssetUrl(src, banner, this.linkContext()),
     );
   }
 
@@ -583,8 +600,12 @@ export class TopsortBannerSlot extends LitElement {
   }
 
   private applyBannerTemplate(banner: Banner) {
-    applyTemplate(this, banner, this.context?.language, (href) =>
-      resolveLink(href, banner, this.linkContext()),
+    applyTemplate(
+      this,
+      banner,
+      this.context?.language,
+      (href) => resolveLink(href, banner, this.linkContext()),
+      (src) => resolveAssetUrl(src, banner, this.linkContext()),
     );
   }
 
