@@ -7,7 +7,7 @@ rules:
     override:
       - { if: "claude/code_review = pass AND ALL pr/authors = bot:renovate", verdict: { claude: approves, seats: 0 } }
       - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
-  - purpose: "Changes to the review rules, agent instructions, code owners or the CodeBuild pipeline take two people."
+  - purpose: "Changes to the review rules, agent instructions, code owners, the Renovate config or the CodeBuild pipeline take two people."
     paths:
       # Review policy and agent config
       - "**/.claude/**"
@@ -24,8 +24,9 @@ rules:
       - "**/.claudeignore"
       - "**/.cursorignore"
       - "**/.mcp.json"
-      # Who reviews
+      # Who reviews and what Renovate merges by itself
       - ".github/CODEOWNERS"
+      - ".github/renovate.json"
       # CodeBuild pipeline
       - "**/buildspec.yml"
       - "**/build.sh"
