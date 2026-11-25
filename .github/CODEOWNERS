@@ -26,6 +26,10 @@ CLAUDE.local.md @Topsort/integrations
 /renovate.json* @Topsort/integrations
 /.renovaterc* @Topsort/integrations
 
+# Git attribute files
+.gitattributes @Topsort/integrations
+.gitmodules @Topsort/integrations
+
 # Build pipeline
 buildspec.yml @Topsort/integrations
 build.sh @Topsort/integrations
