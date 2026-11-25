@@ -11,6 +11,7 @@ rules:
     paths:
       # Review policy and agent config
       - "**/.claude/**"
+      - "**/REVIEW.md"
       - ".agents/**"
       - ".cursor/agents/**"
       # Agent instructions Claude reads before reviewing
@@ -40,8 +41,8 @@ rules:
     verdict: { claude: comments, seats: 2 }
     override:
       - { if: "claude/code_review = pass AND ALL pr/authors = bot:renovate", verdict: { claude: approves, seats: 0 } }
-  - purpose: "Review instructions and Git attribute files keep the two-person default, with no Renovate shortcut."
-    paths: ["**/REVIEW.md", "**/.gitattributes", "**/.gitmodules"]
+  - purpose: "Git attribute files keep the two-person default, with no Renovate shortcut."
+    paths: ["**/.gitattributes", "**/.gitmodules"]
     verdict: { claude: comments, seats: 2 }
     override:
       - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }

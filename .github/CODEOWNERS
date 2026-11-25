@@ -8,6 +8,7 @@
 
 # Review rules and agent instructions
 .claude/ @Topsort/integrations
+REVIEW.md @Topsort/integrations
 /.agents/ @Topsort/integrations
 /.cursor/ @Topsort/integrations
 /docs/agents/ @Topsort/integrations

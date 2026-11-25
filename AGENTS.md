@@ -81,7 +81,7 @@ Telemetry is handled externally by `@topsort/analytics.js`, not by this library.
 
 ### Customization Hooks
 
-`window.TS_BANNERS` allows consumers to override rendering functions: `getLink`, `getLoadingElement`, `getErrorElement`, `getNoWinnersElement`, `getBannerElement`. Each function in `src/index.ts` checks the global hook first and falls back to defaults.
+`window.TS_BANNERS` allows consumers to override rendering functions: `getLink`, `resolveLink`, `resolveAssetUrl`, `getLoadingElement`, `getErrorElement`, `getNoWinnersElement`, `getBannerElement`. Each function in `src/index.ts` checks the global hook first and falls back to defaults.
 
 Links go through two separate hooks, both receiving a `LinkContext` (`location`, `slotId`, `language`) so they can depend on where the banner renders. `getLink(banner, context)` *generates* a URL and is called only from `getBannerElement` (standard mode). `resolveLink(href, banner, context)` *transforms* a URL the auction supplied and is called only from predefined mode, via the `resolveHref` callback passed into `applyTemplate`, for every binding that resolves to `href`. The callback is injected rather than imported to keep `template.ts` free of a circular dependency on `index.ts`.
 
@@ -94,7 +94,7 @@ Keeping them separate is a back-compat requirement, not a style choice: merchant
 - `TopsortRequestError` — API errors (includes HTTP `status`).
 - `TopsortConfigurationError` — Missing token or slot ID.
 
-Errors are only logged to console in dev mode (`import.meta.env.DEV`).
+Request errors are logged to console only in dev mode (`import.meta.env.DEV`). Warnings (`console.warn`) and HLS load errors (`console.error`) in `src/index.ts` and `src/template.ts` run unconditionally.
 
 ## Source File Map
 
@@ -107,7 +107,8 @@ Errors are only logged to console in dev mode (`import.meta.env.DEV`).
 | `src/errors.ts` | Custom error classes with type guards |
 | `src/user-id.ts` | Opaque user ID integration with analytics.js |
 | `src/template.ts` | `applyTemplate()` — predefined content mode, mutates customer markup in place |
-| `utils/transform-video-urls.ts` | Manifest-to-iframe URL transformer |
+| `src/translations.ts` | `resolveTranslations()` — language-keyed content for predefined mode |
+| `utils/transform-video-urls.ts` | Manifest-to-iframe URL transformer. Not imported anywhere; only listed in `tsconfig.json` `include` |
 
 ## Code Conventions
 
@@ -164,9 +165,9 @@ Every bug fix must be accompanied by a regression test that would have caught th
 
 Always run `pnpm lint` before committing. Biome enforces both formatting and lint rules — CI will fail if either is violated.
 
-- **Runner**: Vitest 4.x + jsdom 28.x
+- **Runner**: Vitest + jsdom (versions in `package.json`)
 - **Config**: `vitest.config.ts` (separate from `vite.config.ts`)
-- **Test files**: `src/__tests__/` — 7 files, 69 tests covering all source modules
+- **Test files**: `src/__tests__/` — unit tests for the source modules; `e2e/` holds Playwright specs
 - **Commands**: `pnpm test` (watch) / `pnpm test:run` (CI)
 - **CI**: `.github/workflows/test.yml` runs `pnpm test:run` on every PR
 
@@ -178,4 +179,6 @@ New runtime dependencies require strong justification — every byte matters in 
 
 - **Pull requests** trigger `.github/workflows/lint.yml`: actionlint, typos, tsc, and Biome checks.
 - **Pull requests** trigger `.github/workflows/test.yml`: Vitest unit tests.
+- **Pull requests** also run the `Build` job in `test.yml`, which includes the bundle size guard (`pnpm size`, size-limit).
+- **Pushes to `main`** trigger `.github/workflows/pages.yml` (deploys the demo to GitHub Pages) and `.github/workflows/e2e.yml` (Playwright e2e, also run on published releases).
 - **Releases** trigger `.github/workflows/release.yml`: builds and publishes to npm.
