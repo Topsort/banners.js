@@ -19,7 +19,7 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 ## Git Workflow
 
 - Never commit directly to `main`. All changes go through a feature branch and pull request.
-- Keep PRs focused on a single concern — separate concerns deserve separate PRs.
+- **Stack dependent work.** Base each PR on the previous branch, not `main`, and merge them in order. Each one must build and pass CI on its own.
 - After moving a package between `dependencies` and `devDependencies` in `package.json`, always run `pnpm install` and commit the updated `pnpm-lock.yaml` in the same PR. CI runs `pnpm install --frozen-lockfile` and will fail if they are out of sync.
 - Admin override (`gh pr merge --admin`) is only appropriate to bypass the **review requirement** when all CI checks pass. Never use it to force-merge a PR with failing CI — fix the failures first. Before using `--admin`, check whether the repo allows it (e.g. `gh api repos/{owner}/{repo}` or branch protection settings). If admin override is not permitted or you cannot verify it is, do not merge — ask the user instead.
 - Keep branches up to date with `main` before merging — rebase or merge `main` into your branch to resolve conflicts locally, not in the merge commit.
@@ -29,6 +29,8 @@ Ease of use means the library must be a `<script>` tag and two HTML attributes a
 
 ## Pull Requests
 
+Claude Code Review checks every pull request. When it passes, the author can merge without a second engineer, except for the paths in `.claude/approvals.yml` that need two people. Plan pull requests so that a person reviews as little as possible, and only what needs a person.
+
 Before creating or updating a PR, check whether the cumulative branch diff
 (`git diff <base>...HEAD`) changes anything the README documents: installation and usage (ES module
 and IIFE bundle), `<topsort-banner>` and `<topsort-banner-slot>` attributes, styling and CSS
@@ -37,6 +39,15 @@ variables, banner behaviors, predefined content mode and its binding convention,
 the rendering overrides), third-party impression tracking, custom user IDs, emitted events, or the
 playground and local setup. If it does, update `README.md` in the same PR. If it does not, say so in
 the PR body.
+
+- **One change per pull request.** A bug fix, a feature or a refactor, never more than one. Aim for under about 400 changed lines, excluding tests, generated files and lockfiles. A reviewer can check that much carefully. A larger diff gets skimmed.
+- **Tests ship with the code they cover.** Put the tests for a change in the same pull request as the change, never in a follow-up.
+- **Each pull request is safe to revert on its own.** Once merged, `main` must still build and release, and reverting just this pull request must not break anything that merged after it.
+- **Keep two-person paths in their own pull request.** Before planning a pull request or a stack, read `.claude/approvals.yml`: every rule after the first one (on `**`) lists paths that always need a second person. That file is the list, so do not copy it elsewhere. It usually covers CI workflows, the review policy, agent instructions and `CODEOWNERS`, plus files specific to this repo. A change to one of them makes the whole pull request wait for a second person. Open that change separately, kept small, and let the rest merge on Claude's review.
+- **Separate moves from changes.** Renames, file moves and formatting go in their own pull request, with no behaviour change, so the next diff shows only what changed.
+- **Never hand-edit generated files.** Lockfiles, API dumps, codegen output and snapshots come from their tool, not from hand edits. Regenerate them in the same pull request as the change that caused them. Mark generated paths `linguist-generated=true` in `.gitattributes` so GitHub collapses them in the diff.
+- **Say why in the description.** Give the reason for the change, how it was tested, and what a reviewer should look at first. Name any risk you know of.
+- **Fix review findings in new commits.** Do not rewrite history the reviewer has already seen, until it merges.
 
 ## Architecture
 
