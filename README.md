@@ -16,8 +16,8 @@ Directly from unpkg.com
 <script>
   // Set window.TS before either script loads. Load analytics.js synchronously
   // (no async) before banners.js: banners.js reads window.TS.token and
-  // window.TS.getUserId when it runs the auction, and a late analytics.js
-  // means the auction is sent without an opaqueUserId.
+  // window.TS.getUserId when it runs the auction. If analytics.js has not run
+  // yet, banners.js reads the analytics.js user ID cookie instead, if it exists.
   // Requires @topsort/analytics.js 2.9.0 or later.
   window.TS = {
     token: "<your topsort api key>",
@@ -368,7 +368,9 @@ window.TS = {
 };
 ```
 
-If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine, and it is the recommended order: set `window.TS`, then load analytics.js, then banners.js. `getUserId` must be defined before banners.js runs its first auction. If you need to set or change the token **after** analytics.js has already loaded, use property assignment (`window.TS.token = '...'`) so the internal setter can flush queued events.
+If this runs before analytics.js loads (e.g. in an inline `<script>` tag), object assignment (`window.TS = { ... }`) is fine, and it is the recommended order: set `window.TS`, then load analytics.js, then banners.js. A custom `getUserId` must be defined before banners.js runs its first auction.
+
+When `window.TS.getUserId` is not defined yet (for example, analytics.js loads with `async` or through a tag manager and has not run), banners.js reads the analytics.js user ID cookie (`tsuid`, or `window.TS.cookieName` if set), so the auction and the user's events share the same `opaqueUserId`. banners.js never creates that cookie: on a visitor's first page view, before analytics.js has set it, the auction is sent without an `opaqueUserId`. If you need to set or change the token **after** analytics.js has already loaded, use property assignment (`window.TS.token = '...'`) so the internal setter can flush queued events.
 
 # Listening to events
 The banner component emits a `statechange` event when the auction resolves. You can listen to this event to write custom logic.
