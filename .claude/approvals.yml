@@ -13,13 +13,11 @@ rules:
       - "**/.claude/**"
       - "**/REVIEW.md"
       - ".agents/**"
-      - ".cursor/agents/**"
+      - ".cursor/**"
       # Agent instructions Claude reads before reviewing
       - "**/AGENTS.md"
       - "**/CLAUDE.md"
       - "**/CLAUDE.local.md"
-      - ".cursor/rules/**"
-      - ".cursor/skills/**"
       - "docs/agents/**"
       # Which files agents read and which tools they run
       - "**/.claudeignore"
