@@ -54,6 +54,6 @@ jobs:
 
       - name: Publish to npm
         id: publish
-        run: npm publish --no-git-checks --provenance
+        run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

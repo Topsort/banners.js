@@ -44,6 +44,7 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "vite serve",
     "build": "vite build",
+    "prepack": "pnpm run build",
     "lint": "biome check .",
     "lint:fix": "biome check --apply .",
     "test": "vitest",
