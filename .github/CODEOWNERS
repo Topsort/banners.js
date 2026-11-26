@@ -4,7 +4,8 @@
 # One exception CODEOWNERS cannot express: a Renovate-only workflow update needs
 # nobody when Claude's review passes, but still requests the team here.
 # Keep this file and the two-person rules in .claude/approvals.yml in step.
-# "Require review from Code Owners" stays off: Claude cannot be a code owner.
+# "Require review from Code Owners" is on: GitHub requires a code owner on these
+# paths. Keep routine paths out of this file, or Claude's approval stops being enough.
 
 # Review rules and agent instructions
 .claude/ @Topsort/integrations
