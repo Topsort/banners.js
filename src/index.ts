@@ -26,6 +26,7 @@ declare global {
       readonly token: string;
       readonly url?: string;
       getUserId?: () => string;
+      readonly cookieName?: string;
       readonly gatedImpressions?: boolean;
     };
   }
