@@ -30,3 +30,9 @@ CLAUDE.local.md @Topsort/integrations
 # Build pipeline
 buildspec.yml @Topsort/integrations
 build.sh @Topsort/integrations
+
+# Billing attributes, the auction request and the user id cookie
+/src/template.ts @Topsort/integrations
+/src/auction.ts @Topsort/integrations
+/src/user-id.ts @Topsort/integrations
+/src/mixin.ts @Topsort/integrations
