@@ -293,14 +293,14 @@ export class TopsortBanner extends BannerComponent(LitElement) {
           options.signal.throwIfAborted();
           registerImpressionPixels(winners);
           if (this.isContext) {
-            this.context = { ...this.context, banners: winners };
+            this.context = { ...this.context, banners: winners, error: undefined };
           }
           return winners;
         })
         .catch((error) => {
           options.signal.throwIfAborted();
           if (this.isContext) {
-            this.context = { ...this.context, error };
+            this.context = { ...this.context, banners: undefined, error };
           }
           throw error;
         }),

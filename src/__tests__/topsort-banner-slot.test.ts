@@ -9,6 +9,7 @@ vi.mock("../auction", () => ({
 }));
 
 import "../index";
+import { runAuction } from "../auction";
 
 function setWindowTS(token = "test-token") {
   Object.defineProperty(window, "TS", {
@@ -236,5 +237,86 @@ describe("TopsortBannerSlot", () => {
       expect(el.isConnected).toBe(true);
       vi.restoreAllMocks();
     });
+  });
+});
+
+describe("context auction errors", () => {
+  let original: typeof window.TS_BANNERS;
+
+  beforeEach(() => {
+    original = window.TS_BANNERS;
+  });
+
+  afterEach(() => {
+    window.TS_BANNERS = original;
+  });
+
+  function hookEl(name: string): HTMLElement {
+    const el = document.createElement("div");
+    el.setAttribute("data-hook", name);
+    return el;
+  }
+
+  async function mountContext(): Promise<{ parent: Element; slot: Element }> {
+    const parent = document.createElement("topsort-banner");
+    parent.setAttribute("id", "slot-1");
+    parent.setAttribute("context", "");
+    const slot = document.createElement("topsort-banner-slot");
+    slot.setAttribute("rank", "1");
+    parent.appendChild(slot);
+    document.body.appendChild(parent);
+    await settle(parent, slot);
+    return { parent, slot };
+  }
+
+  async function settle(parent: Element, slot: Element): Promise<void> {
+    for (let i = 0; i < 2; i++) {
+      await (parent as LitElement).updateComplete;
+      await new Promise<void>((r) => setTimeout(r, 0));
+      await (slot as LitElement).updateComplete;
+    }
+  }
+
+  // Regression: render() checked `banners` before `error`, so a failed auction left
+  // every slot on the loading element and getErrorElement never ran.
+  it("renders getErrorElement with the error instead of the loading element", async () => {
+    const error = new Error("auction failed");
+    const getErrorElement = vi.fn(() => hookEl("error"));
+    window.TS_BANNERS = {
+      getErrorElement,
+      getLoadingElement: () => hookEl("loading"),
+    } as unknown as typeof window.TS_BANNERS;
+    vi.mocked(runAuction).mockRejectedValue(error);
+    const { slot } = await mountContext();
+    expect(getErrorElement).toHaveBeenCalledWith(error);
+    expect(slot.querySelectorAll("[data-hook]")).toHaveLength(1);
+    expect(slot.querySelector('[data-hook="error"]')).not.toBeNull();
+  });
+
+  it("renders nothing when no getErrorElement hook is set", async () => {
+    window.TS_BANNERS = {} as typeof window.TS_BANNERS;
+    vi.mocked(runAuction).mockRejectedValue(new Error("auction failed"));
+    const { slot } = await mountContext();
+    expect(slot.children).toHaveLength(0);
+  });
+
+  // Regression: a successful auction after a failed one never cleared the old error.
+  it("shows the banner, not the error, when a later auction succeeds", async () => {
+    const getBannerElement = vi.fn(() => hookEl("banner"));
+    window.TS_BANNERS = {
+      getErrorElement: () => hookEl("error"),
+      getBannerElement,
+    } as unknown as typeof window.TS_BANNERS;
+    vi.mocked(runAuction).mockRejectedValueOnce(new Error("auction failed"));
+    const { parent, slot } = await mountContext();
+    expect(slot.querySelector('[data-hook="error"]')).not.toBeNull();
+
+    const winner = makeBanner();
+    vi.mocked(runAuction).mockResolvedValue([winner]);
+    await (parent as unknown as { task: { run(): Promise<void> } }).task.run();
+    await settle(parent, slot);
+    expect(getBannerElement).toHaveBeenCalledWith(winner);
+    expect(slot.querySelector('[data-hook="error"]')).toBeNull();
+    expect(slot.querySelector('[data-hook="banner"]')).not.toBeNull();
   });
 });
