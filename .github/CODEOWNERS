@@ -35,3 +35,4 @@ build.sh @Topsort/integrations
 /src/template.ts @Topsort/integrations
 /src/auction.ts @Topsort/integrations
 /src/user-id.ts @Topsort/integrations
+/src/mixin.ts @Topsort/integrations
