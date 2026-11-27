@@ -293,14 +293,14 @@ export class TopsortBanner extends BannerComponent(LitElement) {
           options.signal.throwIfAborted();
           registerImpressionPixels(winners);
           if (this.isContext) {
-            this.context = { ...this.context, banners: winners };
+            this.context = { ...this.context, banners: winners, error: undefined };
           }
           return winners;
         })
         .catch((error) => {
           options.signal.throwIfAborted();
           if (this.isContext) {
-            this.context = { ...this.context, error };
+            this.context = { ...this.context, banners: undefined, error };
           }
           throw error;
         }),
@@ -517,11 +517,11 @@ export class TopsortBannerSlot extends LitElement {
     if (!this.context) {
       return html``;
     }
-    if (!this.context.banners) {
-      return getLoadingElement();
-    }
     if (this.context.error) {
       return getErrorElement(this.context.error);
+    }
+    if (!this.context.banners) {
+      return getLoadingElement();
     }
     if (!this.context.banners.length || this.context.banners.length < this.rank) {
       return getNoWinnersElement();
