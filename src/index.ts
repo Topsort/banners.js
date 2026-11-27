@@ -517,11 +517,11 @@ export class TopsortBannerSlot extends LitElement {
     if (!this.context) {
       return html``;
     }
-    if (!this.context.banners) {
-      return getLoadingElement();
-    }
     if (this.context.error) {
       return getErrorElement(this.context.error);
+    }
+    if (!this.context.banners) {
+      return getLoadingElement();
     }
     if (!this.context.banners.length || this.context.banners.length < this.rank) {
       return getNoWinnersElement();
