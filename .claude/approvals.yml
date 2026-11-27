@@ -44,3 +44,9 @@ rules:
     verdict: { claude: comments, seats: 2 }
     override:
       - { if: "claude/code_review = pass", verdict: { claude: approves, seats: 1 } }
+  - purpose: "The billing attributes on rendered banners, the auction request and the user id cookie reach every site at once: someone else from Integrations approves, whatever the review says."
+    paths:
+      - "src/template.ts"
+      - "src/auction.ts"
+      - "src/user-id.ts"
+    verdict: { claude: comments, seats: [{ count: 1, from: [Topsort/integrations, "!pr/authors"] }] }
