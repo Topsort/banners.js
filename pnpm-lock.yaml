@@ -451,8 +451,8 @@ packages:
     peerDependencies:
       size-limit: 13.1.1
 
-  '@stencil/core@4.45.5':
-    resolution: {integrity: sha512-tz6h9MI/s0WwNsfGbSguo9+xnerWam8NI8/U3VUS9MNMviTYyg3Ymz5XniSM9PGFnbd2xhhmyJhHHaFmy9mYog==}
+  '@stencil/core@4.45.6':
+    resolution: {integrity: sha512-nmg+4zTPOc691c4+ZJvjuGBghGWLS98H23CtHWrry9tWWhCzXIsXnB3qwNB3Mr1xJcTDNiWitMclW7jxD7H1+g==}
     engines: {node: '>=16.0.0', npm: '>=7.10.0'}
     hasBin: true
 
@@ -962,8 +962,8 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  postcss@8.5.33:
-    resolution: {integrity: sha512-RVHEU9/Pp1Fnjr/MpAJsZoADukCKhfIi15OunEYiGktIkYLkPVvC1sioWolGDS7XByMTx9m/IGbro0Js13zhnQ==}
+  postcss@8.5.34:
+    resolution: {integrity: sha512-P1Qzj0XXZjMda74C7qiVnBG90UKNbyNUAOeQRBW8X63RsIMV57gevRqjnkELdwtZ/S2/uQFksJhmwuN8xShLPw==}
     engines: {node: ^10 || ^12 || >=14}
 
   punycode@2.3.1:
@@ -1155,11 +1155,11 @@ packages:
     resolution: {integrity: sha512-LgO3D9yZJjApUiuUfl9iFAwrtaX4+lok3wJIqttGoKCHlWUqHqbQpnxCf82L8FjgKsh4iGo78hqJwgL8F6To2A==}
     engines: {node: '>=14.0.0'}
 
-  tldts-core@7.6.1:
-    resolution: {integrity: sha512-FzTCzmZVba1BJVZQJTGVfaRUV5dxPNV4nQZZuFrSitnsXS3k81XyDBhOUzB9/41cyVKdt2TW3YfIv9KKCBMMXg==}
+  tldts-core@7.6.2:
+    resolution: {integrity: sha512-/ZG+gignPzfgtpWNnbS7AKcU1ptt9jDqhIlr7vHOaw/Psz6HjXyB2CeFS3RrUGYwER/Q4F6IS8+9rZuYfRUz+Q==}
 
-  tldts@7.6.1:
-    resolution: {integrity: sha512-+q5zzJwjNwBPQV30jnqIaQMeZ/nQfc790uMq1vDj3kCGKNfokh+HYfwtd1d80OdSPNVS+mHV8vMd+yDtlK/+mQ==}
+  tldts@7.6.2:
+    resolution: {integrity: sha512-IylRLICacWmPVf5tQIOvKkZzf2Vp8qJT3bAZox+3bWXj5P/pn45PC1a9l86loP7D/ywbSt/h/NnyIoR0fg4utA==}
     hasBin: true
 
   tough-cookie@6.1.0:
@@ -1189,8 +1189,8 @@ packages:
   undici-types@7.24.6:
     resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
 
-  undici@8.13.1:
-    resolution: {integrity: sha512-Kt7EaPjh0s93lJH/PmW3d5rhkcpUa6fS3jqZ7+YGxNd9L7Xy/i827xe4C2uhhq+pJebM4tQOl5AgHmW11G5Skg==}
+  undici@8.14.0:
+    resolution: {integrity: sha512-MqM6wqORYo0jb1WFUwFKZTFWFz6VeBMPj9op5Hq+RvlrQjISQCyLEfx5+/iqOLWC/LL1HliJ5t0NP1BgYpXeVQ==}
     engines: {node: '>=22.19.0'}
 
   unplugin-dts@1.1.2:
@@ -1638,7 +1638,7 @@ snapshots:
     dependencies:
       size-limit: 13.1.1
 
-  '@stencil/core@4.45.5':
+  '@stencil/core@4.45.6':
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.44.0
       '@rollup/rollup-darwin-x64': 4.44.0
@@ -1649,9 +1649,9 @@ snapshots:
       '@rollup/rollup-win32-arm64-msvc': 4.44.0
       '@rollup/rollup-win32-x64-msvc': 4.44.0
 
-  '@stencil/sass@3.3.3(@stencil/core@4.45.5)':
+  '@stencil/sass@3.3.3(@stencil/core@4.45.6)':
     dependencies:
-      '@stencil/core': 4.45.5
+      '@stencil/core': 4.45.6
       sass-embedded: 1.108.2
 
   '@tybys/wasm-util@0.10.5':
@@ -1909,7 +1909,7 @@ snapshots:
       parse5-parser-stream: 8.1.1
       saxes: 6.0.0
       tough-cookie: 6.1.0
-      undici: 8.13.1
+      undici: 8.14.0
       w3c-xmlserializer: 6.0.0
       webidl-conversions: 8.0.1
       whatwg-mimetype: 5.0.0
@@ -2063,7 +2063,7 @@ snapshots:
     dependencies:
       playwright-core: 1.65.1
 
-  postcss@8.5.33:
+  postcss@8.5.34:
     dependencies:
       nanoid: 3.3.20
       picocolors: 1.1.1
@@ -2210,8 +2210,8 @@ snapshots:
 
   skeleton-webcomponent-loader@3.0.0:
     dependencies:
-      '@stencil/core': 4.45.5
-      '@stencil/sass': 3.3.3(@stencil/core@4.45.5)
+      '@stencil/core': 4.45.6
+      '@stencil/sass': 3.3.3(@stencil/core@4.45.6)
 
   source-map-js@1.2.4: {}
 
@@ -2238,15 +2238,15 @@ snapshots:
 
   tinyrainbow@3.2.0: {}
 
-  tldts-core@7.6.1: {}
+  tldts-core@7.6.2: {}
 
-  tldts@7.6.1:
+  tldts@7.6.2:
     dependencies:
-      tldts-core: 7.6.1
+      tldts-core: 7.6.2
 
   tough-cookie@6.1.0:
     dependencies:
-      tldts: 7.6.1
+      tldts: 7.6.2
 
   tr46@7.0.0:
     dependencies:
@@ -2283,7 +2283,7 @@ snapshots:
 
   undici-types@7.24.6: {}
 
-  undici@8.13.1: {}
+  undici@8.14.0: {}
 
   unplugin-dts@1.1.2(rolldown@1.2.19)(typescript@7.0.2)(vite@8.3.4(@types/node@24.19.2)(sass-embedded@1.108.2)(sass@1.108.2)):
     dependencies:
@@ -2330,7 +2330,7 @@ snapshots:
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.7
-      postcss: 8.5.33
+      postcss: 8.5.34
       rolldown: 1.2.19
       tinyglobby: 0.2.17
     optionalDependencies:
